@@ -1,0 +1,68 @@
+$CONTROL
+
+!Analysis file path/prefix
+ANPREF      = './test.supercell/a-A',
+
+!REVU output file path/prefix. Leave blank to output this directory.
+REVPREF     = ' ',
+
+ANATYPE     = 'TEXT',  !Output file type (HDF5 or TEXT)
+IGRID       = 1,       !Grid to post process
+IZTRAN      = 1,       !Vertical coord: 1=sigma, 2=cartesian, 3=pressure
+                       ! 4=soil-levels/snow-levels/land-patches
+TVAR     ='/0:0:0/',   !File times to run: /start:stop:interval/ (zeros = all)
+ZVAR     ='/0:0:0/',   !Z-levels to run: /start:stop:interval/ (zeros = all)
+YVAR     ='/0:0:0/',   !Y-pts to run: /start:stop:interval/ (zeros = all)
+XVAR     ='/0:0:0/',   !X-pts to run: /start:stop:interval/ (zeros = all)
+
+!Variables to output. See REVU variable documentation in "docs".
+REVUVAR(1)  = '/u/',
+REVUVAR(2)  = '/v/',
+REVUVAR(3)  = '/vapor/',
+REVUVAR(4)  = '/theta/',
+REVUVAR(5)  = '/w/',
+REVUVAR(6)  = '/total_cond/',
+REVUVAR(7)  = '/ccn_concen_mg/',
+REVUVAR(8)  = '/aggregates/',
+REVUVAR(9)  = '/snow/',
+REVUVAR(10) = '/graupel/',
+REVUVAR(11) = '/hail/',
+REVUVAR(12) = '/pristine/',
+REVUVAR(13) = '/rain/',
+REVUVAR(14) = '/cloud/',
+
+$END
+
+!If outputting pressure levels, these are the ones
+!available from REVU start with k=1 -> 1000 mb
+!and going up from there every 25 mb.
+k=1  -> 1000  k=14  -> 675   k=27  -> 350
+k=2  -> 975   k=15  -> 650   k=28  -> 325
+k=3  -> 950   k=16  -> 625   k=29  -> 300
+k=4  -> 925   k=17  -> 600   k=30  -> 275
+k=5  -> 900   k=18  -> 575   k=31  -> 250
+k=6  -> 875   k=19  -> 550   k=32  -> 225
+k=7  -> 850   k=10  -> 525   k=33  -> 200
+k=8  -> 825   k=21  -> 500   k=34  -> 175
+k=9  -> 800   k=22  -> 475   k=35  -> 150
+k=10 -> 775   k=23  -> 450   k=36  -> 125
+k=11 -> 750   k=24  -> 425   k=37  -> 100
+k=12 -> 725   k=25  -> 400
+k=13 -> 700   k=26  -> 375
+
+Note that for IZTRAN = 1,2,3 you can only access 2D and 3D 
+variables. Variables that output on soil levels, snow layers,
+or land patches require IZTRAN = 4. When IZTRAN = 4, you cannot
+output 2D or 3D variables. These will need to be contained in
+separate output files for the HDF5 output option since a single
+z-coordinate is assigned to a given HDF5 output file from REVU.
+Thus we cannot mix and match both atmospheric levels and
+soil-levels/snow-layers/land-patches. When IZTRAN = 4, the chosen
+appropriate variables will output all available levels/layers/patches
+and the z-coordinate in HDF5 output will be integer values. So, if
+you have 10 soil levels, 8 snow layers, and 3 land patches, REVU will
+tell HDF5 that there are 10 vertical coordinate levels with values of
+1,2,3,4,5,6,7,8,9,10. No that the top soil layer in this case would
+be level 10, top snow layer would be level 8, and first land-surface
+patch is always water. 
+
