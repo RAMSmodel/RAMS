@@ -19,6 +19,7 @@ bin.dp.grib1/example_data/*
 bin.dp.grib2/example_data/*
 bin.revu/example_data/*
 bin.dp.grib2/wgrib*
+bin.rams/dprep.test/*
 
 # Ignore external libraries
 misc/hdf5-1.*
