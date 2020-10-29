@@ -749,8 +749,7 @@ do j = 1,n3
             !Limit soil water fraction maximum for soil type. Need to do this 
             !since input soil water from gridded data can differ from RAMS due 
             !to differences in soil classes and soil porosity.
-            if(isfcl==2) &
-             soil_water(k,i,j,ipat) = min(slmsts(nsoil),soil_water(k,i,j,ipat))
+            soil_water(k,i,j,ipat) = min(slmsts(nsoil),soil_water(k,i,j,ipat))
 
             !By default, initialize soil internal energy at a temperature equal 
             !to airtemp + stgoff(k) and with all water assumed to be liquid.  If 

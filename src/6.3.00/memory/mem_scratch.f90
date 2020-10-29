@@ -11,7 +11,8 @@ implicit none
                          scr1,scr2 &
                         ,vt3da,vt3db,vt3dc,vt3dd,vt3de,vt3df,vt3dg  &
                         ,vt3dh,vt3di,vt3dj,vt3dk,vt3dl,vt3dm,vt3dn  &
-                        ,vt3do,vt3dp
+                        ,vt3do,vt3dp,u_the_d,v_the_d,w_the_d &
+                        ,p_the_d
    real, allocatable, dimension(:) :: &
                         vt2da,vt2db,vt2dc,vt2dd,vt2de,vt2df
                          
@@ -94,6 +95,10 @@ implicit none
       allocate (scratch%vt3dm(ntpts3))
       allocate (scratch%vt3dn(ntpts3))
       allocate (scratch%vt3do(ntpts3))
+      allocate (scratch%u_the_d(ntpts3))
+      allocate (scratch%v_the_d(ntpts3))
+      allocate (scratch%w_the_d(ntpts3))
+      allocate (scratch%p_the_d(ntpts3))
       if (level<4) then
          allocate (scratch%vt3dp(ntpts3))
       else
@@ -135,6 +140,10 @@ implicit none
    if (allocated(scratch%vt3dn))  deallocate (scratch%vt3dn)
    if (allocated(scratch%vt3do))  deallocate (scratch%vt3do)
    if (allocated(scratch%vt3dp))  deallocate (scratch%vt3dp)
+   if (allocated(scratch%u_the_d))  deallocate (scratch%u_the_d)
+   if (allocated(scratch%v_the_d))  deallocate (scratch%v_the_d)
+   if (allocated(scratch%w_the_d))  deallocate (scratch%w_the_d)
+   if (allocated(scratch%p_the_d))  deallocate (scratch%p_the_d)
    if (allocated(scratch%vt2da))  deallocate (scratch%vt2da)
    if (allocated(scratch%vt2db))  deallocate (scratch%vt2db)
    if (allocated(scratch%vt2dc))  deallocate (scratch%vt2dc)

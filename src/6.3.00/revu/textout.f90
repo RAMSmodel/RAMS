@@ -107,6 +107,14 @@ if(ncall(nngd).eq.0) then
     nelat1 = swlat1 + 1.0
   endif
 
+  !Saleeby(2020)
+  !If using a tiny LES type grid, expand for GEMPAK.
+  !Note that this could be problem for grid draped over the poles.
+  if(nje>1 .and. abs(nelat1-swlat1)<0.1 .and. abs(nelon1-swlon1)<0.1)then
+   nelat1 = swlat1 + 0.5
+   nelon1 = swlon1 + 0.5 / cos(polelatn*3.14159/180.)
+  endif
+
   if(iyear1 >= 2000) iyr1=iyear1-2000
   if(iyear1 <  2000) iyr1=iyear1-1900
 
@@ -847,6 +855,7 @@ if(ivtype.ge.2) then
   if(ivtype==3) then
     if(iztrans.eq.1.or.iztrans.eq.2) then
       if(zl==1) typlev=int(ztn(k,nngd)) ! T-vertical stagger (scalars)
+      if(zl==1 .and. typlev==0) typlev=1 !do not allow zt level = 0m
       if(zl==2) typlev=int(zmn(k,nngd)) ! M-vertical stagger (W,radfluxes)
     endif
     if(iztrans.eq.3) typlev=int(iplevs(k))

@@ -71,7 +71,7 @@ data ggamma(1:nc, 5) /0.56, 0.58, 0.56, 0.56, 0.56, 0.54, 0.54, 0.54, &
 !Filling the data for water viscosity
 !Temperature (C)
 data tt(1:nt) /0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100/
-!Dynamic viscosity of water (kg/m/s) x 1.e-6 (ie. 1787.e-6)
+!Dynamic viscosity of water (kg/m/s) x 1.0e-6 (ie. 1787.e-6)
 data dvcosity(1:nt) /1787,1519,1307,1002,798,653,547,467,404,355,315,282/
        
 END MODULE aero_include

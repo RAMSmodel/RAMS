@@ -67,7 +67,7 @@ enddo
 do k = k1(11),k2(11)
    qhydm(k) = alvl * rliq(k) + alvi * rice(k)
    rvstr(k) = rtp(k) - rliq(k) - rice(k)
-   sa(k,1) = til(k) * qhydm(k) / max(rxmin,rliq(k) + rice(k))
+   sa(k,1) = til(k) * qhydm(k) / max(1.0e-12,rliq(k) + rice(k))
 enddo
 !FOR ICE/LIQUID LAYER get temp of sat air in Celcius
 do k = k1(11),k2(11)
@@ -384,7 +384,7 @@ do k = k1,k2
 
       if (vap(k,3) .gt. 0.) then
          lhcat = jhcat(k,3)
-         embx = max(rxmin,rx(k,3)) / max(1.e-6,cx(k,3))
+         embx = max(rxmin,rx(k,3)) / max(cxmin,cx(k,3))
          dn = dnfac(lhcat) * embx ** pwmasi(lhcat)
          it = min(5000,max(1,nint(dn * 1.e6)))
 
@@ -414,7 +414,7 @@ do k = k1,k2
 
       else
          lhcat = jhcat(k,4)
-         embx = max(rxmin,rx(k,4)) / max(1.e-6,cx(k,4))
+         embx = max(rxmin,rx(k,4)) / max(cxmin,cx(k,4))
          dn = dnfac(lhcat) * embx ** pwmasi(lhcat)
          it = min(5000,max(1,nint(dn * 1.e6)))
          
@@ -482,7 +482,7 @@ do k = k1,k2
       !Compare preliminary calculation pristine mean mass with maximum.
       delta_r = 0.0
       prelim_m = 0.0
-      if(cx(k,3) > 1.e-6) prelim_m = rx(k,3) / cx(k,3)
+      if(cx(k,3) > cxmin) prelim_m = rx(k,3) / cx(k,3)
       if (prelim_m .gt. emb1(3)) then
           old_m = (rx(k,3) + dvap) / (cx(k,3) + dnum)
           old_c = cx(k,3) + dnum

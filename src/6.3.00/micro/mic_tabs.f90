@@ -312,7 +312,7 @@ do lhcat = 1,nhcat
 
    !Calculating the mass categories (m.k.s) with the lowest diameter
    !of 3.125 microns and mass doubling every bin
-   diam(1)=1.5625 * 2.0 * 1.e-6
+   diam(1)=1.5625 * 2.0 * 1.0e-6
    massx(1)=cfmas(lhcat)*diam(1)**pwmas(lhcat)
    do ibin=2,nbin+1
      massx(ibin)=2.0*massx(ibin-1)
@@ -496,7 +496,7 @@ do lhcat = 1,nhcat
       shedtab(1,idns) = 0.0
       shedtab(ninc,idns) = 0.0
 
-      if (ndns1 .gt. 1) dn = 1.e-3 * float(idns) / gnu(lcat)
+      if (ndns1 .gt. 1) dn = 1.0e-3 * float(idns) / gnu(lcat)
 
       totfmg = 0.
       totmass = 0.
@@ -653,12 +653,12 @@ do ihy = 1,nhcat
             if (ipairc(ihx,ihy) .gt. 0) then
                CALL avint (dx,fx,ndx,dxlo,dxhi,ans)
                coltabc(iembx,iemby,ipairc(ihx,ihy))=  &
-                  -log10(max(1.e-30,ans))
+                  -log10(max(1.0e-30,ans))
             endif
             if (ipairr(ihx,ihy) .gt. 0) then
                CALL avint (dx,gx,ndx,dxlo,dxhi,ans)
                coltabr(iembx,iemby,ipairr(ihx,ihy))=  &
-                  -log10(max(1.e-30,ans))
+                  -log10(max(1.0e-30,ans))
             endif
          enddo
       enddo
@@ -785,6 +785,7 @@ do i=1,ibins
       endif
 
       !For RAIN-RAIN collection (not currently used)
+      !This is done in subroutine "cols" in order to include drop breakup
       !if(i >  ithresh1 .and. k >  ithresh1) &
       !   akbarx(i,k,6) = akbar(i,k)
    enddo
@@ -803,6 +804,7 @@ enddo
 !(d1min and d1max are equivalent to dmb0 and dmb1, but may have diff values)
 !Diameters in cm (4.e-4 cm = 4 microns)
 !Mixing ratios in g/cm3 (.01e-6g/cm3 = .01e-3kg/kg = .01 g/kg for dn0=1)
+!Mixing ratios in g/cm3 (.01e-8g/cm3 = .01e-5kg/kg = .0001 g/kg for dn0=1)
 d1min = 4.e-4
 if(jnmb(8).eq.0) d1max = 40.e-4
 if(jnmb(8).gt.0) d1max = 35.e-4
@@ -810,26 +812,26 @@ d2min = 65.e-4
 d2max = 100.e-4
 d3min = 2.e-2
 d3max = 1.
-r3min = .01e-6
+r3min = .01e-8
 r3max = 20.e-6
 !For ICE SPECIES: SNOW, AGGREGATES, GRAUPEL, AND HAIL
 dimin = 2.e-2
 dimax = 1.
-rimin = .01e-6
+rimin = .01e-8
 rimax = 20.e-6
 
 d1ecr = log10 (d1max / d1min) / float(ndccr-1)
 d2ecr = log10 (d2max / d2min) / float(ndccr-1)
 r3ecr = log10 (r3max / r3min) / float(nrrcr-1)
-r3err = log10 (r3max / r3min) / float(nrrr-1)
+
 !For SNOW, AGGREGATES, GRAUPEL, AND HAIL
 rieci = log10 (rimax / rimin) / float(nrrcr-1)
 
 en1 = 100.
 en2 = 1.
-en3 = 1.e-6
+en3 = 1.0e-6
 !For SNOW, AGGREGATES, GRAUPEL, AND HAIL
-enice = 1.e-6
+enice = 1.0e-6
 
 en1i = 1. / en1
 en1i2 = en1i ** 2.
@@ -913,8 +915,8 @@ do idccr = 1,ndccr
         CALL sumn (ank,amk,1,icutoff,ibins,sun1,sum1)
        endif
 
-       r1tabcr(idccr,irrcr,idrcr) = alog10(max(1.e-20,(sum10-sum1)*en1i))
-       c1tabcr(idccr,irrcr,idrcr) = alog10(max(1.e-20,(sun10-sun1)*en1i))
+       r1tabcr(idccr,irrcr,idrcr) = alog10(max(1.0e-20,(sum10-sum1)*en1i))
+       c1tabcr(idccr,irrcr,idrcr) = alog10(max(1.0e-20,(sun10-sun1)*en1i))
 
 !      write(*,'(a2,2X,i2,2X,i2,2X,i2,2X,f7.1,2X,f10.2,2X,f10.2)') &
 !        'CR',idccr,irrcr,idrcr,d1*10000,r1tabcr(idccr,irrcr,idrcr) &
@@ -985,8 +987,8 @@ do idccr = 1,ndccr
        CALL sxy (x,amk0,ank0,amk,ank,akbarx(1,1,4))
        CALL sumn (ank,amk,ithresh,ithresh1,ibins,sun2,sum2)
 
-       r2tabcr(idccr,irrcr,idrcr) = alog10(max(1.e-20,sum20-sum2))
-       c2tabcr(idccr,irrcr,idrcr) = alog10(max(1.e-20,sun20-sun2))
+       r2tabcr(idccr,irrcr,idrcr) = alog10(max(1.0e-20,sum20-sum2))
+       c2tabcr(idccr,irrcr,idrcr) = alog10(max(1.0e-20,sun20-sun2))
 
 !       write(*,'(a3,2X,i2,2X,i2,2X,i2,2X,f10.2,2X,f10.2)') &
 !        ,'DR',idccr,irrcr,idrcr,r2tabcr(idccr,irrcr,idrcr) &
@@ -1071,9 +1073,9 @@ do idccr = 1,ndccr
       endif
 
    if(cld==1)then
-    r1tabci(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.e-20,sum1*en1i))
-    c1tabci(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.e-20,sun1*en1i))
-    r1rimer(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.e-20,collectormass*en1i))
+    r1tabci(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.0e-20,sum1*en1i))
+    c1tabci(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.0e-20,sun1*en1i))
+    r1rimer(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.0e-20,collectormass*en1i))
 !    write(*,'(a2,2X,a5,i2,3(2X,a6,i2),3(2X,f10.2))') &
 !     'CI','lcat=',lcat,'idccr=',idccr,'irrcr=',irrcr,'idrcr=',idrcr &
 !     ,r1tabci(idccr,irrcr,idrcr,lcat-3) &
@@ -1081,9 +1083,9 @@ do idccr = 1,ndccr
    endif
 
    if(cld==2)then
-    r2tabci(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.e-20,sum1))
-    c2tabci(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.e-20,sun1))
-    r2rimer(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.e-20,collectormass))
+    r2tabci(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.0e-20,sum1))
+    c2tabci(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.0e-20,sun1))
+    r2rimer(idccr,irrcr,idrcr,lcat-3) = alog10(max(1.0e-20,collectormass))
 !    write(*,'(a3,2X,a5,i2,3(2X,a6,i2),3(2X,f10.2))') &
 !     'DI','lcat=',lcat,'idccr=',idccr,'irrcr=',irrcr,'idrcr=',idrcr &
 !     ,r2tabci(idccr,irrcr,idrcr,lcat-3) &

@@ -536,21 +536,6 @@ if(iaerodep==1) &
     ,ustar(1),prough(1),imonthx                       &
     )
 
-
-! Get final vertical range of each hydrometeor species
-!do lcat = 1,8
-! if (jnmb(lcat) .ge. 1) then
-!   k1(lcat) = k1(11)
-!   k2(lcat) = 1
-!   do k = k1(11),k2(11)
-!     if (rx(k,lcat) >= rxmin) k2(lcat) = k
-!     if (k2(lcat) == 1 .and. rx(k,lcat) < rxmin) k1(lcat) = k + 1
-!   enddo
-! endif
-!enddo
-
-
-
 return
 END SUBROUTINE mcphys
 

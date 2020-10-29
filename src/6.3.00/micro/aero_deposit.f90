@@ -118,7 +118,7 @@ do acat=1,aerocat
 
 !#####Saleeby testing
 !do k = 1,m1-1
-!rdry(k) = 1.e0 / 2.0 * 1.e-6
+!rdry(k) = 1.0e0 / 2.0 * 1.0e-6
 !xup(k) = 15.0
 !xvp(k) = 0.0
 !enddo
@@ -240,7 +240,7 @@ do acat=1,aerocat
 !#####Saleeby testing
 
       !Do scavenging if precip rate > 0.01 mm/hr (2.777e-6 mm/sec)
-      if (totrr>2.777e-6 .and. rx(k,lcat)>1.e-10 .and. cx(k,lcat)>1.e-6) then
+      if (totrr>2.777e-6 .and. rx(k,lcat)>rxmin .and. cx(k,lcat)>cxmin) then
         CALL wet_scavenge_slinn (k,rhowet,totrr,rwet(k),xmu,cc &
             ,diff,dn0(k),ScaRate,lcat,cfmas(lhcat),pwmas(lhcat) &
             ,cfvt(lhcat),pwvt(lhcat),Dpc)
@@ -721,7 +721,7 @@ else
   st = vgwet/g*(ustar**2/(xmu/rair))
   ! Schmidt number - Slinn & Slinn(1980) Text
   Sc = xmu/(rair*diff)
-  if (uh .le. 1.e-10) then
+  if (uh .le. 1.0e-10) then
     ! Gravitation setting velocity - Baron & Willeke(2001) eq.3-28
     vd = r0w*dpwet**2*g*Cc/(18.*xmu)*1.0e-12
   else
@@ -925,7 +925,7 @@ implicit none
 
       ! Calulating wet deposition scavenging rate (/s)
       ! First convert RR in mm/s to m/s
-        ScaRate = (3./2.)*Ecollect*(RR*1.e-3)/Dpc
+        ScaRate = (3./2.)*Ecollect*(RR*1.0e-3)/Dpc
 
 return
 END SUBROUTINE wet_scavenge_slinn
