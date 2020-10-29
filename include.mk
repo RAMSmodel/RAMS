@@ -6,8 +6,8 @@ MAKE=/usr/bin/make
 #############################################################################
 # Set your RAMS root path and version number.
 #############################################################################
-RAMS_ROOT=/home/smsaleeb/rams_20201011_dev
-RAMS_VERSION=6.2.16
+RAMS_ROOT=/home/smsaleeb/rams_20201027_dev
+RAMS_VERSION=6.3.00
 
 #############################################################################
 # Set root locations for HDF5 I/O software.
@@ -133,7 +133,7 @@ LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
 # If it does not work, it will fail or hang on the first file write.
 #############################################################################
 C_COMP=gcc
-C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=c99
+C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=c99 -DENABLE_PARALLEL_COMPRESSION
 #C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=c99 -DRAMS_DOUBLE_PREC
 
 #############################################################################

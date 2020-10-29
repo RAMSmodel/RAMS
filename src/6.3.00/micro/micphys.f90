@@ -14,12 +14,12 @@ implicit none
 integer, parameter :: nthz=26,nrhhz=10,ngam=5000,ninc=201   &
                      ,ndns=15,ntc=21,ndnc=11                &
                      ,ndcc=60,ndcd=20,ndccr=15,nrrcr=30     &
-                     ,ndrcr=30,nrrr=20,ndrr=20              &
+                     ,ndrcr=30                              &
                      ,ncat=8,nhcat=16,npairc=101,npairr=147 &
                      ,nembc=20
 real, parameter    :: dtc=1.,ddnc=2.e-6 ,dthz=1.,drhhz=.02
 real, parameter    :: budget_scalet=1.
-real, parameter    :: rxmin=1.e-12
+real, parameter    :: rxmin=1.e-9,cxmin=1.e-3
 
 !IDIFFPERTS
 !0=normal scalar diffusion
@@ -47,7 +47,7 @@ logical, parameter :: lhrtheta = .true.
 real :: cparm,dparm,rparm,pparm,sparm,aparm,gparm,hparm         &
        ,rictmin,rictmax,dps,dps2                                &
        ,d1min,d1max,d2min,d2max,d3min,d3minx,d3max,r3min,r3max  &
-       ,d1ecr,d2ecr,d3ecr,r3ecr,d3err,r3err                     &
+       ,d1ecr,d2ecr,d3ecr,r3ecr                                 &
        ,colf,pi4dt,sedtime0,sedtime1                            &
        ,dimin,diminx,dimax,rimin,rimax,dieci,rieci,scmtime
 
@@ -94,7 +94,6 @@ real, dimension(ndcc)        :: r1tabcc,c1tabcc,c2tabcc
 real, dimension(ndcc)        :: r2tabdd,c2tabdd,c3tabdd
 real, dimension(ndcd,ndcd)   :: r1tabcd,c1tabcd,r2tabcd,c2tabcd
 real, dimension(ndccr,nrrcr,ndrcr)  :: r1tabcr,c1tabcr,r2tabcr,c2tabcr
-real, dimension(nrrr,ndrr)          :: c3tabrr
 
 character(len=strl1) :: dustfile
 
@@ -184,11 +183,11 @@ integer, dimension(aerocat) :: iaero_chem,aero_vanthoff
 
 !Minimum aerosol concentration (#/kg) and mass (kg/kg) 
 !values for condition statements involving aerosols
-real, parameter :: mincon=1.e-1         &  
-                  ,minmas=1.e-21        &
+real, parameter :: mincon=1.0e-1         &  
+                  ,minmas=1.0e-21        &
                   ,maxaero=20000.e6     &
-                  ,minmashydro=1.e-27   &
-                  ,minifn=1.e-14
+                  ,minmashydro=1.0e-27   &
+                  ,minifn=1.0e-14
 
 !Aerosol distribution spectral width (sigma)
 !Note: do not change this unless you update cloud nucleation lookup

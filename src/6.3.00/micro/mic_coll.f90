@@ -74,12 +74,12 @@ if(rx(k,1) .ge. rxmin .or. rx(k,8) .ge. rxmin) then
    dmb3cgs = 100. * (emb(k,2) * cfmasi3) ** pwmasi3
 
 !mixing ratio rain - convert (kg/kg) to (g/cm3)
-   r3cgs  = 1.e-3 * rx(k,2) * dn0(k)
+   r3cgs  = 1.0e-3 * rx(k,2) * dn0(k)
    if(rx(k,2) .lt. rxmin) r3cgs = 0.0
 
 !number concentration cloud 1 & 2 - convert (#/kg) to (#/cm3)
-   en1cgs = 1.e-6 * cx(k,1) * dn0(k)
-   en2cgs = 1.e-6 * cx(k,8) * dn0(k)
+   en1cgs = 1.0e-6 * cx(k,1) * dn0(k)
+   en2cgs = 1.0e-6 * cx(k,8) * dn0(k)
 
 !max diameter of cloud 1 & 2
    ad1 = max(d1min,min(d1max,dmb1cgs))
@@ -377,10 +377,10 @@ if(  ((lcat==4 .or. lcat==5) .and. emb(k,jcat) .gt. 9.0e-13) .or. &
    dmbicgs = 100. * (emb(k,lcat) / cfmas(lcat)) ** (1./pwmas(lcat))
 
 !mixing ratio ice species - convert (kg/kg) to (g/cm3)
-   ricgs  = 1.e-3 * rx(k,lcat) * dn0(k)
+   ricgs  = 1.0e-3 * rx(k,lcat) * dn0(k)
 
 !number concentration cloud 1 & 2 - convert (#/kg) to (#/cm3)
-   en1cgs = 1.e-6 * cx(k,jcat) * dn0(k)
+   en1cgs = 1.0e-6 * cx(k,jcat) * dn0(k)
 
 !max diameter of cloud 1 & 2
    ad1 = max(dcmin,min(dcmax,dmb1cgs))
@@ -480,7 +480,7 @@ endif
 
  !Compute fraction liquid of combined ice and cloud1 droplets
  rcoal = umcld + rimer
- qcoal = (qx(k,jcat) * umcld + qx(k,lcat) * rimer) / max(1.e-20,rcoal)
+ qcoal = (qx(k,jcat) * umcld + qx(k,lcat) * rimer) / max(1.0e-20,rcoal)
  
  CALL qtc (qcoal,tcoal,fracliq)
 
@@ -545,7 +545,7 @@ endif
 
  enxfer(k,jcat,jcat) = enxfer(k,jcat,jcat) + min(uncld,cx(k,mx))
  if(lcat.ne.ccat) enxfer(k,lcat,ccat) = enxfer(k,lcat,ccat) &
-   + ytoz * min(uncld,cx(k,lcat)) / max(1.e-20,rx(k,lcat))
+   + ytoz * min(uncld,cx(k,lcat)) / max(1.0e-20,rx(k,lcat))
 
 endif !if cloud mean mass is greater than min threshold
 endif !if cloud mixing ratio greater than min threshold
@@ -959,7 +959,7 @@ if(rx(k,mx) .ge. rxmin .and. rx(k,my) .ge. rxmin) then
    qrcoal = qrcx + qrcy
 
    !Saleeby (3-15-06) Lowering the threshold to prevent over-freezing
-   qcoal = qrcoal / max(1.e-20,rcoal)
+   qcoal = qrcoal / max(1.0e-20,rcoal)
 
    CALL qtc (qcoal,tcoal,fracliq)
 
@@ -1034,7 +1034,7 @@ if(rx(k,mx) .ge. rxmin .and. rx(k,my) .ge. rxmin) then
    if (jnmb(mx) >= 5 .or. jnmb(my) >= 5) then
      enxfer(k,mx,mx) = enxfer(k,mx,mx) + min(colnum,cx(k,mx))
      if (my .ne. mz) enxfer(k,my,mz) = enxfer(k,my,mz)  &
-        + (rfinlz - xtoz) * min(colnum,cx(k,my)) / max(1.e-20,rcy)
+        + (rfinlz - xtoz) * min(colnum,cx(k,my)) / max(1.0e-20,rcy)
    endif
 
 ! BUT NEED TO CHANGE THE ABOVE FOR 177 COLLECTION BECAUSE X = Y
@@ -1133,7 +1133,7 @@ do k = k1,k2
    qrcx = rcx * qx(k,mx)
    qrcy = rcy * qx(k,my)
    qrcoal = qrcx + qrcy
-   qcoal = qrcoal / max(1.e-20,rcoal)
+   qcoal = qrcoal / max(1.0e-20,rcoal)
 
    CALL qtc (qcoal,tcoal,fracliq)
 
@@ -1224,7 +1224,7 @@ do k = k1,k2
         CALL F94 (rx(k,2),cx(k,2),cx(k,3),dn0(k),ansn,ansr)
         ansn=ansn*cx(k,2) !#/conc of new hailstones [1/kg]
         ansr=ansr*cx(k,2) !mixing ratio of new hailstones [kg/kg]
-        cfinlz=coalnum*rfinlz/max(rcoal,1.e-20) !regular 2M value for # of new hail
+        cfinlz=coalnum*rfinlz/max(rcoal,1.0e-20) !regular 2M value for # of new hail
         if(ansr.lt.rcx)then !recompute these variables
          rcx=ansr
          rcoal=rcx+rcy
@@ -1270,7 +1270,7 @@ do k = k1,k2
       endif                  !   # conc of newly formed cat z particles [g or h]
 
       if (jnmb(mx) >= 5) then
-         cfinlz = coalnum * rfinlz / max(rcoal,1.e-20)
+         cfinlz = coalnum * rfinlz / max(rcoal,1.0e-20)
          if (my .eq. mz) then
             enxfer(k,mx,mx) = enxfer(k,mx,mx) + colnumx
          elseif (colnumy .ge. colnumx) then
@@ -1327,7 +1327,7 @@ ansr=0.
 
 !--compute characteristic diameter for rain (lcat=2)
 dmbodn=(exp(gammln(gnu(2)+pwmas(2))-gammln(gnu(2))))**pwmasi(2)
-tmp1=rxa/(max(cxx,rxmin))  !mean mass
+tmp1=rxa/(max(cxx,1.0e-12))  !mean mass
 meand=(tmp1/cfmas(2))**pwmasi(2)       !mean mass diam
 chdiam=meand/dmbodn         !char. diam
 
@@ -1344,7 +1344,7 @@ do i=1,nbins !numerically integrate Eqs 4.19 & 4.23 over rain diameters
  Pri(i)=min(1.,Nri(i))  !Probabilistic freezing of rain [Eqn 4.20 in F94]
  tmp1=radF94(i)*tmp2
  fgam(i)=tmp2*exp(-tmp1)*(tmp1**tmp4)*tmp5 !gamma pdf values
- if((fgam(i).lt.1.e-35).or.(fgam(i).gt.1.e+35))THEN
+ if((fgam(i).lt.1.0e-35).or.(fgam(i).gt.1.0e+35))THEN
   fgam(i)=0.0
  endif
  tmp6=rdbF94(i+1)-rdbF94(i)  !size bin width
@@ -1396,8 +1396,8 @@ do lcat = 1,8
       enddo
 
       do k = kd1,kd2
-         rloss(k) = min(1.,rx(k,lcat) / max(1.e-20,rloss(k)))
-         enloss(k) = min(1.,cx(k,lcat) / max(1.e-10,enloss(k)))
+         rloss(k) = min(1.,rx(k,lcat) / max(1.0e-20,rloss(k)))
+         enloss(k) = min(1.,cx(k,lcat) / max(1.0e-10,enloss(k)))
       enddo
 
       do jcat = 1,8
@@ -1493,7 +1493,7 @@ do lcat = 1,8
             if(cx(k,lcat)<0.0) cx(k,lcat)=0.0
             !Adjust immersion freezing nuclei number
             if(iifn==3 .and. iccnlev>=1 .and. (lcat==1.or.lcat==8.or.lcat==2)) then
-              cldnumratio = min(1.0,max(0.0,cx(k,lcat)/max(1.e-20,cxtemp)))
+              cldnumratio = min(1.0,max(0.0,cx(k,lcat)/max(1.0e-20,cxtemp)))
               immerhx(k,lcat) = max(0.,immerhx(k,lcat)*cldnumratio)
             endif
          enddo

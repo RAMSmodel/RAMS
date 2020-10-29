@@ -133,7 +133,7 @@ elseif (jnmb(1) >= 5) then
         wtw2 = rjw - float(jw)
         wtw1 = 1. - wtw2
         !********** AEROSOL NUMBER, MASS, & MEDIAN RADIUS CONSTRAINTS ********
-        rjconcen = max(1., min(7., 2. * log10(1.e-7 * concen_nuc) + 1.))
+        rjconcen = max(1., min(7., 2. * log10(1.0e-7 * concen_nuc) + 1.))
         jconcen = int(rjconcen)
         wtcon2 = rjconcen - float(jconcen)
         wtcon1 = 1. - wtcon2
@@ -499,12 +499,12 @@ save
 do k = kc1,kc2
 
  !If cloud water exists at a minimum quantity
- if (rx(k,1) .gt. 1.e-10) then
+ if (rx(k,1) .gt. rxmin) then
 
    !define dn locally from emb
    dn1 = dnfac(1) * emb(k,1) ** pwmasi(1)
    fraccld=0.
-   if (rx(k,1) .gt. 1.e-10 .and. tairc(k) .le. -30.01) then
+   if (tairc(k) .le. -30.01) then
       ridnc = max(1.,min(float(ndnc-1),dn1 / ddnc))
       idnc = int(ridnc)
       wdnc2 = ridnc - float(idnc)
@@ -598,12 +598,12 @@ enddo
 do k = kd1,kd2
 
  !If drizzle water exists at a minimum quantity
- if (rx(k,8) .gt. 1.e-10) then
+ if (rx(k,8) .gt. rxmin) then
 
    !define dn locally from emb
    dn1 = dnfac(16) * emb(k,8) ** pwmasi(16)
    fraccld = 0.
-   if (rx(k,8) .gt. 1.e-10 .and. tairc(k) .le. -30.01) then
+   if (tairc(k) .le. -30.01) then
       ridnc = max(1.,min(float(ndnc-1),dn1 / ddnc))
       idnc = int(ridnc)
       wdnc2 = ridnc - float(idnc)
@@ -819,7 +819,7 @@ do k = 2,m1-1
 
     !Compute and test Haze fraction for DeMott(2010) aerosol micro
     if(iifn==3 .and. iccnlev>=1 .and. jnmb(1)>=5) then 
-      heterofrac=(vapnuc-diagni)/max(rxmin,haznuc)
+      heterofrac=(vapnuc-diagni)/max(1.0e-12,haznuc)
       heterofrac = min(1.0,max(0.0,heterofrac))
     !Compute and test Haze fraction for non-aerosol micro
     else
@@ -908,14 +908,14 @@ do k = 2,m1-1
 
        !Determine freezing number and mixing ratio
        embtemp = max(emb0(lcat),min(emb1(lcat),rx(k,lcat)  & !mean mass
-            / max(1.e-6,cx(k,lcat))))
+            / max(1.0e-6,cx(k,lcat))))
        frzc = min(cx(k,lcat),ifntemp)
        frzr = min(rx(k,lcat),frzc * embtemp)
 
        !Aerosol and solubility tracking
        !Transfering immersion freezing aerosol mass from cloud to pristine ice
        if(iccnlev>=2) then
-        rxferratio = min(1.0,frzr/max(rxmin,rx(k,lcat)))
+        rxferratio = min(1.0,frzr/max(1.0e-12,rx(k,lcat)))
         ccnmass  = cnmhx(k,lcat) * rxferratio
         cnmhx(k,lcat) = cnmhx(k,lcat) - ccnmass
         cnmhx(k,3)    = cnmhx(k,3)    + ccnmass
@@ -959,7 +959,7 @@ do k = 2,m1-1
    rx(k,3) = rx(k,3) + vapnucr
    cx(k,3) = cx(k,3) + vapnuc
 
-   pcthaze = haznuc / max(1.e-30,(haznuc + diagni + immerin))
+   pcthaze = haznuc / max(1.0e-30,(haznuc + diagni + immerin))
 
    if(imbudget >= 1) then
      xnucicert(k) = xnucicert(k) + vapnucr * budget_scalet
@@ -969,7 +969,7 @@ do k = 2,m1-1
      xinuchazrt(k) = xinuchazrt(k) + vapnucr * pcthaze * budget_scalet
    endif
 
-   if (rx(k,3) .gt. rxmin) k2pnuc = k
+   if (rx(k,3) .ge. rxmin) k2pnuc = k
    if (k2pnuc .eq. 1 .and. rx(k,3) .lt. rxmin) k1pnuc = k + 1
 
 enddo
@@ -987,6 +987,8 @@ END SUBROUTINE icenuc
 !##############################################################################
 Subroutine contnuc (rx,cx,tx,vap,press  &
    ,dynvisc,thrmcon,tair,tairc,pbvi,ptvi,pdvi,ptotvi,dn1,dtlt)
+
+use micphys, only:rxmin
 
 implicit none
 
@@ -1017,7 +1019,7 @@ data aka,raros/5.39e-3,3.e-7/
 
    ptotvi = 0.
 
-   if (tx .le. -2. .and. rx .gt. 1.e-10) then
+   if (tx .le. -2. .and. rx .gt. rxmin) then
 
       ana = exp(4.11 - 0.262 * tx)
       akn = 2.28e-5 * tair / (press * raros)

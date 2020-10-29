@@ -372,7 +372,7 @@ data wprime/0.00000,0.885000,1.84000,2.24160,3.51360,5.85760,7.13460 &
            ,7.13460,9.60960,11.3856,18.7600,0.00000/
 
 rmrat = (100**3)**(1./8.) !rmrat=volume ratio between bins
-rbmin  = 1.e-5*((1.+rmrat)/2.)**(1./3.) !radius of smallest bin [cm]
+rbmin  = 1.0e-5*((1.+rmrat)/2.)**(1./3.) !radius of smallest bin [cm]
 rho_p = 2.65 !particle density [g/cm3]
 
 !Set up the bins/apportionment (Ginoux et al.2001)

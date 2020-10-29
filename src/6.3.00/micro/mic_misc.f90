@@ -669,9 +669,9 @@ elseif (jnmb(lcat) == 4) then
    enddo
 elseif (jnmb(lcat) == 5) then
    do k = k1(lcat),k2(lcat)
-      embtemp=rx(k,lcat)/max(rxmin,cx(k,lcat))
+      embtemp=rx(k,lcat)/max(cxmin,cx(k,lcat))
       emb(k,lcat) = max(emb0(lcat),min(emb1(lcat),rx(k,lcat)  &
-         / max(rxmin,cx(k,lcat))))
+         / max(cxmin,cx(k,lcat))))
       !Saleeby(2011): Use of single precision here allows for enemb to produce
       !artificial number concentration even when mass is in bounds. This is
       !generally small but could accumulate over time. Added the IF statement
@@ -680,7 +680,7 @@ elseif (jnmb(lcat) == 5) then
                                 embtemp > 1.001*emb1(lcat))) .or.  &
           (rx(k,lcat) == 0.0 .and. cx(k,lcat) > 0.0 )        .or.  &
           (embtemp >= emb0(lcat) .and. embtemp <= emb1(lcat) .and. &
-               cx(k,lcat)<rxmin .and. rx(k,lcat)>0.0))      then
+               cx(k,lcat)<cxmin .and. rx(k,lcat)>0.0))      then
         cx(k,lcat) = rx(k,lcat) / emb(k,lcat)
       endif
    enddo
@@ -796,7 +796,7 @@ elseif (lcat == 4 .or. lcat == 5) then
       qx(k,lcat) = qr(k,lcat) * rinv
       CALL qtc (qx(k,lcat),tcoal,fracliq)
 
-      if (fracliq > 1.e-6) then
+      if (fracliq > 1.0e-6) then
          !Compute liquid portion to xfer to graupel
          rmelt = rx(k,lcat) * fracliq
          !Compute ice portion of xfer to graupel
@@ -1051,7 +1051,7 @@ enddo
 do k = k1,k2
    lhcat = jhcat(k,lcat)
 
-   if (rx(k,lcat) > 1.e-20) then
+   if (rx(k,lcat) > rxmin) then
       colddn0 = cx(k,lcat) * dn0(k) !Convert #/kg to #/m3
       rolddn0 = rx(k,lcat) * dn0(k) !Convert kg/kg to kg/m3
       qrolddn0 = qx(k,lcat) * rolddn0
@@ -1148,7 +1148,7 @@ endif
 
 do k = 2,k2
    rtp(k) = rtp(k) + rnew(k) - rx(k,lcat)
-   qnew = qrnew(k) / max(1.e-20, rnew(k))
+   qnew = qrnew(k) / max(1.0e-20, rnew(k))
 
    tairc(k) = tairc(k) - thp(k) * thp(k)  &
       * (2820. * (rnew(k) - rx(k,lcat))  &
@@ -1241,7 +1241,7 @@ enddo
 do k = k1,k2
    lhcat = jhcat(k,lcat)
 
-   if (rx(k,lcat) > 1.e-20) then
+   if (rx(k,lcat) > rxmin) then
       colddn0 = cx(k,lcat) * dn0(k) !Convert #/kg to #/m3
       rolddn0 = rx(k,lcat) * dn0(k) !Convert kg/kg to kg/m3
       qrolddn0 = qx(k,lcat) * rolddn0
@@ -1435,7 +1435,7 @@ endif
 
 do k = 2,k2
    rtp(k) = rtp(k) + rnew(k) - rx(k,lcat)
-   qnew = qrnew(k) / max(1.e-20, rnew(k))
+   qnew = qrnew(k) / max(1.0e-20, rnew(k))
 
    tairc(k) = tairc(k) - thp(k) * thp(k)  &
       * (2820. * (rnew(k) - rx(k,lcat))  &

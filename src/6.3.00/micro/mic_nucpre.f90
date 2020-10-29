@@ -217,8 +217,8 @@ real, dimension(m1) :: dn0,rv
    !activated for the given grid cell parcel.
    nifn(k) = nifn(k) - ifnnucx(k)
    tot_in  = tot_in  - ifnnucx(k)
-   if(nifn(k) < 1.e-6) nifn(k) = 0.0
-   if(tot_in  < 1.e-6) tot_in  = 0.0
+   if(nifn(k) < 1.0e-6) nifn(k) = 0.0
+   if(tot_in  < 1.0e-6) tot_in  = 0.0
    ifnfrac = max(0.0,min(1.0,nifn(k)/tot_in))
    if(nifn(k)==0.0 .or. tot_in==0.0) ifnfrac = 0.0
  else

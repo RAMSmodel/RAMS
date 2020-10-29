@@ -34,7 +34,7 @@
 # Set you RAMS root path
 rd=`pwd`/..
 # RAMS version (ie. 6.1.6)
-vs=6.2.14
+vs=6.3.00
 # Set flag for type of test (0=sequential, 1=parallel)
 runtype=0
 # Set number of nodes for parallel run.
@@ -48,7 +48,7 @@ del=1
 machsmake=1
 
 # Set your parallel executable here
-a1=$rd/misc/mpich2-1.4.1.binaries.post2020/bin/mpiexec
+a1=/home/smsaleeb/software/mpich-3.3.2/bin/mpiexec
 # Set you machines file path here
 a2=$rd/bin.rams/machs
 # Set RAMS executable path and name
