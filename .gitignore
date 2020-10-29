@@ -22,10 +22,7 @@ bin.dp.grib2/wgrib*
 bin.rams/dprep.test/*
 
 # Ignore external libraries
-misc/hdf5-1.*
-misc/mpich2*
-misc/extra/*.tar
-misc/openmpi*
+misc/*
 *.tar.gz
 *.tar
 *.tgz

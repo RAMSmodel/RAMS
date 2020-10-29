@@ -1,0 +1,57 @@
+# Sample executable statement for running RAMS in parallel on systems that do
+# not use module loading and PBS and QSUB queuing software.
+# ../misc/mpich2-1.4.1-64bit/bin/mpiexec -machinefile machs -np 12 \
+# ../bin.rams/rams-6.1.19 -f RAMSIN.full.mc3e3
+# Note: might have to add "-ifrace eth0" or something similar depending on how
+#  you compute nodes communicate. Use utility "ifconfig" to find out how your
+#  nodes communicate (ie. eth0 or eth1)
+
+#SINGLE MACHINE
+#`hostname`
+
+#Using "ccn" cluster with MPICH
+#node01:1
+#node02:8
+#node03:8
+#node04:8
+#node05:8
+#node06:8
+#node07:8
+#node08:8
+
+#Using "ccn" cluster with openMPI
+#node01 slots=1
+#node02 slots=8
+#node03 slots=8
+#node04 slots=8
+#node05 slots=8
+#node06 slots=8
+#node07 slots=8
+#node08 slots=8
+
+#Using "frost" cluster with MPICH
+#frost:1
+#frost1:16
+#frost2:16
+#frost3:16
+#frost4:16
+#frost5:16
+#frost6:16
+#frost7:16
+#frost8:16
+
+#Using "ice" cluster (infiniband) MPICH
+#icehome_ib:8
+#ice1_ib:12
+#ice2_ib:12
+#ice3_ib:12
+#ice4_ib:12
+
+#Ciracluster (head node is cm00, but do not include that in list)
+#cc00:12
+#cc01:12
+#cc02:12
+#cc03:12
+#cc04:12
+#cc05:12
+
