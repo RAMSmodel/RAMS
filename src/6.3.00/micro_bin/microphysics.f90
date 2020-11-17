@@ -1166,7 +1166,7 @@ Subroutine adj1_bin (m1,m2,m3,rtp,micro)
 
 use mem_micro
 use micro_prm, only:nkr,col,iceprocs,iceflag
-use micphys, only:ipris,igraup,ihail,rxmin
+use micphys, only:ipris,igraup,ihail
 
 implicit none
 
@@ -1194,29 +1194,29 @@ do j=1,m3
             endif
          enddo
          do kr = 1,nkr
-            if (micro%ffcd(k,i,j,kr)*col < rxmin) micro%ffcd(k,i,j,kr) = 0.
+            if (micro%ffcd(k,i,j,kr)*col < 1.e-12) micro%ffcd(k,i,j,kr) = 0.
             if (iceprocs == 1) then
                if (ipris == 1 .or. ipris >= 4) then
-                  if (micro%ffic(k,i,j,kr)*col < rxmin) micro%ffic(k,i,j,kr) = 0.
+                  if (micro%ffic(k,i,j,kr)*col < 1.e-12) micro%ffic(k,i,j,kr) = 0.
                endif
                if (ipris == 2 .or. ipris >= 4) then
-                  if (micro%ffip(k,i,j,kr)*col < rxmin) micro%ffip(k,i,j,kr) = 0.
+                  if (micro%ffip(k,i,j,kr)*col < 1.e-12) micro%ffip(k,i,j,kr) = 0.
                endif
                if (ipris >= 3) then
-                  if (micro%ffid(k,i,j,kr)*col < rxmin) micro%ffid(k,i,j,kr) = 0.
+                  if (micro%ffid(k,i,j,kr)*col < 1.e-12) micro%ffid(k,i,j,kr) = 0.
                endif
-               if (micro%ffsn(k,i,j,kr)*col < rxmin) micro%ffsn(k,i,j,kr) = 0.
+               if (micro%ffsn(k,i,j,kr)*col < 1.e-12) micro%ffsn(k,i,j,kr) = 0.
                if (igraup > 0) then
-                  if (micro%ffgl(k,i,j,kr)*col < rxmin) micro%ffgl(k,i,j,kr) = 0.
+                  if (micro%ffgl(k,i,j,kr)*col < 1.e-12) micro%ffgl(k,i,j,kr) = 0.
                endif
                if (ihail > 0) then
-                  if (micro%ffhl(k,i,j,kr)*col < rxmin) micro%ffhl(k,i,j,kr) = 0.
+                  if (micro%ffhl(k,i,j,kr)*col < 1.e-12) micro%ffhl(k,i,j,kr) = 0.
                endif
                if (iceflag == 1) then
-                  if (micro%ffin(k,i,j,kr)*col < rxmin) micro%ffin(k,i,j,kr) = 0.
+                  if (micro%ffin(k,i,j,kr)*col < 1.e-12) micro%ffin(k,i,j,kr) = 0.
                endif
              endif
-            if (micro%fncn(k,i,j,kr)*col < rxmin) micro%fncn(k,i,j,kr) = 0.
+            if (micro%fncn(k,i,j,kr)*col < 1.e-12) micro%fncn(k,i,j,kr) = 0.
          enddo
 
          if (totbef < 0.) then
