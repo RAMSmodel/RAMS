@@ -2142,7 +2142,7 @@ return
 END SUBROUTINE rams_net_rad_flx
 
 !##############################################################################
-Subroutine rams_swheatrate (n1,n2,n3,heatrt,swup,swdn,dn0,pi,ngrd)
+Subroutine rams_heatrate (n1,n2,n3,heatrt,lswup,lswdn,dn0,pi,ngrd)
 
 use mem_grid, only:dztn
 use rconstants, only:cp
@@ -2151,7 +2151,7 @@ implicit none
 
 integer :: n1,n2,n3,i,j,k,ngrd
 real :: divisor
-real, dimension(n1,n2,n3) :: heatrt,swup,swdn,dn0,pi
+real, dimension(n1,n2,n3) :: heatrt,lswup,lswdn,dn0,pi
 
 !Note: summing as (UP - DOWN)
 
@@ -2160,7 +2160,7 @@ do j=1,n2
   do k=2,n3-2
      divisor = dn0(i,j,k) * (1./dztn(k,ngrd)) * cp * pi(i,j,k)/cp
      heatrt(i,j,k) = &
-        (swdn(i,j,k)-swdn(i,j,k-1)+swup(i,j,k-1)-swup(i,j,k))/divisor
+        (lswdn(i,j,k)-lswdn(i,j,k-1)+lswup(i,j,k-1)-lswup(i,j,k))/divisor
   enddo
   heatrt(i,j,1)=heatrt(i,j,2)
   heatrt(i,j,n3)=heatrt(i,j,n3-2)!issue with not having McLatchy levels post-run
@@ -2169,37 +2169,7 @@ do j=1,n2
 enddo
 
 return
-END SUBROUTINE rams_swheatrate
-
-!##############################################################################
-Subroutine rams_lwheatrate (n1,n2,n3,heatrt,lwup,lwdn,dn0,pi,ngrd)
-
-use mem_grid, only:dztn
-use rconstants, only:cp
-
-implicit none
-
-integer :: n1,n2,n3,i,j,k,ngrd
-real :: divisor
-real, dimension(n1,n2,n3) :: heatrt,lwup,lwdn,dn0,pi
-
-!Note: summing as (UP - DOWN)
-
-do j=1,n2
- do i=1,n1
-  do k=2,n3-2
-     divisor = dn0(i,j,k) * (1./dztn(k,ngrd)) * cp * pi(i,j,k)/cp
-     heatrt(i,j,k) = &
-        (lwdn(i,j,k)-lwdn(i,j,k-1)+lwup(i,j,k-1)-lwup(i,j,k))/divisor
-  enddo
-  heatrt(i,j,1)=heatrt(i,j,2)
-  heatrt(i,j,n3)=heatrt(i,j,n3-2)!issue with not having McLatchy levels post-run
-  heatrt(i,j,n3-1)=heatrt(i,j,n3-2)!issue with not having McLatchy levels post-run
- enddo
-enddo
-
-return
-END SUBROUTINE rams_lwheatrate
+END SUBROUTINE rams_heatrate
 
 !##############################################################################
 Subroutine rams_sum_rad_flx (n1,n2,n3,netflx,swup,lwup,swdn,lwdn)

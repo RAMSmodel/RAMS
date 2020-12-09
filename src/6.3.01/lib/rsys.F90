@@ -78,7 +78,8 @@ if(iprelen == 0) iprelen=len(file_prefix)
 
 ! Process leading shell variables
 if (file_prefix(1:5) == '$HOME') then
-   CALL getenv ('HOME',chome)
+   !Use lowercase "call" since this is a system call
+   call getenv ('HOME',chome)
    file_pref=trim(chome)//trim(file_prefix(6:))
 else
    file_pref=trim(file_prefix)

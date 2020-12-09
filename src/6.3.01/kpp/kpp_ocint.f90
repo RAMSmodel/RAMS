@@ -1,5 +1,5 @@
 !##############################################################################
-SUBROUTINE mckpp_physics_ocnint (kpp_1d_fields,kpp_const_fields &
+Subroutine MCKPP_PHYSICS_OCNINT (kpp_1d_fields,kpp_const_fields &
                                 ,kmixe,Uo,Xo,ii,jj)
 
 use mem_kpp, only:kpp_1d_type,kpp_const_type
@@ -208,10 +208,10 @@ implicit none
                                      ,kppNZ,kpp_1d_fields%X(:,2))
 
 return
-END SUBROUTINE mckpp_physics_ocnint
+END SUBROUTINE MCKPP_PHYSICS_OCNINT
 
 !##############################################################################
-Subroutine mckpp_physics_solvers_tridcof (diff,nzi,cu,cc,cl,kpp_const_fields)
+Subroutine MCKPP_PHYSICS_SOLVERS_TRIDCOF (diff,nzi,cu,cc,cl,kpp_const_fields)
 
 use mem_kpp, only:kpp_const_type
 
@@ -248,10 +248,10 @@ use mem_kpp, only:kpp_const_type
   cl(nzi)= 0.
 
 return
-END SUBROUTINE mckpp_physics_solvers_tridcof
+END SUBROUTINE MCKPP_PHYSICS_SOLVERS_TRIDCOF
 
 !##############################################################################
-Subroutine mckpp_physics_solvers_tridrhs (yo,ntflux,diff,ghat,sturflux &
+Subroutine MCKPP_PHYSICS_SOLVERS_TRIDRHS (yo,ntflux,diff,ghat,sturflux &
     ,ghatflux,nzi,rhs,kpp_const_fields)
 
 use mem_kpp, only:kpp_const_type
@@ -304,10 +304,10 @@ use mem_kpp, only:kpp_const_type
   endif
   
 return
-END SUBROUTINE mckpp_physics_solvers_tridrhs
+END SUBROUTINE MCKPP_PHYSICS_SOLVERS_TRIDRHS
 
 !##############################################################################
-Subroutine mckpp_physics_solvers_tridmat (cu,cc,cl,rhs,yo,nzi,yn)
+Subroutine MCKPP_PHYSICS_SOLVERS_TRIDMAT (cu,cc,cl,rhs,yo,nzi,yn)
 
   ! Solve tridiagonal matrix for new vector yn, given right hand side
   ! vector rhs. Note: yn(nzi+1) = yo(nzi+1).
@@ -355,4 +355,4 @@ Subroutine mckpp_physics_solvers_tridmat (cu,cc,cl,rhs,yo,nzi,yn)
   yn(nzi+1) = yo(nzi+1)
   
 return
-END SUBROUTINE mckpp_physics_solvers_tridmat
+END SUBROUTINE MCKPP_PHYSICS_SOLVERS_TRIDMAT

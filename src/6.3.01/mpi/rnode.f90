@@ -80,7 +80,7 @@ Subroutine rams_node ()
         CALL newgrid (ifm)
         isstp=isched(npass,3)
         icm=nxtnest(ifm)
-        CALL interp_nest_bounds(icm,ifm)
+        CALL interp_nest_bounds (icm,ifm)
       endif
 
     enddo ! do npass = 1, nsubs

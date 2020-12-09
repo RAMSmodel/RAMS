@@ -254,7 +254,7 @@ implicit none
     ! read the configuration specs and set parameters
     CALL read_nl (nl_fname)
     CALL eng_params ()
-  
+
     ! print initial banner
     write(6,'(a1,78a1)') ' ',('*',i=1,78)
     write(6,'(2a1,a42)') ' ','*','    RAMS - Version 6.0'

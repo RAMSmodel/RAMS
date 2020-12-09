@@ -130,19 +130,15 @@ select case (an_extra(nv)%ind_comp)
              ,basic_g(ngr)%dn0,a)
    case(4) 
       ! Check; 3D variable here
-      !CALL ancomp_check (mmxyzp(ngr),basic_g(ngr)%dn0,a)
       skip = .true.
    case(5)
       ! Check; add new here 4D leaf
-      !CALL ancomp_check (mmxyzp(ngr),leaf_g(ngr)%soil_water,a)
       skip = .true.
    case(6)
       ! Check; add new here 5D leaf
-      !CALL ancomp_check (mmxyzp(ngr),leaf_g(ngr)%sfcwater_mass,a)
       skip = .true.
    case(7)
       ! Check; add new here 6D leaf
-      !CALL ancomp_check (mmxyzp(ngr),leaf_g(ngr)%stom_resist,a)
       skip = .true.
    case(8)
       ! Total cloud water
@@ -340,22 +336,6 @@ select case (an_extra(nv)%ind_comp)
 end select
 return
 END SUBROUTINE anal_extra_comp
-
-!##############################################################################
-Subroutine ancomp_check (n1,b,a)
-
-implicit none
-
-integer :: n1
-real, dimension(n1) :: a,b
-integer :: i
-
-do i=1,n1
-   a(i)=b(i)
-enddo
-
-return
-END SUBROUTINE ancomp_check
 
 !##############################################################################
 Subroutine ancomp_pi (n1,b,c,a)

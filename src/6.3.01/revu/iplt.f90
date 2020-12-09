@@ -130,7 +130,7 @@ if(action(1:4)=='TEXT'.or.action(1:4)=='HDF5') then
 
    !DEBUG
    ! look at latitude values
-   !call textarray (idims(1),idims(2),idims(3),arra,sfclat,0)
+   CALL textarray (idims(1),idims(2),idims(3),arra,sfclat,0,0)
 
    CALL rams_fill_fld (idims(1),idims(2),idims(3)  &
                       ,arra,arrb,arrbb  &
@@ -147,7 +147,8 @@ if(action(1:4)=='TEXT'.or.action(1:4)=='HDF5') then
 
    !DEBUG
    ! look at longitude values
-   !call textarray (idims(1),idims(2),idims(3),arra,sfclon,1)
+   CALL textarray (idims(1),idims(2),idims(3),arra,sfclon,1,0)
+
 endif
 
 !*************************************************************************
@@ -284,13 +285,16 @@ return
 END SUBROUTINE copy_sfc_values
 
 !##############################################################################
-Subroutine textarray (n1,n2,n3,array,array2d,TextCols)
+Subroutine textarray (n1,n2,n3,array,array2d,TextCols,useflag)
 
 implicit none
 
-integer :: n1,n2,n3,TextCols,i
+integer :: n1,n2,n3,TextCols,i,useflag
 real, dimension(n1,n2,n3) :: array
 real, dimension(n1,n2) :: array2d
+
+!Do this debugging if flag = 1
+if(useflag==1) then
 
 print*,'DEBUG: TextArray:'
 if (TextCols == 1) then
@@ -308,6 +312,8 @@ else
     print*,''
   enddo
 endif
+
+endif !if useflag
 
 return
 END SUBROUTINE textarray

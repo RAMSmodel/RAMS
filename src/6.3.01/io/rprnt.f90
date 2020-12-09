@@ -12,7 +12,11 @@ implicit none
 
 integer :: k
 
-IF(initial == 1 .or. (initial == 3 .and. initorig == 1))THEN
+!PRINT INITIAL SOUNDING INPUT ONLY IF DOING HORIZONTALLY HOMOGENEOUS
+!SIMULATION AT TIME=0 SINCE THE SOUNDING DATA IS NOT CONVERTED TO
+!UNITS IN THE LIST BELOW UNLESS ROUTINE "INITHH" IS USED. THAT ONLY
+!OCCURS IF "INITIAL=1".
+IF(initial == 1)THEN
   CALL mrsl (nsndg,ps(1),ts(1),vctr5(1))
   do k=1,nsndg
      vctr1(k) = 100. * rts(k) / vctr5(k)
@@ -27,7 +31,8 @@ IF(initial == 1 .or. (initial == 3 .and. initorig == 1))THEN
              ,VCTR1(K),K=1,NSndg)
 42      FORMAT(1X,F11.1,F10.1,2F9.2,2F9.2,F10.5,F9.2)
 ENDIF
-!
+
+!PRINT REFERENCE STATE FOR ANY TYPE OF SIMULATION
 DO K=1,NNZP(1)
   VCTR1(K)=P00*(PI01DN(K,1)/CP)**CPOR
   VCTR2(K)=TH01DN(K,1)/(1.+.61*RT01DN(K,1))

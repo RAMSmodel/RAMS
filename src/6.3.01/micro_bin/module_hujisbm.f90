@@ -5934,36 +5934,6 @@ return
 END SUBROUTINE ccn_reg
 
 !##############################################################################
-Subroutine ccn_reg2 (fccnin,fccnout,rccn,nkr,ccnreg)
-
-! ANother module to add ccnreg evenly to the bins with radius no less than 0.05 um
-
-implicit none
-
-real ccnreg
-integer  nkr, kr
-real rccn(nkr)
-real fccnin(nkr)
-real fccnout(nkr)
-integer countn
-
-countn = 0
-do kr = 1, nkr
-   if (rccn(kr) .GE. 0.05*1.e-4) countn=countn+1
-enddo
-
-! ccnreg ia added evenly to the bins larger than 0.05 um (radius)
-
-if (ccnreg > 0.) then
-   do kr=nkr-countn+1,nkr
-      fccnout(kr)=fccnin(kr)+ ccnreg/col/float(countn)
-   end do
-endif
-
-return
-END SUBROUTINE ccn_reg2
-
-!##############################################################################
 Subroutine evapfrz (ccnreg,frzfract,NKR,ICEMAX, TT, DT, xi,ff2r,rndrop)
  
 ! for dropet freezing

@@ -44,23 +44,6 @@ return
 END SUBROUTINE azero_int
 
 !##############################################################################
-Subroutine ae1t0 (n1,a,b,c)
-
-implicit none
-
-integer :: n1
-real, dimension(n1) :: a,b
-real :: c
-integer :: n
-
-do n=1,n1
-   a(n)=b(n)*c
-enddo
-
-return 
-END SUBROUTINE ae1t0
-
-!##############################################################################
 Subroutine ae1 (npts,a,b)
 
 implicit none

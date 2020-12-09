@@ -196,7 +196,7 @@ do ngr=1,ngrids
          elseif(vtab_r(nv,ngr)%idim_type == 7) then
             !  Rearrange 4-d micro bin variables to (i,j,k,kr)
             allocate(temp_var1(mmxp(ngr),mmyp(ngr),mmzp(ngr),nkr))
-            call rearrange_p(mmxp(ngr),mmyp(ngr),mmzp(ngr),nkr  &
+            CALL rearrange_p (mmxp(ngr),mmyp(ngr),mmzp(ngr),nkr  &
                             ,v_pointer,temp_var1)
             ndims=4 ; idims(3)=mmzp(ngr); idims(4)=nkr
 
@@ -332,7 +332,7 @@ do ngr=1,ngrids
 
          elseif(idtype == 7) then
             !  Rearrange 4-d micro bin variables to (i,j,k,kr)
-            CALL rearrange_p(mmxp(ngr),mmyp(ngr),mmzp(ngr),nkr  &
+            CALL rearrange_p (mmxp(ngr),mmyp(ngr),mmzp(ngr),nkr  &
                            ,temp_var1,temp_var2)
 
          elseif(idtype == 10) then

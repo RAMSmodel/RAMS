@@ -93,8 +93,8 @@ if (ivflag == 0) then   ! Initialization of initial fields
    do ifm = 1,ngrids
      icm = nxtnest(ifm)
      if (icm .ge. 1) then
-       CALL newgrid(ifm)
-       CALL interp_fine_grid(ifm,icm,IFG_VF_INIT)
+       CALL newgrid (ifm)
+       CALL interp_fine_grid (ifm,icm,IFG_VF_INIT)
      endif
    enddo
    
@@ -134,7 +134,7 @@ elseif (ivflag == 1) then   ! Fill nudging arrays and compute weights
    endif
 
    ! Compute weighting factors for grid 1
-   CALL newgrid(1)
+   CALL newgrid (1)
    CALL varweight (mmzp(1),mmxp(1),mmyp(1),varinit_g(1)%varwts(1,1,1)  &
                  ,grid_g(1)%topt(1,1),grid_g(1)%rtgt(1,1))
    
@@ -146,7 +146,7 @@ elseif (ivflag == 1) then   ! Fill nudging arrays and compute weights
       CALL newgrid (ifm)
       
       ! Interpolate weights to all other grids
-      if(ifm > 1) CALL interp_varf(ifm,1)
+      if(ifm > 1) CALL interp_varf (ifm,1)
 
       ! See if this grid's varfile is created.
       CALL varf_update (0,ifileok,0)
@@ -156,7 +156,7 @@ elseif (ivflag == 1) then   ! Fill nudging arrays and compute weights
          if(print_msg) print*,'Varfile read of grid-',ifm
       else
          ! Using interpolated nudging arrays from parent grid.
-         CALL interp_varf(ifm,2)
+         CALL interp_varf (ifm,2)
          if(print_msg) print*,'Interpolation of grid-',ifm
       endif
 
@@ -230,7 +230,7 @@ do ifm = 1,ngrids
       if(print_msg) print*,'Future varfile read of grid-',ifm
    else
       ! Using interpolated nudging arrays from parent grid.
-      CALL interp_varf(ifm,2)
+      CALL interp_varf (ifm,2)
       if(print_msg) print*,'Future interpolation of grid-',ifm
    endif
 

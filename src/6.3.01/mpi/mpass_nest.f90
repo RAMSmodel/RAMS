@@ -3,15 +3,17 @@
 !
 ! This routine will make a node_send_ctile(), node_get_ctile() pair call.
 !
-Subroutine update_ctile(nzc,nxc,nyc,varc,nzct,nxct,nyct,varc_tile,ic0,jc0,ifm,icm,dimtype)
+Subroutine update_ctile (nzc,nxc,nyc,varc,nzct,nxct,nyct,varc_tile &
+                        ,ic0,jc0,ifm,icm,dimtype)
+
   implicit none
 
   integer :: nzc, nxc, nyc, nzct, nxct, nyct, ifm, icm, ic0, jc0, dimtype
   real, dimension(nzc,nxc,nyc) :: varc
   real, dimension(nzct,nxct,nyct) :: varc_tile
 
-  CALL node_send_ctile(nzc,nxc,nyc,varc,ic0,jc0,ifm,icm,dimtype)
-  CALL node_get_ctile(nzct,nxct,nyct,varc_tile,ifm,dimtype)
+  CALL node_send_ctile (nzc,nxc,nyc,varc,ic0,jc0,ifm,icm,dimtype)
+  CALL node_get_ctile (nzct,nxct,nyct,varc_tile,ifm,dimtype)
 
   return
 END SUBROUTINE update_ctile
@@ -36,6 +38,7 @@ END SUBROUTINE update_ctile
 !    3      var(nzc,nxc,nyc)    nzc   nxc   nyc    ic0   jc0
 !
 Subroutine node_send_ctile (nzc,nxc,nyc,var,ic0,jc0,ifm,icm,dimtype)
+
   use node_mod
 
   implicit none

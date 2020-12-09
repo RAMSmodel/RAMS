@@ -52,7 +52,7 @@ REAL::qv,tabs,pcgs,rhocgs
 REAL::theta,exner
 ! SBM VARIABLES
 REAL,DIMENSION (nkr) :: FF1IN,FF3IN,FF4IN,FF5IN,&
-                        FF1R,FF3R,FF4R,FF5R,FCCN,FIN
+                        FF1R,FF3R,FF4R,FF5R,FCCN,FIN,FCCNIN
 REAL,DIMENSION (nkr,icemax) :: FF2IN,FF2R
 
 REAL :: SUP2_OLD 
@@ -68,8 +68,9 @@ REAL FACTZ,CONCCCN_XZ,CONCDROP
 INTEGER ISYM1,ISYM2,ISYM3,ISYM4,ISYM5
 INTEGER DIFFU
 !!! For CCN regeneration
+INTEGER aeroregen,fixice
 real fccn0(nkr)
-real :: ndrop, subtot  ! for diagnostic CCN
+real :: ndrop, subtot, frzfract, rndrop, tot_reg  ! for diagnostic CCN
 !functions
 real :: sum_pris, sum_snow
 INTEGER :: k,i,j
@@ -348,34 +349,42 @@ do k = 1,mzp
 
 !-----------------------------------------------------------------------
 !CCN and IN regeneration
+! 1. Saleeby(2020):This section of regeneration should be checked.
+! 2. Should the line with "rndropr(k,i,j) = rndrop" be commented out???
+! 3. "fixice" was not a standard flag here. I added it, but am not sure of its usage.
+ aeroregen=0
+ fixice=1
+ if(aeroregen==1)then
        !For ccn regeneration from evaporation (J. Fan Oct 2007)
-       !if (fixice .ne.1 .and. iceflag == 1) then 
-       !   ! For drop freezing from evaporation (J. Fan Oct 2007)
-       !   if (iceform == 1) then
-       !      if (ccnreg > 0.0 .and. TT < (273.15-5.0)) then
-       !         frzfract = 0.8e-5
-       !         call evapfrz (ccnreg,frzfract,NKR,ICEMAX,TT,dtlt,xi,ff2r,rndrop)
-       !         !rndropr(k,i,j) = rndrop
-       !      endif
-       !      if (inreg > 0.) then
-       !         fin(nkr)=fin(nkr)+inreg/col
-       !      endif
-       !   ! part of drop evaporating residuals back to inreg
-       !   else if (iceform == 2) then
-       !      inreg= inreg + ccnreg*0.5e-5
-       !      fin(nkr)=fin(nkr)+inreg/col
-       !   endif
-       !endif   !if (.not.fixice .and. iceflag == 1)
+       if (fixice .ne.1 .and. iceflag == 1) then 
+          ! For drop freezing from evaporation (J. Fan Oct 2007)
+          if (iceform == 1) then
+             if (ccnreg > 0.0 .and. TT < (273.15-5.0)) then
+                frzfract = 0.8e-5
+                CALL evapfrz (ccnreg,frzfract,NKR,ICEMAX,TT,dtlt,xi,ff2r,rndrop)
+                !rndropr(k,i,j) = rndrop
+             endif
+             if (inreg > 0.) then
+                fin(nkr)=fin(nkr)+inreg/col
+             endif
+          ! part of drop evaporating residuals back to inreg
+          else if (iceform == 2) then
+             inreg= inreg + ccnreg*0.5e-5
+             fin(nkr)=fin(nkr)+inreg/col
+          endif
+       endif   !if (.not.fixice .and. iceflag == 1)
         
        !Put ccnreg back to aerosol (CCN regeneration) if diagCCN = false
-       !if (diagCCN .eqv. .false.) then
-       !    tot_reg  = ccnreg
-       !    if (tot_reg > 0.0) then
-       !       fccnin(:) = fccn(:)  
-       !       call ccn_reg (fccn0,fccnin,fccn,nkr,tot_reg,ff1r,xl,  &
-       !            ff2r,xi,ff3r,xs,ff4r,xg)
-       !    endif
-       ! endif
+       if (diagCCN .eqv. .false.) then
+           tot_reg  = ccnreg
+           if (tot_reg > 0.0) then
+              fccnin(:) = fccn(:)  
+              CALL ccn_reg (fccn0,fccnin,fccn,nkr,tot_reg,ff1r,xl,  &
+                   ff2r,xi,ff3r,xs,ff4r,xg)
+           endif
+        endif
+
+ endif !aeroregen
 
             END DO    ! end NCOND
             !Finish latent heating budget
@@ -1166,7 +1175,7 @@ Subroutine adj1_bin (m1,m2,m3,rtp,micro)
 
 use mem_micro
 use micro_prm, only:nkr,col,iceprocs,iceflag
-use micphys, only:ipris,igraup,ihail,rxmin
+use micphys, only:ipris,igraup,ihail
 
 implicit none
 
@@ -1194,29 +1203,29 @@ do j=1,m3
             endif
          enddo
          do kr = 1,nkr
-            if (micro%ffcd(k,i,j,kr)*col < rxmin) micro%ffcd(k,i,j,kr) = 0.
+            if (micro%ffcd(k,i,j,kr)*col < 1.e-12) micro%ffcd(k,i,j,kr) = 0.
             if (iceprocs == 1) then
                if (ipris == 1 .or. ipris >= 4) then
-                  if (micro%ffic(k,i,j,kr)*col < rxmin) micro%ffic(k,i,j,kr) = 0.
+                  if (micro%ffic(k,i,j,kr)*col < 1.e-12) micro%ffic(k,i,j,kr) = 0.
                endif
                if (ipris == 2 .or. ipris >= 4) then
-                  if (micro%ffip(k,i,j,kr)*col < rxmin) micro%ffip(k,i,j,kr) = 0.
+                  if (micro%ffip(k,i,j,kr)*col < 1.e-12) micro%ffip(k,i,j,kr) = 0.
                endif
                if (ipris >= 3) then
-                  if (micro%ffid(k,i,j,kr)*col < rxmin) micro%ffid(k,i,j,kr) = 0.
+                  if (micro%ffid(k,i,j,kr)*col < 1.e-12) micro%ffid(k,i,j,kr) = 0.
                endif
-               if (micro%ffsn(k,i,j,kr)*col < rxmin) micro%ffsn(k,i,j,kr) = 0.
+               if (micro%ffsn(k,i,j,kr)*col < 1.e-12) micro%ffsn(k,i,j,kr) = 0.
                if (igraup > 0) then
-                  if (micro%ffgl(k,i,j,kr)*col < rxmin) micro%ffgl(k,i,j,kr) = 0.
+                  if (micro%ffgl(k,i,j,kr)*col < 1.e-12) micro%ffgl(k,i,j,kr) = 0.
                endif
                if (ihail > 0) then
-                  if (micro%ffhl(k,i,j,kr)*col < rxmin) micro%ffhl(k,i,j,kr) = 0.
+                  if (micro%ffhl(k,i,j,kr)*col < 1.e-12) micro%ffhl(k,i,j,kr) = 0.
                endif
                if (iceflag == 1) then
-                  if (micro%ffin(k,i,j,kr)*col < rxmin) micro%ffin(k,i,j,kr) = 0.
+                  if (micro%ffin(k,i,j,kr)*col < 1.e-12) micro%ffin(k,i,j,kr) = 0.
                endif
              endif
-            if (micro%fncn(k,i,j,kr)*col < rxmin) micro%fncn(k,i,j,kr) = 0.
+            if (micro%fncn(k,i,j,kr)*col < 1.e-12) micro%fncn(k,i,j,kr) = 0.
          enddo
 
          if (totbef < 0.) then

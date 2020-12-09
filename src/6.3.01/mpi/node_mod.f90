@@ -15,6 +15,12 @@ implicit none
 !     mpass_oda.f90       masterput_oda()
 !                         nodeget_oda()
 !
+!  Note that mpass_oda.f90 has been removed from this version of RAMS as it
+!  was never converted to the distributed memory version of RAMS that will
+!  run on supercomputing systems. It was not converted because it is rarely
+!  if every used and would be a time consuming task. Please see past versions
+!  of RAMS prior to 6.3.01 for the mpass_oda.f90 file.
+!
 !     mpass_nest.f90      node_send_ctile()
 !
 !     mpass_lbc.f90       node_sendlbc()

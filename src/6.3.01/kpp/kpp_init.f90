@@ -1,5 +1,5 @@
 !##############################################################################
-Subroutine MCKPP_INITIALIZE_FIELDS ()
+Subroutine mckpp_initialize_fields ()
 
 use mem_kpp, only:kpp_3d_fields,kpp_const_fields
 use kpp_parameters, only:kppNZ,kppNZP1,nkppz
@@ -13,19 +13,19 @@ implicit none
   !Call routine to copy constants and logicals needed for ocean
   !physics into the kpp_const_fields derived type.
   if(print_msg) print*,'Calling MCKPP_INITIALIZE_CONSTANTS'
-  CALL MCKPP_INITIALIZE_CONSTANTS (kpp_const_fields) 
+  CALL mckpp_initialize_constants (kpp_const_fields) 
 
   !Call routine to set up lat/lon kpp grid and ocean depth
   if(print_msg) print*,'Calling MCKPP_INITIALIZE_BATHYMETRY'
-  CALL MCKPP_INITIALIZE_BATHYMETRY ()
+  CALL mckpp_initialize_bathymetry ()
 
   !Initialize the vertical grid
   if(print_msg) print*,'Calling MCKPP_INITIALIZE_GEOGRAPHY'
-  CALL MCKPP_INITIALIZE_GEOGRAPHY ()
+  CALL mckpp_initialize_geography ()
 
   !Initialize water type for optical properties of seawater
   if(print_msg) print*,'Calling MCKPP_INITIALIZE_OPTICS'
-  CALL MCKPP_INITIALIZE_OPTICS ()
+  CALL mckpp_initialize_optics ()
 
   !Initialize ocean profiles (most of this not done for HISTORY runs)
   !Here setup routine to set: (must be interpolated to KPP levels)
@@ -34,20 +34,20 @@ implicit none
   !3. "bottomt" (bottom level ocean temperature)
   !4. U and V ocean currents
   if(print_msg) print*,'Calling MCKPP_INITIALIZE_OCEAN_PROFILES'
-  CALL MCKPP_INITIALIZE_OCEAN_PROFILES ()
+  CALL mckpp_initialize_ocean_profiles ()
 
   !Generate lookup tables for wmt,wst used to get turbulent velocity
   !scales at normalized depth (sigma)(d/hbl)
   if(print_msg) print*,'Calling MCKPP_PHYSICS_LOOKUP'
-  CALL MCKPP_PHYSICS_LOOKUP ()
+  CALL mckpp_physics_lookup ()
 
   !Initialize ocean model (most of this not done for HISTORY runs)
   !and get initial HMIX and fluxes with zero initial Atmos forcing.
   if(print_msg) print*,'Calling MCKPP_INITIALIZE_OCEAN_MODEL'
-  CALL MCKPP_INITIALIZE_OCEAN_MODEL ()
+  CALL mckpp_initialize_ocean_model ()
 
 return
-END SUBROUTINE MCKPP_INITIALIZE_FIELDS
+END SUBROUTINE mckpp_initialize_fields
 
 !##############################################################################
 Subroutine mckpp_initialize_constants (kpp_const_fields)
@@ -769,7 +769,7 @@ implicit none
      IF (nint(leaf_g(ngrid)%leaf_class(i,j,1)) == 0. .and. &
               leaf_g(ngrid)%patch_area(i,j,1) > 0.50) THEN !Saleeby(2018)
 
-        CALL MCKPP_FIELDS_3Dto1D (kpp_3d_fields(ngrid),kpp_1d_fields,i,j)
+        CALL mckpp_fields_3dto1d  (kpp_3d_fields(ngrid),kpp_1d_fields,i,j)
 
         CALL MCKPP_PHYSICS_VERTICALMIXING (kpp_1d_fields,kpp_const_fields &
                                           ,hmix0,kmix0,i,j)
@@ -817,7 +817,7 @@ implicit none
            ENDDO
         ENDDO
 
-        CALL MCKPP_FIELDS_1Dto3D (kpp_1d_fields,kpp_3d_fields(ngrid),i,j)
+        CALL mckpp_fields_1dto3d (kpp_1d_fields,kpp_3d_fields(ngrid),i,j)
 
      ENDIF
    ENDDO

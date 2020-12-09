@@ -426,32 +426,6 @@ return
 END SUBROUTINE acctimes
 
 !##############################################################################
-Subroutine output_points ()
-
-use mem_all
-use node_mod
-
-implicit none
-
-real :: a,b,c
-integer :: k,i,j,ii,jj
-
-do i=1,mxp
- do j=1,myp
-  do k=1,mzp
-    ii = i+mi0(ngrid)
-    jj = j+mj0(ngrid)
-    a=basic_g(ngrid)%wp(k,ii,jj)
-    b=micro_g(ngrid)%rcp(k,ii,jj)
-    if(k==50.and.ii==200.and.jj==1) print*,'output',ngrid,k,ii,jj,a,b
-  enddo
- enddo
-enddo
-
-return
-END SUBROUTINE output_points
-
-!##############################################################################
 Subroutine mass_flux_bc (m1,m2,m3,up,vp,dn0,pp,pi0,rtgu,rtgv,dyu,dxv)
 
 use mem_grid
@@ -556,35 +530,3 @@ print*,'==============================='
 
 return
 END SUBROUTINE mass_flux_bc
-
-!*****************************************************************************
-! print_debug_grid_cell()
-!
-! This routine will write a message along with the data in the specified grid
-! cell. Subdomain locations are considered in this routine, so the specified 
-! grid location should be given relative to the entire domain.
-!
-Subroutine print_debug_grid_cell (nz,nx,ny,var,kloc,iloc,jloc,ngr,msg,vname)
-  use node_mod
-
-  implicit none
-
-  integer :: nz, nx, ny, kloc, iloc, jloc, ngr
-  real, dimension(nz,nx,ny) :: var
-  character (len=*) :: msg, vname
-
-  integer :: i, j, k
-
-  i = iloc - mi0(ngr)
-  j = jloc - mj0(ngr)
-  k = kloc
-
-  ! print the message if this subdomain contains the grid location
-  if ((i .ge. 1) .and. (i .le. mmxp(ngr)) .and. (j .ge. 1) &
-     .and. (j .le. mmyp(ngr))) then
-    print'(a,i0,5a,4i10,e20.10)', 'DEBUG: NODE', my_rams_num, ': ' &
-     ,trim(msg),'ngr,k,i,j, ',trim(vname), ': ',ngr,k,i,j,var(k,i,j)
-  endif
-
-  return
-END SUBROUTINE print_debug_grid_cell

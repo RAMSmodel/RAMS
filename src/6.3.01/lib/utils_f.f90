@@ -25,7 +25,8 @@ implicit none
 real :: wstart
 integer :: ii,ir
 
-CALL system_clock (count=ii,count_rate=ir)
+!Use lowercase "call" since this is a system call
+call system_clock (count=ii,count_rate=ir)
 walltime = float(ii)/float(ir) - wstart
 
 return

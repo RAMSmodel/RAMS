@@ -176,16 +176,16 @@ implicit none
         case(LBC_ALL_SCALARS)
           CALL update_lbc_vgroup (ngrid,LBC_ALL_SCALARS)
         case(LBC_UP)
-          CALL update_lbc_var(mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
+          CALL update_lbc_var (mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
                              ,basic_g(ngrid)%up,3)
         case(LBC_VP)
-          CALL update_lbc_var(mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
+          CALL update_lbc_var (mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
                              ,basic_g(ngrid)%vp,3)
         case(LBC_PP)
-          CALL update_lbc_var(mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
+          CALL update_lbc_var (mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
                              ,basic_g(ngrid)%pp,3)
         case(LBC_WP)
-          CALL update_lbc_var(mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
+          CALL update_lbc_var (mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
                              ,basic_g(ngrid)%wp,3)
       endselect
     endif
@@ -199,16 +199,16 @@ implicit none
         case(LBC_ALL_SCALARS)
           CALL update_lbc_vgroup (ngrid,LBC_ALL_SCALARS)
         case(LBC_UP)
-          CALL update_lbc_var(mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
+          CALL update_lbc_var (mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
                              ,basic_g(ngrid)%up,3)
         case(LBC_VP)
-          CALL update_lbc_var(mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
+          CALL update_lbc_var (mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
                              ,basic_g(ngrid)%vp,3)
         case(LBC_PP)
-          CALL update_lbc_var(mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
+          CALL update_lbc_var (mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
                              ,basic_g(ngrid)%pp,3)
         case(LBC_WP)
-          CALL update_lbc_var(mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
+          CALL update_lbc_var (mmzp(ngrid),mmxp(ngrid),mmyp(ngrid),ngrid &
                              ,basic_g(ngrid)%wp,3)
       endselect
     endif

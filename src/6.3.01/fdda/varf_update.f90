@@ -328,7 +328,7 @@ CALL refs3d (mzp,mxp,myp,pi0,dn0,dn0u,dn0v,th0,topt,rtgt)
 
 ! Sync up overlap regions between sub-domains on the complete
 ! var list which contains the 3D reference state
-if (nmachs .gt. 1) CALL update_lbc_vgroup(ngrid,LBC_ALL_VARS)
+if (nmachs .gt. 1) CALL update_lbc_vgroup (ngrid,LBC_ALL_VARS)
 
 deallocate(temp_v1)
 deallocate(temp_v2)

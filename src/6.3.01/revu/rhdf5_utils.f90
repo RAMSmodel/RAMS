@@ -156,13 +156,6 @@ implicit none
                       ,dset_ndims,dset_dims,ext_dims,chunk_dims,dnstring)
   CALL rhdf5_adjust_chunk_sizes (dset_ndims,chunk_dims,dsize)
 
-  ! Use the original ndims and dims values for the call to 
-  ! rhd5_add_null_bytes(). Since this routine treats the sdata array 
-  ! as a 1D array with a total number of elements given by the product of 
-  ! the sizes in dims, it doesn't matter what order the dimension sizes are 
-  ! listed in dims. We also want to use dims and ndims since they describe 
-  ! what is in sdata.
-
   CALL rh5d_setup_and_write (id,trim(vname)//char(0),dtype,0,dset_ndims &
        ,dset_dims,ext_dims,chunk_dims,deflvl,dsetid,rdata,hdferr)
 
@@ -244,13 +237,6 @@ implicit none
   CALL rhdf5_build_dims_for_write (itstep,ndims,dims,dimnames &
                       ,dset_ndims,dset_dims,ext_dims,chunk_dims,dnstring)
   CALL rhdf5_adjust_chunk_sizes (dset_ndims,chunk_dims,dsize)
-
-  ! Use the original ndims and dims values for the call to 
-  ! rhd5_add_null_bytes(). Since this routine treats the sdata array 
-  ! as a 1D array with a total number of elements given by the product of 
-  ! the sizes in dims, it doesn't matter what order the dimension sizes are 
-  ! listed in dims. We also want to use dims and ndims since they describe 
-  ! what is in sdata.
 
   CALL rh5d_setup_and_write (id,trim(vname)//char(0),dtype,0,dset_ndims &
        ,dset_dims,ext_dims,chunk_dims,deflvl,dsetid,fsngl,hdferr)
@@ -438,35 +424,6 @@ integer :: rhdf5_find_even_divisor
 
 return
 END SUBROUTINE rhdf5_adjust_chunk_sizes
-
-!##############################################################################
-Subroutine rhdf5_add_null_bytes (sdata,ssize,ndims,dims)
-
-! This routine will walk through the sdata array adding null bytes
-! to the ends of all the strings.
-
-implicit none
-
-integer :: ndims, ssize
-integer, dimension(*) :: dims
-character(len=ssize), dimension(*) :: sdata
-integer :: i, ntot
-
-! No matter what the dimensions of sdata really are, the strings are all 
-! lined up in contiguous memory, each one spaced apart by ssize bytes. 
-! Therefore we can treat sdata as a 1D array of strings with length ssize, 
-! and just step through as many strings as the actual dimensions dicatate.
-ntot = 1
-do i = 1, ndims
-  ntot = ntot * dims(i)
-enddo
-
-do i = 1, ntot
-  sdata(i) = trim(sdata(i)) // char(0)
-enddo
-
-return
-END SUBROUTINE rhdf5_add_null_bytes
 
 !##############################################################################
 Subroutine rhdf5_c2f_string (cstring,fstring,ssize)

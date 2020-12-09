@@ -120,12 +120,12 @@ if(trim(runtype) == 'INITIAL' .or. &
       do ifm = 1,ngrids
         icm = nxtnest(ifm)
         if (icm .ge. 1) then
-          CALL newgrid(ifm)
+          CALL newgrid (ifm)
           if (initial .eq. 1) then
-            CALL interp_fine_grid(ifm,icm,IFG_HH_INIT)
+            CALL interp_fine_grid (ifm,icm,IFG_HH_INIT)
           else
             ! initial == 3 (history initialization)
-            CALL interp_fine_grid(ifm,icm,IFG_HIST_INIT)
+            CALL interp_fine_grid (ifm,icm,IFG_HIST_INIT)
           endif
         endif
       enddo
@@ -231,7 +231,7 @@ if(trim(runtype) == 'INITIAL' .or. &
 
       !Initialize KPP mixed layer ocean model
       if(IKPP > 0) &
-       CALL MCKPP_INITIALIZE_FIELDS ()
+       CALL mckpp_initialize_fields ()
 
    enddo !end do for all grid initialization
 
@@ -299,9 +299,9 @@ if (if_oda == 1) CALL oda_read (nnzp(1),nnxp(1),nnyp(1),basic_g(1)%pi0(1,1,1))
 ! regions of those nodes.
 if (nmachs .gt. 1) then
   do ifm = 1, ngrids
-    CALL newgrid(ifm)
-    CALL update_lbc_vgroup(ifm,LBC_ALL_INIT_VARS)
-    CALL update_lbc_vgroup(ifm,LBC_ALL_VARS)
+    CALL newgrid (ifm)
+    CALL update_lbc_vgroup (ifm,LBC_ALL_INIT_VARS)
+    CALL update_lbc_vgroup (ifm,LBC_ALL_VARS)
   enddo
 endif
 

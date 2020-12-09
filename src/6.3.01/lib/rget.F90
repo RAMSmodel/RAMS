@@ -20,7 +20,8 @@ implicit none
       !Routine to get command line argument
 
 #if defined (PC_LINUX1)
-      CALL getarg (i,arg)
+      !Use lowercase "call" since this is a system call
+      call getarg (i,arg)
 #else
    print*,"You specified machine/OS other than PC_LINUX1"
    print*,"You need to modify filelist.F90 to add your machine/OS"
@@ -42,7 +43,8 @@ implicit none
       !Routine to get command line argument
 
 #if defined (PC_LINUX1)
-      CALL system (trim(arg))
+      !Use lowercase "call" since this is a system call
+      call system (trim(arg))
 #else
    print*,"You specified machine/OS other than PC_LINUX1"
    print*,"You need to modify filelist.F90 to add your machine/OS"

@@ -209,7 +209,7 @@ deallocate(dpdx)
 deallocate(dpdx_top)
 
 ! Update u overlap regions
-if (nmachs .gt. 1) CALL update_lbc_var(m1,m2,m3,ngrid,up,3)
+if (nmachs .gt. 1) CALL update_lbc_var (m1,m2,m3,ngrid,up,3)
 
 return
 END SUBROUTINE prdctu
@@ -283,7 +283,7 @@ if (jdim .eq. 1) then
    deallocate(dpdy_top)
 
    ! Update v overlap regions
-   if (nmachs .gt. 1) CALL update_lbc_var(m1,m2,m3,ngrid,vp,3)
+   if (nmachs .gt. 1) CALL update_lbc_var (m1,m2,m3,ngrid,vp,3)
 
 endif
 
@@ -338,7 +338,7 @@ do j = ja,jz
 enddo
 
 ! Update w overlap regions
-if (nmachs .gt. 1) CALL update_lbc_var(m1,m2,m3,ngrid,wp,3)
+if (nmachs .gt. 1) CALL update_lbc_var (m1,m2,m3,ngrid,wp,3)
 
 return
 END SUBROUTINE prdctw1
@@ -402,7 +402,7 @@ if (impl .eq. 1) then
 endif
 
 ! Update w overlap regions
-if (nmachs .gt. 1) CALL update_lbc_var(m1,m2,m3,ngrid,wp,3)
+if (nmachs .gt. 1) CALL update_lbc_var (m1,m2,m3,ngrid,wp,3)
 
 return
 END SUBROUTINE prdctw2
@@ -432,7 +432,7 @@ if (impl .eq. 1) then
 endif
 
 ! Update w overlap regions
-if (nmachs .gt. 1) CALL update_lbc_var(m1,m2,m3,ngrid,wp,3)
+if (nmachs .gt. 1) CALL update_lbc_var (m1,m2,m3,ngrid,wp,3)
 
 return
 END SUBROUTINE prdctw3
@@ -530,7 +530,7 @@ deallocate(heatdv)
 deallocate(heatfx)
 
 ! Update p overlap regions
-if (nmachs .gt. 1) CALL update_lbc_var(m1,m2,m3,ngrid,pp,3)
+if (nmachs .gt. 1) CALL update_lbc_var (m1,m2,m3,ngrid,pp,3)
 
 return
 END SUBROUTINE prdctp1
@@ -560,7 +560,7 @@ enddo
 if (nstbot .eq. 1) CALL botset (m1,m2,m3,pp,'P')
 
 ! Update p overlap regions
-if (nmachs .gt. 1) CALL update_lbc_var(m1,m2,m3,ngrid,pp,3)
+if (nmachs .gt. 1) CALL update_lbc_var (m1,m2,m3,ngrid,pp,3)
 
 return
 END SUBROUTINE prdctp2

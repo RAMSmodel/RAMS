@@ -683,7 +683,8 @@ real :: rand_num
 
 do j = 1, ny
   do i = 1, nx
-    CALL random_number (rand_num)                ! random number between 0 and 1
+    !Use lowercase "call" since this is a system call
+    call random_number (rand_num)                ! random number between 0 and 1
     bub_rand_nums(i,j) = 1.0 - (2.0 * rand_num)  ! random number between -1 and 1
   enddo
 enddo

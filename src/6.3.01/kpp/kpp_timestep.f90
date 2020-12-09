@@ -124,15 +124,15 @@ do j = ja,jz
    IF (nint(leaf_g(ngrid)%leaf_class(i,j,1)) == 0. .and. &
             leaf_g(ngrid)%patch_area(i,j,1) > 0.50) THEN !Saleeby(2018)
     !Copy 3D fields stored arrays to temporary 1D column for physics
-    CALL MCKPP_FIELDS_3Dto1D (kpp_3d_fields(ngrid),kpp_1d_fields,i,j)
+    CALL mckpp_fields_3dto1d (kpp_3d_fields(ngrid),kpp_1d_fields,i,j)
     !Run physics ocean timestep
-    CALL MCKPP_PHYSICS_OCNSTEP (kpp_1d_fields,kpp_const_fields,i,j)
+    CALL mckpp_physics_ocnstep (kpp_1d_fields,kpp_const_fields,i,j)
     !Enforced overrides
-    CALL MCKPP_OVERRIDES_PROFILE (kpp_1d_fields,kpp_const_fields,i,j)
+    CALL mckpp_overrides_profile (kpp_1d_fields,kpp_const_fields,i,j)
     !Force bottom layer temperature to observations "bottomt"
-    CALL MCKPP_OVERRIDES_BOTTOMTEMP (kpp_1d_fields,kpp_const_fields,i,j)
+    CALL mckpp_overrides_bottomtemp (kpp_1d_fields,kpp_const_fields,i,j)
     !Copy 1D updated fields from physics to 3D stored arrays
-    CALL MCKPP_FIELDS_1Dto3D (kpp_1d_fields,kpp_3d_fields(ngrid),i,j)
+    CALL mckpp_fields_1dto3d (kpp_1d_fields,kpp_3d_fields(ngrid),i,j)
 
     !Output SST back to RAMS (X_t is in celcius already)
     !For now, setting top level ocean model temperature to SST

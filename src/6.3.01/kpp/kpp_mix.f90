@@ -436,7 +436,7 @@ implicit none
          ,kpp_1d_fields%X(k,1),-kpp_const_fields%zm(k) &
          ,alpha,beta,exppr,sigma0,sigma)
      kpp_1d_fields%rho(k)= 1000. + sigma0
-     kpp_1d_fields%CP(k) = MCKPP_CPSW (kpp_1d_fields%X(k,2) &
+     kpp_1d_fields%CP(k) = MCKPP_CPSW(kpp_1d_fields%X(k,2) &
           +kpp_1d_fields%Sref,kpp_1d_fields%X(k,1),-kpp_const_fields%zm(k))
      kpp_1d_fields%talpha(k) = alpha
      kpp_1d_fields%sbeta(k)  = beta
@@ -880,7 +880,7 @@ return
 END SUBROUTINE MCKPP_PHYSICS_VERTICALMIXING_DDMIX
 
 !##############################################################################
-Subroutine mckpp_physics_verticalmixing_bldepth (km, kmp1, dVsq, Ritop &
+Subroutine MCKPP_PHYSICS_VERTICALMIXING_BLDEPTH (km, kmp1, dVsq, Ritop &
   , ustar, Bo, Bosol, hbl, bfsfc, stable, caseA, kbl, Rib, sigma, wm &
   , ws, kpp_1d_fields, kpp_const_fields,i,j)
 
@@ -1132,10 +1132,10 @@ implicit none
   endif
 
 return
-END SUBROUTINE mckpp_physics_verticalmixing_bldepth
+END SUBROUTINE MCKPP_PHYSICS_VERTICALMIXING_BLDEPTH
 
 !##############################################################################
-Subroutine mckpp_physics_verticalmixing_blmix (km, mdiff, ustar, bfsfc, hbl &
+Subroutine MCKPP_PHYSICS_VERTICALMIXING_BLMIX (km, mdiff, ustar, bfsfc, hbl &
     , stable, caseA, kbl,gat1, dat1, dkm1, blmc, sigma, wm, ws &
     , kpp_1d_fields,kpp_const_fields,i,j)
 
@@ -1302,7 +1302,7 @@ implicit none
   dkm1(3) = hbl * ws * sig * (1. + sig * Gt)
   
 return
-END SUBROUTINE mckpp_physics_verticalmixing_blmix
+END SUBROUTINE MCKPP_PHYSICS_VERTICALMIXING_BLMIX
 
 !##############################################################################
 Subroutine MCKPP_PHYSICS_VERTICALMIXING_ENHANCE (km,mdiff,dkm1,hbl,kbl &

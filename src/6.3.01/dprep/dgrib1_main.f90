@@ -76,15 +76,15 @@ c_hr  ='99999999'
 
 !Read command line arguments
 do i=1,ia,2
-   call ugetarg(i,cflag(i))
+   CALL ugetarg (i,cflag(i))
    if(cflag(i).eq.'-t')then
-      call ugetarg(i+1,c_datatype)
+      CALL ugetarg (i+1,c_datatype)
    elseif(cflag(i).eq.'-d')then
-      call ugetarg(i+1,c_date)
+      CALL ugetarg (i+1,c_date)
    elseif(cflag(i).eq.'-h')then
-      call ugetarg(i+1,c_hr)
+      CALL ugetarg (i+1,c_hr)
    elseif(cflag(i).eq.'-f')then
-      call ugetarg(i+1,filein)
+      CALL ugetarg (i+1,filein)
    endif
 enddo
 
@@ -289,34 +289,34 @@ endif
 !******************************************************************************
 
 !Read some of the grib metadata
-call grib_query (filein(1:lcg))            !Open the grib file
-call grib_queryc('projection',projection)  !get Grid projection
-call grib_queryf('lat1',alat1)             !get SW lat
-call grib_queryf('lon1',alon1)             !get SW lon
-call grib_queryf('lat2',alat2)             !get NE lat
-call grib_queryf('lon2',alon2)             !get NE lon
-call grib_queryf('dx',dx)                  !get Delta-X (km or deg)
-call grib_queryf('dy',dy)                  !get Delta-Y (km or deg)
-call grib_queryi('nx',nx)                  !get # of X grid points
-call grib_queryi('ny',ny)                  !get # of Y grid points
+CALL grib_query  (filein(1:lcg))            !Open the grib file
+CALL grib_queryc ('projection',projection)  !get Grid projection
+CALL grib_queryf ('lat1',alat1)             !get SW lat
+CALL grib_queryf ('lon1',alon1)             !get SW lon
+CALL grib_queryf ('lat2',alat2)             !get NE lat
+CALL grib_queryf ('lon2',alon2)             !get NE lon
+CALL grib_queryf ('dx',dx)                  !get Delta-X (km or deg)
+CALL grib_queryf ('dy',dy)                  !get Delta-Y (km or deg)
+CALL grib_queryi ('nx',nx)                  !get # of X grid points
+CALL grib_queryi ('ny',ny)                  !get # of Y grid points
 allocate (a(nx,ny))
-call grib_queryi('nrec',nrec)              !get # of records
-call grib_queryi('longdate',longdate)      !get the date/time
-call grib_queryi('mode',mode)              !get grid mode info (see grid tables)
-call grib_queryf('orient',aorient)         
-call grib_queryf('lov',alov)               !get grid orientation for LC projection
-call grib_queryf('latin1',reflat1)         !get reference lat 1 for LC projection
-call grib_queryf('latin2',reflat2)         !get reference lat 2 for LC projection
+CALL grib_queryi ('nrec',nrec)              !get # of records
+CALL grib_queryi ('longdate',longdate)      !get the date/time
+CALL grib_queryi ('mode',mode)              !get grid mode info (see grid tables)
+CALL grib_queryf ('orient',aorient)         
+CALL grib_queryf ('lov',alov)               !get grid orientation for LC projection
+CALL grib_queryf ('latin1',reflat1)         !get reference lat 1 for LC projection
+CALL grib_queryf ('latin2',reflat2)         !get reference lat 2 for LC projection
 allocate (irecs(nrec))
 allocate (levs(nrec))
 allocate (idates(nrec))
 allocate (ifhrs(nrec))
 allocate (fields(nrec))
-call grib_queryi('irecs',irecs)
-call grib_queryi('levs',levs)
-call grib_queryi('idates',idates)
-call grib_queryi('ifhrs',ifhrs)
-call grib_queryc('fields',fields)
+CALL grib_queryi ('irecs',irecs)
+CALL grib_queryi ('levs',levs)
+CALL grib_queryi ('idates',idates)
+CALL grib_queryi ('ifhrs',ifhrs)
+CALL grib_queryc ('fields',fields)
 
 print*,'DX,DY: ',dx,dy
 print*,'NX,NY: ',nx,ny
@@ -555,9 +555,9 @@ do j=1,nlev
  do i=1,nvar3d
    a=amiss
    matched = .false.
-   call getfield(a,var3d(i),nrec,irecs,fields,levs,idates,ifhrs &
+   CALL getfield (a,var3d(i),nrec,irecs,fields,levs,idates,ifhrs &
                 ,iplevs(j),ndate,nhr,matched)
-   call prepfield(a,nx,ny,projection,llisglobal,var3d(i),mode &
+   CALL prepfield (a,nx,ny,projection,llisglobal,var3d(i),mode &
                  ,amiss,'3d',datatype,i)
 !write(10,*)'3d NEXT ',var3d(i)
    write(10,'(8f12.5)')a
@@ -576,10 +576,10 @@ do i=1,nvarsd
   do j=startlev,endlev
      a=amiss
      matched = .false.
-     call getfield(a,varsd(i),nrec,irecs,fields,levs,idates,ifhrs &
+     CALL getfield (a,varsd(i),nrec,irecs,fields,levs,idates,ifhrs &
                   ,islevs(j),ndate,nhr,matched)
      if(matched) then
-      call prepfield(a,nx,ny,projection,llisglobal,varsd(i),mode &
+      CALL prepfield (a,nx,ny,projection,llisglobal,varsd(i),mode &
                     ,amiss,'sd',datatype,i)
 !write(10,*)'SOIL NEXT ',varsd(i),islevs(j)
       write(10,'(8f12.5)')a
@@ -591,10 +591,10 @@ do i=1,nvarsd
     do j=startlev,endlev
       a=amiss
       matched = .false.
-      call getfield(a,varsd(i),nrec,irecs,fields,levs,idates,ifhrs &
+      CALL getfield (a,varsd(i),nrec,irecs,fields,levs,idates,ifhrs &
                    ,islevs(j),ndate,nhr,matched)
       if(matched) then
-       call prepfield(a,nx,ny,projection,llisglobal,varsd(i),mode &
+       CALL prepfield (a,nx,ny,projection,llisglobal,varsd(i),mode &
                      ,amiss,'sd',datatype,i)
 !write(10,*)'SOIL NEXT EXTRA ',varsd(i)
        write(10,'(8f12.5)')a
@@ -625,10 +625,10 @@ writesnowlevs=0
 do i=1,nvar2d
    a=amiss
    j=0 !specify j=0 for the surface
-   call getfield(a,var2d(i),nrec,irecs,fields,levs,idates,ifhrs &
+   CALL getfield (a,var2d(i),nrec,irecs,fields,levs,idates,ifhrs &
                 ,j,ndate,nhr,matched)
    if(matched) then
-    call prepfield(a,nx,ny,projection,llisglobal,var2d(i),mode &
+    CALL prepfield (a,nx,ny,projection,llisglobal,var2d(i),mode &
                  ,amiss,'2d',datatype,i)
 !write(10,*)'SNOW NEXT ',var2d(i)
     write(10,'(8f12.5)')a
@@ -692,7 +692,7 @@ do i=1,nrec,1
 
    if(type==fields(i).and.iplev==levs(i).and.ndate==idates(i).and. &
       nhr==ifhrs(i))then
-      call grib_get(a,irecs(i))
+      CALL grib_get (a,irecs(i))
       print*,'matched ',fields(i),levs(i),idates(i),ifhrs(i)
       matched = .true.
       return
@@ -723,10 +723,10 @@ if(projection=='latlon'.and.mode==128)then
    allocate (b(nx*ny))
    if(llisglobal) then
     print*,'   flipping the projection'
-    call flip(nx,ny,a,b)
+    CALL flip (nx,ny,a,b)
    else
     print*,'   flipping the projection (latsonly)'
-    call flip_lats(nx,ny,a,b)
+    CALL flip_lats (nx,ny,a,b)
    endif
    a=b
    deallocate (b)

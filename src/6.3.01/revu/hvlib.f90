@@ -3970,7 +3970,7 @@ elseif(cvar(1:lv).eq.'sw_heat_rate') then
    ierr=rams_getvar('SWDN',idim_type,ngrd,pv2,flnm) !atmos shortwave down
    ierr=rams_getvar('DN0' ,idim_type,ngrd,pv3,flnm)
    ierr=rams_getvar('PI'  ,idim_type,ngrd,pv4,flnm)
-   CALL rams_swheatrate (nnxp(ngrd),nnyp(ngrd),nnzp(ngrd),a &
+   CALL rams_heatrate (nnxp(ngrd),nnyp(ngrd),nnzp(ngrd),a &
      ,pv1,pv2,pv3,pv4,ngrd)
    deallocate (pv1,pv2,pv3,pv4)
    CALL rams_comp_mults (n1,n2,n3,a,86400.)
@@ -3987,7 +3987,7 @@ elseif(cvar(1:lv).eq.'lw_heat_rate') then
    ierr=rams_getvar('LWDN',idim_type,ngrd,pv2,flnm) !atmos longwave down
    ierr=rams_getvar('DN0' ,idim_type,ngrd,pv3,flnm)
    ierr=rams_getvar('PI'  ,idim_type,ngrd,pv4,flnm)
-   CALL rams_swheatrate (nnxp(ngrd),nnyp(ngrd),nnzp(ngrd),a &
+   CALL rams_heatrate (nnxp(ngrd),nnyp(ngrd),nnzp(ngrd),a &
      ,pv1,pv2,pv3,pv4,ngrd)
    deallocate (pv1,pv2,pv3,pv4)
    CALL rams_comp_mults (n1,n2,n3,a,86400.)

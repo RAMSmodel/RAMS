@@ -1,6 +1,6 @@
 
 !##############################################################################
-subroutine exevolve (mzp,mxp,myp,ia,iz,ja,jz,izu,jzv,key,thvlast)
+Subroutine exevolve (mzp,mxp,myp,ia,iz,ja,jz,izu,jzv,key,thvlast)
 
 use mem_tend
 use mem_basic
@@ -58,7 +58,7 @@ return
 END SUBROUTINE exevolve
 
 !##############################################################################
-subroutine exadvlf (m1,m2,m3,ia,iz,ja,jz,izu,jzv,rtgu,fmapui,rtgv,fmapvi &
+Subroutine exadvlf (m1,m2,m3,ia,iz,ja,jz,izu,jzv,rtgu,fmapui,rtgv,fmapvi &
          ,f13t,f23t,rtgt,fmapt,dxt,dyt,uc,dn0u,vc,dn0v,dn0,wc,pt,pc)
 
 use mem_basic
@@ -159,7 +159,7 @@ return
 END SUBROUTINE exadvlf
 
 !##############################################################################
-subroutine excondiv (m1,m2,m3,ia,iz,ja,jz,izu,jzv,uc,vc,wc,pc,pt  &
+Subroutine excondiv (m1,m2,m3,ia,iz,ja,jz,izu,jzv,uc,vc,wc,pc,pt  &
     ,dxt,dyt,rtgt,rtgu,rtgv,f13t,f23t,fmapt,fmapui,fmapvi)
 
 use mem_basic
@@ -249,7 +249,7 @@ return
 END SUBROUTINE excondiv
 
 !##############################################################################
-subroutine fthvlast (m1,m2,m3,ia,iz,ja,jz,thvlast,theta,rtp,rv)
+Subroutine fthvlast (m1,m2,m3,ia,iz,ja,jz,thvlast,theta,rtp,rv)
 
 use mem_basic
 use mem_grid
@@ -282,7 +282,7 @@ return
 END SUBROUTINE fthvlast
 
 !##############################################################################
-subroutine exheat (m1,m2,m3,ia,iz,ja,jz,izu,jzv,thvlast)
+Subroutine exheat (m1,m2,m3,ia,iz,ja,jz,izu,jzv,thvlast)
 
 use mem_tend
 use mem_basic
@@ -307,7 +307,7 @@ return
 END SUBROUTINE exheat
 
 !##############################################################################
-subroutine thetvtend (m1,m2,m3,ia,iz,ja,jz,izu,jzv,theta,rtp,rv &
+Subroutine thetvtend (m1,m2,m3,ia,iz,ja,jz,izu,jzv,theta,rtp,rv &
                      ,thvtend,thvlast)
 
 use mem_basic
@@ -356,7 +356,7 @@ return
 END SUBROUTINE thetvtend
 
 !##############################################################################
-subroutine exthvadv (mzp,mxp,myp,ia,iz,ja,jz,izu,jzv,thvadv)
+Subroutine exthvadv (mzp,mxp,myp,ia,iz,ja,jz,izu,jzv,thvadv)
 
 use mem_basic
 use mem_grid
@@ -463,7 +463,7 @@ return
 END SUBROUTINE exthvadv
 
 !##############################################################################
-subroutine prep_thetv (mzp,mxp,myp,ia,iz,ja,jz,theta,rtp,rv,thetav)
+Subroutine prep_thetv (mzp,mxp,myp,ia,iz,ja,jz,theta,rtp,rv,thetav)
 
 use micphys, only:level
 
@@ -494,7 +494,7 @@ return
 END SUBROUTINE prep_thetv
 
 !##############################################################################
-subroutine exhtend (mzp,mxp,myp,ia,iz,ja,jz,pi0,pc,rtp,theta,rv,pt &
+Subroutine exhtend (mzp,mxp,myp,ia,iz,ja,jz,pi0,pc,rtp,theta,rv,pt &
                    ,thvtend,thvadv)
 
 use mem_tend

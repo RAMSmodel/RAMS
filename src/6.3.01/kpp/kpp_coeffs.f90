@@ -63,7 +63,7 @@ implicit none
 ! minimize storage in common (alpha overwrites coefficients that beta 
 ! obtains through common from Sig80). 
 ! 
-! On Entry, the calling program should specify a nonzero value for
+! On entry, the calling program should specify a nonzero value for
 ! any or all of: alpha,beta,kappa in the argument list.  This indicates 
 ! to THIS routine which values are desired.
 ! 
@@ -76,7 +76,7 @@ implicit none
 ! beta will have already used them (if it was computed at all). 
 ! 
 ! Since Kappa does not require density values to be known, but does
-! require the Bulk Modulus, an Entry point to compute only K in Sig80 
+! require the Bulk Modulus, an entry point to compute only K in Sig80 
 ! has been set up.  However, if alpha or beta are computed then K and 
 ! other necessary terms to compute kappa will be in common and the
 ! call to BLKMOD in Sig80 will not be necessary.  There is, however, a 
@@ -350,7 +350,7 @@ implicit none
 
   Common /EOS/R1,R2,R3,R4,A,B,C,D,E,A1,B1,K,SR,P0,PK,Rho,Rho0,ABFac,ABFlg 
 
-  ! If P=0 must go to Sig80 routine at Entry BlkMod
+  ! If P=0 must go to Sig80 routine at entry BlkMod
   If(P.eq.0) Then 
      KapFlg=.True. 
      CALL MCKPP_BlkMod (S,T,P,KapFlg) 
@@ -402,11 +402,11 @@ implicit none
   REAL A,B,C,D,E,A1,B1,AW,BW,K,K0,KW       
   !Bulk Modulus Terms
   Real BlkMod                              
-  !Entry Point for Kappa 
+  !entry Point for Kappa 
   Real Sig,Rho,Rho0,ABFac                    
   !Sigma + 1000
   Logical KapFlg, ABFlg                           
-  !True when Entry at BlkMod 
+  !True when entry at BlkMod 
 
 ! Common Block for the Equation Of State routines Alf80,Bet80,Kap80
 ! Which can utilize Intermediate sums to minimize overhead once density 
@@ -414,7 +414,7 @@ implicit none
   Common /EOS/R1,R2,R3,R4,A,B,C,D,E,A1,B1,K,SR,P0,PK,Rho,Rho0,ABFac,ABFlg 
  
 ! CONVERT PRESSURE TO BARS AND SQ ROOT SALINITY 
-! And Set the Logical Flag used to control Entry Point Below for Kappa 
+! And Set the Logical Flag used to control entry Point Below for Kappa 
   P0=P/10.0 
   SR=SQRT(ABS(S)) 
   KapFlg=.False.
@@ -440,13 +440,13 @@ implicit none
   ! COMPUTE COMPRESSION TERMS 
   
   ! This is the entry point when the Bulk Modulus K is desired, which 
-  ! does not require knowledge of density. Entry from Kappa will have
+  ! does not require knowledge of density. entry from Kappa will have
   ! KapFlg set .True. so that we exit before computing Sig.  
   Entry MCKPP_BlkMod (S,T,P,KapFlg)
   
   ! For Computation of Kappa  
   
-  ! If Entry without density computed need these two common terms 
+  ! If entry without density computed need these two common terms 
   
   If(KapFlg)Then
      P0=P/10.0 
@@ -477,7 +477,7 @@ implicit none
 ! EVALUATE PRESS POLYNOMIAL AND RETURN 
   K=(B*P0+A)*P0+K0
    
-! If Entry at BlkMod Exit Now 
+! If entry at BlkMod Exit Now 
   PK=P0/K 
   If (KapFlg) Return
   Sig=(1000.0*PK+Sig0)/(1.0-PK)   

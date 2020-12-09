@@ -31,10 +31,10 @@ if (numarg < 1) then
 endif
 
 ! Get the command line arguments
-CALL ugetarg(1,source)   ! input file name
-CALL ugetarg(2,datatype) ! datatype number indicator
-CALL ugetarg(3,hpath)    ! output file path (and location of header file)
-CALL ugetarg(4,fpref)    ! output file name prefix for header and blocks
+CALL ugetarg (1,source)   ! input file name
+CALL ugetarg (2,datatype) ! datatype number indicator
+CALL ugetarg (3,hpath)    ! output file path (and location of header file)
+CALL ugetarg (4,fpref)    ! output file name prefix for header and blocks
 
 ! Set the attributes of the input data. These could be set in an input namelist
 !    but let's hardwire these in here for now:

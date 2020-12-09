@@ -91,7 +91,7 @@ CALL each_call (mzp,dtlt)
 dtlti = 1. / dtlt
 
 !******************************************************************************
-! RUN THE MICROPHYSICS WITH IMBEDDED CALL TO HARRINGTON RADIATION
+! RUN THE MICROPHYSICS WITH IMBEDDED call TO HARRINGTON RADIATION
 !******************************************************************************
 !Going forth, ngr is used as abbreviation for ngrid
 ngr = ngrid
