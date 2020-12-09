@@ -33,7 +33,7 @@
 # Set you RAMS root path
 rd=`pwd`/..
 # RAMS version (ie. 6.1.6)
-vs=6.3.00
+vs=6.3.01
 # Set flag for type of test (0=sequential, 1=parallel)
 runtype=1
 # Set number of nodes for parallel run.
