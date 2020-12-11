@@ -24,3 +24,7 @@ REVUIN.*		text
 dp-p*			binary
 *.doc			binary
 *.docx			binary
+*.h5			binary
+*.hdf5			binary
+*.grb			binary
+*.grb2			binary
