@@ -6,8 +6,8 @@ MAKE=/usr/bin/make
 #############################################################################
 # Set your RAMS root path and version number.
 #############################################################################
-RAMS_ROOT=/home/smsaleeb/rams_20201027_dev
-RAMS_VERSION=6.3.00
+RAMS_ROOT=/home/smsaleeb/rams_20201201_dev
+RAMS_VERSION=6.3.01
 
 #############################################################################
 # Set root locations for HDF5 I/O software.
@@ -127,14 +127,24 @@ LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
 # double precision rather than default double precision. Note that using
 # double will make output and runtimes substantially longer but provide the
 # extra precision needed in some highly sensitive simulations.
+#
 # Add the "-DENABLE_PARALLEL_COMPRESSION" flag to attempt doing parallel
 # compression of HDF5 output. Sometime this works and sometimes it does not.
 # But if it does work, it will make it past the first analysis file write.
 # If it does not work, it will fail or hang on the first file write.
+#
+# Use -std=c99 if you need the c99 standard. Use -std=gnu99 potentially to
+# stop unnecessary warnings related to "popen/pclose" in "dprep" code.
+#
+# "-w" turns off warnings, which in many cases are not a problem since our
+# code has been well tested. New "gcc" versions sometime throw extra warnings
+# that are not really as issue for us, but you can turn warnings back on by
+# removing the "-w" if you wish to alter code to eliminate warnings.
 #############################################################################
 C_COMP=gcc
-C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=c99 -DENABLE_PARALLEL_COMPRESSION
-#C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=c99 -DRAMS_DOUBLE_PREC
+C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DENABLE_PARALLEL_COMPRESSION -w
+#C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DRAMS_DOUBLE_PREC \
+#  -DENABLE_PARALLEL_COMPRESSION -w
 
 #############################################################################
 # System archive command syntax

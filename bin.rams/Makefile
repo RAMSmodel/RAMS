@@ -122,13 +122,11 @@ OBJ = $(ARC)($(MODEL)/lib/an_header.o) \
       $(ARC)($(MODEL)/mpi/mpass_init.o) \
       $(ARC)($(MODEL)/mpi/mpass_lbc.o)  \
       $(ARC)($(MODEL)/mpi/mpass_nest.o) \
-      $(ARC)($(MODEL)/mpi/mpass_oda.o) \
       $(ARC)($(MODEL)/mpi/mpass_cyclic.o) \
       $(ARC)($(MODEL)/mpi/para_init.o) \
       $(ARC)($(MODEL)/mpi/par_decomp.o) \
       $(ARC)($(MODEL)/mpi/rnode.o) \
       $(ARC)($(MODEL)/nesting/nest_drivers.o) \
-      $(ARC)($(MODEL)/nesting/nest_filldens.o) \
       $(ARC)($(MODEL)/nesting/nest_intrp.o) \
       $(ARC)($(MODEL)/nesting/nest_feed.o) \
       $(ARC)($(MODEL)/radiate/rrad3.o) \

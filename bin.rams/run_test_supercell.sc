@@ -2,7 +2,7 @@
 ################################################################################
 # This script will run a single test serially (by default) (on any system) or in
 # parallel (on a simple computer cluster that does not use a PBS/QSUB queuing
-# system). Note that on many supercomputing systems (that use modules and PBS
+# system). Note that many supercomputing systems (that use modules and PBS
 # queuing systems) often have different methods for compiling code for serial
 # or parallel processing. The correct compiling method is required for running
 # this script in parallel or serial.
@@ -12,16 +12,16 @@
 #  LEVEL=3 microphysics
 # 2. This idealized simulation does not require geographical data (sfctypehdf5)
 #  for running since geography does not matter. Also, we do not need gridded
-#  initialization data beyond the sounding input into the namelist. The sounding
+#  initialization data beyond the sounding input in the namelist. The sounding
 #  is applied horizontally homogeneous for an idealized run.
 #
 # Here is a sample executable statement for running RAMS in parallel,
 #  but NOT on a supercomputer using a PBS QSUB queuing system. Consult their
 #  userguides for running parallel jobs on their systems. Each system is unique.
-# ../misc/mpich2-1.4.1.precomp.binaries/bin/mpiexec -machinefile machs -np 4 \
-# ./bin.rams/rams-6.2.12 -f RAMSIN.supercell
+# /home/smsaleeb/software/mpich-3.3.2/bin/mpiexec -machinefile machs -np 8 \
+# ./bin.rams/rams-6.3.01 -f RAMSIN.supercell
 # Note: might have to add (-ifrace eth0) to this executable statement or
-#  something similar depending on how you compute nodes communicate. Use
+#  something similar depending on how your compute nodes communicate. Use
 #  utility (ifconfig) to find out how your nodes communicate (ie. eth0 or eth1).
 #
 # Do not blindly use this script for running every simulation. It is simply
@@ -33,9 +33,9 @@
 # Set you RAMS root path
 rd=`pwd`/..
 # RAMS version (ie. 6.1.6)
-vs=6.3.00
+vs=6.3.01
 # Set flag for type of test (0=sequential, 1=parallel)
-runtype=1
+runtype=0
 # Set number of nodes for parallel run.
 n=10
 # Set delete flag (0 = do not delete, 1 = delete and start over)
@@ -68,6 +68,7 @@ fi
 if [ ! -f $rd/bin.rams/RAMSIN.supercell ] || [ ! -f $a3 ] || [ ! -f $a4 ]; then
  echo "One of your input paths is incorrect. Stopping!"
  echo "Check RAMSIN, RAMS executable, and REVU executable!"
+ echo "Need to compile RAMS and REVU for this script to fully work"
  exit
 fi
 
