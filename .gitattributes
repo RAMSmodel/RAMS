@@ -1,2 +1,30 @@
-#Set line endings in all text files to unix style (LF)
-* text eol=lf
+#RAMS Gitattributes file. We want to change line endings of text files to match Unix
+#line endings, but we want to preserve binary files. 
+
+#default option, for all not defined specifically below. 
+*				text=auto
+
+# Source code and RAMS config files
+*.f90			text
+*.c     		text
+*.F				text
+Makefile		text
+*.sc			text
+machs.master	text
+RAMSIN.*		text
+REVUIN.*		text
+
+#git files
+.gitignore		text
+.gitattributes	text
+
+
+# Binary files whose line endings we want to preserve.
+*.pdf			binary
+dp-p*			binary
+*.doc			binary
+*.docx			binary
+*.h5			binary
+*.hdf5			binary
+*.grb			binary
+*.grb2			binary
