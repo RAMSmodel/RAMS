@@ -11,7 +11,7 @@ character(len=strl1) :: hucmfile
 integer, parameter :: nkr=33
 
 ! for bulk nucleation
-integer, parameter :: BULKNUC=0
+integer, parameter :: BULKNUC=1
 
 ! COL=Ln2/3 (for xl(k+1)=xl(k)*2.)
 real :: COL = 0.231049060186648 !=log(2.)/3.

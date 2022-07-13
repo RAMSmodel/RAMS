@@ -17,6 +17,10 @@ real, dimension(mg,mk,mb)       :: wght,xp,alpha,beta
 real, dimension(ncog,mb,npartob) :: ocoef
 real, dimension(ncb,mb,npartob) :: bcoef
 real, dimension(ncog,mb,npartg) :: gcoef
+
+! Dust imaginary index of refraction flag. Larger value mean more
+! absorption. 1 = 0.0015 (low), 2 = 0.003 (mid), 3 = 0.008 (high)
+integer, parameter              :: dust_ref_im = 2
 !---------------------------------------------------------------------------
 
 END MODULE rrad3

@@ -2622,7 +2622,8 @@ Subroutine ONECOND1 (TT,QQ,PP,ROR &
       ,DEL1N,DEL2N,DIV1,DIV2 &
       ,FF1,PSI1,R1,RLEC,RO1BL &
       ,AA1_MY,BB1_MY,AA2_MY,BB2_MY &
-      ,COL,DTCOND,ICEMAX,NKR)
+      ,COL,DTCOND,ICEMAX,NKR &
+      ,vapcldt,vapraint)
 
 IMPLICIT NONE
 
@@ -2670,6 +2671,10 @@ REAL DTIMEO(NKR),DTIMEL(NKR) &
 
 ! CCN regeneration
 real tot_before, tot_after
+
+!condensation budgets
+real vapcldt, vapraint,vapc,vapr
+
 ! NEW ALGORITHM (NO TYPE OF ICE)
 
 OPER2(AR1)=0.622/(0.622+0.378*AR1)/AR1
@@ -2687,6 +2692,9 @@ DATA TPC1, TPC2, TPC3, TPC4, TPC5 &
 DATA EPSDEL, EPSDEL2 /0.1E-03,0.1E-03/  
     
 DATA DT0L, DT0I /1.E20,1.E20/
+
+vapc=0.
+vapr=0.
 
 ! CONTROL OF DROP SPECTRUM IN subroutine ONECOND
 
@@ -2780,9 +2788,10 @@ QOLD=QPN
                    ,DTT,D1N,D2N,DT0L,DT0I)
 
 ! DROPLET DISTRIBUTION function 
+
      CALL JERDFUN (R1,B11_MY,B12_MY &
                  ,FI1,PSI1,D1N &
-                 ,1,1,COL,NKR)
+                 ,1,6,COL,NKR,vapc,vapr,rori)
 
   ELSE ! EVAPORATION - ONLY WATER 
 
@@ -2832,7 +2841,7 @@ QOLD=QPN
        
      CALL JERDFUN (R1,B11_MY,B12_MY &
                   ,FI1,PSI1,D1N &
-                  ,1,1,COL,NKR)
+                  ,1,6,COL,NKR,vapc,vapr,rori)
 
   ENDIF
 
@@ -2891,7 +2900,8 @@ QOLD=QPN
 !------------------------------------------------------------
 CALL JERDFUN_NEW (R1,DSUPINTW &
                  ,FF1_OLD,PSI1,D1N &
-                 ,1,1,COL,NKR)
+                 ,1,1,COL,NKR,vapcldt,vapraint,rori)
+
 RMASSLAA=0.0
 RMASSLBB=0.0
 ! BEFORE JERNEWF
@@ -2902,6 +2912,7 @@ DO K=1,NKR
    RMASSLBB=RMASSLBB+FI1R1
 ENDDO
 RMASSLBB=RMASSLBB*COL3*RORI
+
 IF(RMASSLBB.LT.0.0) RMASSLBB=0.0
 ! AFTER  JERNEWF
 !add CCN regeneration. Calculate the total droplets after condensation -J. Fan
@@ -2913,12 +2924,14 @@ DO K=1,NKR
    RMASSLAA=RMASSLAA+FI1R1
    tot_after = tot_after+psi1(k)*3.0*r1(k)*col
 ENDDO
+
 ! CCN regeneration from evaporation
 ccnreg = max((tot_before-tot_after),0.0)
 
 RMASSLAA=RMASSLAA*COL3*RORI
 IF(RMASSLAA.LT.0.0) RMASSLAA=0.0
 DELMASSL1=RMASSLAA-RMASSLBB
+
 QPN=QOLD-DELMASSL1
 DAL1 = AL1
 TPN=TOLD+DAL1*DELMASSL1
@@ -2942,7 +2955,8 @@ RETURN
 END SUBROUTINE ONECOND1
 
 !##############################################################################
-Subroutine JERDFUN (R2,B21_MY,B22_MY,FI2,PSI2,DEL2N,IND,ITYPE,COL,NKR)
+Subroutine JERDFUN (R2,B21_MY,B22_MY,FI2,PSI2,DEL2N,IND,ITYPE,COL,NKR, &
+                    vapcldt,vapraint,rori)
 
 IMPLICIT NONE
 REAL COL,DEL2N
@@ -2955,6 +2969,9 @@ DOUBLE PRECISION R2R(NKR),R2NR(NKR),FI2R(NKR),PSI2R(NKR)
 DOUBLE PRECISION DR2(NKR,IND),DR2N(NKR,IND),DDEL2N, &
           DB21_MY(NKR,IND)
 DOUBLE PRECISION CHECK
+REAL vapcldt, vapraint
+DOUBLE PRECISION rori
+
 CHECK=0.D0
 DO KR=1,NKR
    CHECK=B21_MY(1,1)*B21_MY(KR,1)
@@ -2989,6 +3006,15 @@ DO ICE=1,IND
   ENDIF
 ENDDO
     
+IF (ITYPE==6) THEN
+  DO KR=1,KRDROP-1
+   vapcldt=vapcldt+3.*FI2R(KR)*R2(KR,1)*(max(0.,R2N(KR,1))-R2(KR,1))*COL*RORI
+  ENDDO
+  DO KR=KRDROP,NKR
+   vapraint=vapraint+3.*FI2R(KR)*R2(KR,1)*(max(0.,R2N(KR,1))-R2(KR,1))*COL*RORI
+  ENDDO
+ENDIF
+
 DO ICE=1,IND
    IF(ITYP.EQ.ICE) THEN
       DO KR=1,NKR
@@ -3009,13 +3035,15 @@ END SUBROUTINE JERDFUN
 !##############################################################################
 Subroutine JERDFUN_NEW (R2,B21_MY &
                          ,FI2,PSI2,DEL2N &
-                         ,IND,ITYPE,COL,NKR)
+                         ,IND,ITYPE,COL,NKR,vapcldt,vapraint,rori)
 
 IMPLICIT NONE
 INTEGER IND,ITYPE,KR,ICE,NRM,NR,NKR
 REAL R2(NKR,IND),FI2(NKR,IND),PSI2(NKR,IND),COL,DEL2N
 DOUBLE PRECISION  B21_MY(NKR,IND)
 DOUBLE PRECISION R2R(NKR),R2NR(NKR),FI2R(NKR),PSI2R(NKR)
+REAL vapcldt,vapraint
+DOUBLE PRECISION rori
 
 DO KR=1,NKR
    FI2R(KR)=FI2(KR,ITYPE)
@@ -3029,6 +3057,13 @@ DO KR=1,NKR
    R2R(KR)=R2(KR,ICE)
    R2NR(KR)=R2(KR,ICE)+B21_MY(KR,ICE)
 ENDDO
+
+  DO KR=1,KRDROP-1
+   vapcldt=vapcldt+3.*FI2R(KR)*R2R(KR)*(max(0.,R2NR(KR))-R2R(KR))*COL*RORI
+  ENDDO
+  DO KR=KRDROP,NKR
+   vapraint=vapraint+3.*FI2R(KR)*R2R(KR)*(max(0.,R2NR(KR))-R2R(KR))*COL*RORI
+  ENDDO
 
 CALL JERNEWF (NR,NRM,R2R,FI2R,PSI2R,R2NR,COL,NKR)
 DO KR=1,NKR
@@ -3625,6 +3660,9 @@ REAL DEL2D(ICEMAX),SFNI1(ICEMAX),SFNI2(ICEMAX) &
 
 ! For IN regeneration
 real totin_before, totin_after
+
+!dummy budgets
+real vapc,vapr
  
 OPER2(AR1)=0.622/(0.622+0.378*AR1)/AR1
 OPER3(AR1,AR2)=AR1*AR2/(0.622+0.378*AR1)
@@ -3784,30 +3822,30 @@ enddo
       IF(ISYM2.NE.0) THEN
         CALL JERDFUN (R2,B21_MY,B22_MY &
                      ,FI2,PSI2,D2N &
-                     ,ICM,1,COL,NKR)
+                     ,ICM,1,COL,NKR,vapc,vapr,rori)
 
         CALL JERDFUN (R2,B21_MY,B22_MY &
                      ,FI2,PSI2,D2N &
-                     ,ICM,2,COL,NKR)
+                     ,ICM,2,COL,NKR,vapc,vapr,rori)
 
         CALL JERDFUN (R2,B21_MY,B22_MY &
                      ,FI2,PSI2,D2N &
-                     ,ICM,3,COL,NKR)
+                     ,ICM,3,COL,NKR,vapc,vapr,rori)
       ENDIF
       IF(ISYM3.NE.0) THEN !Snow
         CALL JERDFUN (R3,B31_MY,B32_MY &
                      ,FI3,PSI3,D2N &
-                     ,1,4,COL,NKR)
+                     ,1,4,COL,NKR,vapc,vapr,rori)
       ENDIF
       IF(ISYM4.NE.0) THEN  !Graupel
         CALL JERDFUN (R4,B41_MY,B42_MY &
                      ,FI4,PSI4,D2N &
-                     ,1,4,COL,NKR)
+                     ,1,4,COL,NKR,vapc,vapr,rori)
       ENDIF
       IF(ISYM5.NE.0) THEN !Hail
         CALL JERDFUN (R5,B51_MY,B52_MY &
                      ,FI5,PSI5,D2N &
-                     ,1,5,COL,NKR)
+                     ,1,5,COL,NKR,vapc,vapr,rori)
       ENDIF
    ELSE
       DT0I=1.E20
@@ -3847,30 +3885,30 @@ enddo
       IF(ISYM2.NE.0) THEN !CRYSTALS
           CALL JERDFUN (R2,B21_MY,B22_MY &
                        ,FI2,PSI2,D2N &
-                       ,ICM,1,COL,NKR)
+                       ,ICM,1,COL,NKR,vapc,vapr,rori)
 
           CALL JERDFUN (R2,B21_MY,B22_MY &
                        ,FI2,PSI2,D2N &
-                       ,ICM,2,COL,NKR)
+                       ,ICM,2,COL,NKR,vapc,vapr,rori)
 
           CALL JERDFUN (R2,B21_MY,B22_MY &
                        ,FI2,PSI2,D2N &
-                       ,ICM,3,COL,NKR)
+                       ,ICM,3,COL,NKR,vapc,vapr,rori)
       ENDIF
       IF(ISYM3.NE.0) THEN !SNOW
          CALL JERDFUN (R3,B31_MY,B32_MY &
                       ,FI3,PSI3,D2N &
-                      ,1,3,COL,NKR)
+                      ,1,3,COL,NKR,vapc,vapr,rori)
       ENDIF
       IF(ISYM4.NE.0) THEN !GRAUPEL
           CALL JERDFUN (R4,B41_MY,B42_MY &
                        ,FI4,PSI4,D2N &
-                       ,1,4,COL,NKR)
+                       ,1,4,COL,NKR,vapc,vapr,rori)
       ENDIF
       IF(ISYM5.NE.0) THEN !HAIL
           CALL JERDFUN (R5,B51_MY,B52_MY &
                        ,FI5,PSI5,D2N &
-                       ,1,5,COL,NKR)
+                       ,1,5,COL,NKR,vapc,vapr,rori)
       ENDIF
    ENDIF
 
@@ -3991,7 +4029,8 @@ Subroutine ONECOND3 (TT,QQ,PP,ROR &
 ,FF5,PSI5,R5,RHEC,RO5BL &
 ,AA1_MY,BB1_MY,AA2_MY,BB2_MY &
 ,COL,DTCOND,ICEMAX,NKR &
-,ISYM1,ISYM2,ISYM3,ISYM4,ISYM5)
+,ISYM1,ISYM2,ISYM3,ISYM4,ISYM5 &
+,vapcldt,vapraint)
 
 IMPLICIT NONE
 INTEGER NKR,KR,ITIME,ICE,KCOND,K,ICEMAX &
@@ -4069,11 +4108,18 @@ REAL TIMESTEPD(NKR)
 ! CCN/IN regeneration
 real totccn_before, totccn_after, totin_before, totin_after
 
+!condensation budgets
+real vapcldt, vapraint,vapc,vapr
+
 DATA AL1 /2500./, AL2 /2834./
 REAL EPSDEL,EPSDEL2
 DATA EPSDEL, EPSDEL2 /0.1E-03,0.1E-03/
+
 OPER2(AR1)=0.622/(0.622+0.378*AR1)/AR1
 OPER3(AR1,AR2)=AR1*AR2/(0.622+0.378*AR1)
+
+vapc=0.
+vapr=0.
 
 DT_WATER_COND=0.4
 DT_WATER_EVAP=0.4
@@ -4442,39 +4488,39 @@ enddo
    IF(ISYM1.NE.0) THEN
       CALL JERDFUN (R1,B11_MY,B12_MY &
                    ,FI1,PSI1,D1N &
-                   ,1,1,COL,NKR)
+                   ,1,6,COL,NKR,vapcldt,vapraint,rori)
    ENDIF                     
 !------------ CRYSTALS ---------------------------------------------
    IF(ISYM2.NE.0) THEN
       CALL JERDFUN (R2,B21_MY,B22_MY &
                    ,FI2,PSI2,D2N &
-                   ,ICEMAX,1,COL,NKR)
+                   ,ICEMAX,1,COL,NKR,vapc,vapr,rori)
 
       CALL JERDFUN (R2,B21_MY,B22_MY &
                    ,FI2,PSI2,D2N &
-                   ,ICEMAX,2,COL,NKR)
+                   ,ICEMAX,2,COL,NKR,vapc,vapr,rori)
 
       CALL JERDFUN (R2,B21_MY,B22_MY &
                    ,FI2,PSI2,D2N &
-                   ,ICEMAX,3,COL,NKR)
+                   ,ICEMAX,3,COL,NKR,vapc,vapr,rori)
    ENDIF
 ! ---------------SNOW -----------------------------------------
    IF(ISYM3.NE.0) THEN
       CALL JERDFUN (R3,B31_MY,B32_MY &
                    ,FI3,PSI3,D2N &
-                   ,1,3,COL,NKR)
+                   ,1,3,COL,NKR,vapc,vapr,rori)
    ENDIF
 !------------- GRAUPELS -------------------------------------
    IF(ISYM4.NE.0) THEN
       CALL JERDFUN (R4,B41_MY,B42_MY &
                    ,FI4,PSI4,D2N &
-                   ,1,4,COL,NKR)
+                   ,1,4,COL,NKR,vapc,vapr,rori)
    ENDIF
 ! ---------------HAIL --------------------------------------
    IF(ISYM5.NE.0) THEN
       CALL JERDFUN (R5,B51_MY,B52_MY &
                    ,FI5,PSI5,D2N &
-                   ,1,5,COL,NKR)
+                   ,1,5,COL,NKR,vapc,vapr,rori)
    ENDIF
 
 !------------Update other variables-----------------------------

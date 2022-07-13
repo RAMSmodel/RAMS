@@ -30,7 +30,7 @@ integer :: idiffperts
 
 !--------------------------------------------------------------------------
 integer :: level,icloud,idriz,irain,ipris,isnow,iaggr,igraup,ihail      &
-  ,irime,iplaws,iaerosol,idust,idustloft,isalt,iaerorad,iifn            &
+  ,irime,iplaws,iaerosol,idust,idustloft,iabcarb,isalt,iaerorad,iifn    &
   ,imbudget,isedim,itrkepsilon,itrkdust,itrkdustifn,iaerodep,icheckmic  &
   ,iaeroprnt,iaerohist,iifn_formula,iscm,iscmx,iscmy
 
@@ -131,7 +131,7 @@ integer :: iccnlev,ic,rgb
 real :: cin_max,ccn_max,gccn_max,dust1_max,dust2_max,saltf_max,saltj_max &
  ,salts_max,enxferratio,rxferratio,ccnmass,ccnnum,rxtemp,cxtemp,fracmass &
  ,cxloss,concen_nuc,aeromass,rg,rhosol,cldrat,epsil,ant,rcm,rmlar,rmsma &
- ,power,scnmass,dcnmass,dinmass
+ ,power,scnmass,dcnmass,dinmass,abc1_max,abc2_max
 real, dimension(nzpmax) :: nifn
 
 !Tracking total aerosol mass, immersion freezing number in hydrometeors cats
@@ -173,7 +173,7 @@ data rg_ccn / 0.01e-6,0.02e-6,0.04e-6,0.08e-6 &
 ! 8 = Sub-micron radius regenerated mixed aerosols
 ! 9 = Super-micron radius regenerated mixed aerosols
 integer :: acat
-integer, parameter :: aerocat=9
+integer, parameter :: aerocat=11
 real, dimension(nzpmax) :: cifnx
 real, dimension(nzpmax,2) :: regenmas
 real, dimension(nzpmax,aerocat) :: totifnn,totifnm,aerocon,aeromas
@@ -185,7 +185,7 @@ integer, dimension(aerocat) :: iaero_chem,aero_vanthoff
 !values for condition statements involving aerosols
 real, parameter :: mincon=1.0e-1         &  
                   ,minmas=1.0e-21        &
-                  ,maxaero=20000.e6     &
+                  ,maxaero=20000.e6      &
                   ,minmashydro=1.0e-27   &
                   ,minifn=1.0e-14
 
@@ -200,7 +200,9 @@ data aero_sigma  / 1.80 &       !CCN
                   ,1.80 &       !large mineral dust
                   ,1.80 &       !salt film mode 
                   ,1.80 &       !salt jet mode 
-                  ,1.80 &       !salt spume mode 
+                  ,1.80 &       !salt spume mode
+                  ,1.80 &       !absorbing carbon mode-1
+                  ,1.80 &       !absorbing carbon mode-2
                   ,1.80 &       !sub-micro regenerated aerosol (mixed)
                   ,1.80 /       !super-micro regenerated aerosol (mixed)
 !Set the relationship between median radius and mean mass radius 
@@ -213,6 +215,8 @@ data aero_rg2rm  / 1.6791 &     !CCN
                   ,1.6791 &     !salt film mode 
                   ,1.6791 &     !salt jet mode 
                   ,1.6791 &     !salt spume mode
+                  ,1.6791 &     !absorbing carbon mode-1
+                  ,1.6791 &     !absorbing carbon mode-2
                   ,1.6791 &     !sub-micro regenerated aerosol (mixed)
                   ,1.6791 /     !super-micro regenerated aerosol (mixed)
 

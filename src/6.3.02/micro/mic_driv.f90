@@ -585,6 +585,12 @@ if (isalt > 0) then
    CALL ae1kmic (2,m1-1,micro%salt_spum_np(1,i,j),aerocon(1,7))
    CALL ae1kmic (2,m1-1,micro%salt_spum_mp(1,i,j),aeromas(1,7))
 endif
+if (iabcarb > 0) then
+   CALL ae1kmic (2,m1-1,micro%abc1np(1,i,j),aerocon(1,8))
+   CALL ae1kmic (2,m1-1,micro%abc1mp(1,i,j),aeromas(1,8))
+   CALL ae1kmic (2,m1-1,micro%abc2np(1,i,j),aerocon(1,9))
+   CALL ae1kmic (2,m1-1,micro%abc2mp(1,i,j),aeromas(1,9))
+endif
 
 !Copyback AEROSOL TRACKING VARIABLES
 if (iccnlev>=2) then
@@ -637,10 +643,10 @@ if (iccnlev>=2) then
     if(itrkdustifn==1) CALL ae1kmic (2,dtop,micro%dindp(1,i,j),dinhx(1,8))
    endif
    !Regenerated aerosol variables
-   CALL ae1kmic (2,m1-1,micro%regen_aero1_np(1,i,j),aerocon(1,8))
-   CALL ae1kmic (2,m1-1,micro%regen_aero1_mp(1,i,j),aeromas(1,8))
-   CALL ae1kmic (2,m1-1,micro%regen_aero2_np(1,i,j),aerocon(1,9))
-   CALL ae1kmic (2,m1-1,micro%regen_aero2_mp(1,i,j),aeromas(1,9))
+   CALL ae1kmic (2,m1-1,micro%regen_aero1_np(1,i,j),aerocon(1,aerocat-1))
+   CALL ae1kmic (2,m1-1,micro%regen_aero1_mp(1,i,j),aeromas(1,aerocat-1))
+   CALL ae1kmic (2,m1-1,micro%regen_aero2_np(1,i,j),aerocon(1,aerocat))
+   CALL ae1kmic (2,m1-1,micro%regen_aero2_mp(1,i,j),aeromas(1,aerocat))
    if(itrkepsilon==1) then
     CALL ae1kmic (2,m1-1,micro%resol_aero1_mp(1,i,j),regenmas(1,1))
     CALL ae1kmic (2,m1-1,micro%resol_aero2_mp(1,i,j),regenmas(1,2))

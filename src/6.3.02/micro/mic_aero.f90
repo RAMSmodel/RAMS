@@ -63,7 +63,9 @@ if(iaerodep==1 .and. level<3) then
     ,micro_g(ngrid)%md2np(1,i,j),micro_g(ngrid)%md2mp(1,i,j) &
     ,micro_g(ngrid)%salt_film_np(1,i,j),micro_g(ngrid)%salt_film_mp(1,i,j) &
     ,micro_g(ngrid)%salt_jet_np(1,i,j) ,micro_g(ngrid)%salt_jet_mp(1,i,j)  &
-    ,micro_g(ngrid)%salt_spum_np(1,i,j),micro_g(ngrid)%salt_spum_mp(1,i,j))
+    ,micro_g(ngrid)%salt_spum_np(1,i,j),micro_g(ngrid)%salt_spum_mp(1,i,j) &
+    ,micro_g(ngrid)%abc1np(1,i,j),micro_g(ngrid)%abc1mp(1,i,j) &
+    ,micro_g(ngrid)%abc2np(1,i,j),micro_g(ngrid)%abc2mp(1,i,j))
 
    CALL deposition_driver (i,j,mzp,zm         &
     ,grid_g(ngrid)%rtgt(i,j)                  &
@@ -88,7 +90,9 @@ if(iaerodep==1 .and. level<3) then
     ,micro_g(ngrid)%md2np(1,i,j),micro_g(ngrid)%md2mp(1,i,j) &
     ,micro_g(ngrid)%salt_film_np(1,i,j),micro_g(ngrid)%salt_film_mp(1,i,j) &
     ,micro_g(ngrid)%salt_jet_np(1,i,j) ,micro_g(ngrid)%salt_jet_mp(1,i,j)  &
-    ,micro_g(ngrid)%salt_spum_np(1,i,j),micro_g(ngrid)%salt_spum_mp(1,i,j))
+    ,micro_g(ngrid)%salt_spum_np(1,i,j),micro_g(ngrid)%salt_spum_mp(1,i,j) &
+    ,micro_g(ngrid)%abc1np(1,i,j),micro_g(ngrid)%abc1mp(1,i,j) &
+    ,micro_g(ngrid)%abc2np(1,i,j),micro_g(ngrid)%abc2mp(1,i,j))
 
   enddo
  enddo
@@ -155,7 +159,8 @@ END SUBROUTINE aerosol_init
 !##############################################################################
 Subroutine aero_copy (aflag,m1,cccnp,cccmp,gccnp,gccmp,md1np,md1mp &
                     ,md2np,md2mp,salt_film_np,salt_film_mp,salt_jet_np &
-                    ,salt_jet_mp,salt_spum_np,salt_spum_mp)
+                    ,salt_jet_mp,salt_spum_np,salt_spum_mp &
+                    ,abc1np,abc1mp,abc2np,abc2mp)
 
 !This routine is called in the event that MICRO LEVEL=1,2 so that
 !aerosols can still be allowed to impact radiation.
@@ -167,8 +172,8 @@ implicit none
 integer :: m1,k,aflag
 real, dimension(m1) :: cccnp,cccmp,gccnp,gccmp,md1np,md1mp &
                     ,md2np,md2mp,salt_film_np,salt_film_mp,salt_jet_np &
-                    ,salt_jet_mp,salt_spum_np,salt_spum_mp
-
+                    ,salt_jet_mp,salt_spum_np,salt_spum_mp &
+                    ,abc1np,abc1mp,abc2np,abc2mp
 if(aflag==1)then
  !Zero out aerosol scratch arrays
  do acat = 1,aerocat
@@ -199,6 +204,12 @@ if(aflag==1)then
      aerocon(k,7) = salt_spum_np(k)
      aeromas(k,7) = salt_spum_mp(k)
    endif
+   if (iabcarb > 0) then
+     aerocon(k,8) = abc1np(k)
+     aeromas(k,8) = abc1mp(k)
+     aerocon(k,9) = abc2np(k)
+     aeromas(k,9) = abc2mp(k)
+   endif
  enddo
 
 elseif(aflag==2)then
@@ -223,6 +234,12 @@ elseif(aflag==2)then
     salt_jet_mp(k)  = aeromas(k,6)
     salt_spum_np(k) = aerocon(k,7)
     salt_spum_mp(k) = aeromas(k,7)
+   endif
+   if (iabcarb > 0) then
+    abc1np(k) = aerocon(k,8)
+    abc1mp(k) = aeromas(k,8)
+    abc2np(k) = aerocon(k,9)
+    abc2mp(k) = aeromas(k,9)
    endif
  enddo
 endif

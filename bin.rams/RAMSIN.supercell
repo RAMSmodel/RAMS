@@ -539,6 +539,7 @@
    IAEROSOL = 1,             ! CCN,GCCN: 0=off, 1=userset
    ISALT    = 1,             ! Sea Salt: 0=off, 1=userset, 2=saltmodel
    IDUST    = 1,             ! Dust: 0=off, 1=userset 2=dustmodel
+   IABCARB = 0,              ! Absorbing carbon: 0=off, 1=userset
 
    IDUSTLOFT = 0,            ! 0 = idealized lofting
                              ! 1 = Ginoux(2001) erodible fraction data
@@ -582,17 +583,20 @@
    SALTF_MAX  = 100.,        ! Film Sea Salt (#/mg)
    SALTJ_MAX  = 0.1,         ! Jet Sea Salt (#/mg)
    SALTS_MAX  = 1.e-3,       ! Spume Sea Salt (#/mg)
+   ABC1_MAX   = 0.,          ! Absorbing carbon Mode-1 (#/mg)
+   ABC2_MAX   = 0.,          ! Absorbing carbon Mode-2 (#/mg)
 
    ! Aerosol 9 categories soluble chemistry type: 1=(NH4)2S04, 2=NaCl
-   IAERO_CHEM   = 1,1,1,1,2,2,2,1,1,
+   IAERO_CHEM   = 1,1,1,1,2,2,2,1,1,1,1,
 
    ! Aerosol 9 categories solubility fraction: (0->1)
-   AERO_EPSILON = 0.90,0.90,0.05,0.05,1.00,1.00,1.00,0.20,0.20, 
+   AERO_EPSILON = 0.90,0.90,0.05,0.05,1.00,1.00,1.00,0.05,0.05,0.20,0.20, 
 
    ! Aerosol 9 categories initial median radius (meters)
    AERO_MEDRAD  = 0.04e-6,3.00e-6,          !CCN,GCCN
                   0.05e-6,0.50e-6,          !Dust1,Dust2
                   0.10e-6,1.00e-6,6.00e-6,  !SeaSalt: film,jet,spume
+                  0.05e-6,0.05e-6,          !Absorbing carbon
                   0.01e-6,1.00e-6,          !Regenerated 1 & 2 default
 
    ! Aerosol tracking flags: 0=off, 1=on

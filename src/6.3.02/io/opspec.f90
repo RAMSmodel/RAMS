@@ -223,6 +223,10 @@ endif
     print*,'FATAL - ISALT OUT OF RANGE: MUST BE 0-2'
     IFATERR = IFATERR + 1
  endif
+ if (iabcarb .lt. 0 .or. iabcarb .gt. 1) THEN
+    print*,'FATAL - IABCARB OUT OF RANGE: MUST BE 0-1'
+    IFATERR = IFATERR + 1
+ endif
  if (iaerorad .lt. 0 .or. iaerorad .gt. 1) THEN
     print*,'FATAL - IAERORAD OUT OF RANGE: MUST BE 0-1'
     IFATERR = IFATERR + 1
@@ -346,8 +350,8 @@ elseif (level .eq. 3) then
   endif
  endif
  if (icloud .eq. 5) then
-  if (iaerosol.eq.0 .and. idust.eq.0 .and. isalt.eq.0) then
-    print*,'FATAL - If icloud==5, then either IAEROSOL, IDUST, or ISALT'
+  if (iaerosol.eq.0 .and. idust.eq.0 .and. isalt.eq.0 .and. iabcarb.eq.0) then
+    print*,'FATAL - If icloud==5, then either IAEROSOL, IDUST, IABCARB, or ISALT'
     print*,' must be turned on so that some aerosols are present in order'
     print*,' for cloud nucleation to occur.'
     IFATERR = IFATERR + 1
@@ -405,6 +409,7 @@ elseif (level .eq. 4) then
        iaerosol    > 0 .or. &
        idust       > 0 .or. &
        isalt       > 0 .or. &
+       iabcarb     > 0 .or. &
        iccnlev     > 0 .or. &
        iaerorad    > 0 .or. &
        iaerodep    > 0 .or. &
@@ -417,7 +422,7 @@ elseif (level .eq. 4) then
     print*,'in HUCM Bin Microphysics, so set them to zero for OFF.'
     print*,''
     print*,'ICLOUD, IDRIZ, IRAIN, ISNOW, IAGGR, IAEROSOL' 
-    print*,'ISALT, IDUST, ICCNLEV, IAERORAD, IAERODEP, IAEROPRNT' 
+    print*,'IABCARB, ISALT, IDUST, ICCNLEV, IAERORAD, IAERODEP, IAEROPRNT' 
     print*,'ITRKEPSILON, ITRKDUST, ITRKDUSTIFN, ICHECKMIC.'
     print*,''
     print*,'HUCM only uses the following microphysics flags:'

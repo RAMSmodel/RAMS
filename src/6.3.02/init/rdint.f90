@@ -27,7 +27,7 @@ integer :: ifm,icm,ngr,nv,ierr,nsc
 ! Initialize aerosol density and vanthoff factors if they are used
 ! Not used with HUCM-SBM microphysics
 if(level<=3)then
- if(iaerosol>0 .or. idust>0 .or. isalt>0) CALL aerosol_init ()
+ if(iaerosol>0 .or. idust>0 .or. isalt>0 .or. iabcarb>0) CALL aerosol_init ()
 endif
 
 if(trim(runtype) == 'INITIAL' .or. &
@@ -172,6 +172,12 @@ if(trim(runtype) == 'INITIAL' .or. &
           ,micro_g(ifm)%md2np (1,1,1)  &
           ,micro_g(ifm)%md1mp (1,1,1)  &
           ,micro_g(ifm)%md2mp (1,1,1)  &
+          ,basic_g(ifm)%dn0   (1,1,1),ifm)
+       if(iabcarb > 0) CALL init_absorbing_carbon (mzp,mxp,myp   &
+          ,micro_g(ifm)%abc1np (1,1,1)  &
+          ,micro_g(ifm)%abc2np (1,1,1)  &
+          ,micro_g(ifm)%abc1mp (1,1,1)  &
+          ,micro_g(ifm)%abc2mp (1,1,1)  &
           ,basic_g(ifm)%dn0   (1,1,1),ifm)
        if(isalt  > 0)  CALL init_salt (mzp,mxp,myp   &
           ,micro_g(ifm)%salt_film_np (1,1,1)  &

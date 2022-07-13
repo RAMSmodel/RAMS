@@ -25,7 +25,7 @@ character(len=*) :: group,vr,cc
 real :: ff
 integer :: ii,nv
 integer :: inrflg
-integer, parameter ::nvgrid=37,nvstrt=77,nvindat=142,nvsound=10
+integer, parameter ::nvgrid=37,nvstrt=77,nvindat=145,nvsound=10
 integer ::  igrids(nvgrid),istart(nvstrt),iindat(nvindat),isound(nvsound)
 character(len=16) :: grids(nvgrid),start(nvstrt),indat(nvindat),sound(nvsound)
 data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
@@ -75,7 +75,8 @@ DATA INDAT/  &
      ,'GCCN_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'         &
      ,'SALTS_MAX','IAEROLBC','ICO2LBC','BCTAU','IAERO_CHEM'              &
      ,'AERO_EPSILON','AERO_MEDRAD','ITRKEPSILON','ITRKDUST'              &
-     ,'ITRKDUSTIFN','SCMTIME','ISCMX','ISCMY','FRACSAT'/
+     ,'ITRKDUSTIFN','SCMTIME','ISCMX','ISCMY','FRACSAT','IABCARB'        &
+     ,'ABC1_MAX','ABC2_MAX'/
 DATA SOUND/  &
       'IPSFLG','ITSFLG','IRTSFLG','IUSFLG','HS','PS','TS','RTS','US','VS'/
 
@@ -347,6 +348,7 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'HUCMFILE')     CALL varsetc (VR,HUCMFILE,NV,1,CC,1,strl1)
  IF(VR.EQ.'NDTCOLL')      CALL varseti (VR,NDTCOLL,NV,1,II,1,10)
  IF(VR.EQ.'IAEROSOL')     CALL varseti (VR,IAEROSOL,NV,1,II,0,1)
+ IF(VR.EQ.'IABCARB')      CALL varseti (VR,IABCARB,NV,1,II,0,1)
  IF(VR.EQ.'ISALT')        CALL varseti (VR,ISALT,NV,1,II,0,2)
  IF(VR.EQ.'IDUST')        CALL varseti (VR,IDUST,NV,1,II,0,2)
  IF(VR.EQ.'IDUSTLOFT')    CALL varseti (VR,IDUSTLOFT,NV,1,II,0,99)
@@ -363,15 +365,17 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'GCCN_MAX')     CALL varsetf (VR,GCCN_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST1_MAX')    CALL varsetf (VR,DUST1_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST2_MAX')    CALL varsetf (VR,DUST2_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'ABC1_MAX')     CALL varsetf (VR,ABC1_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'ABC2_MAX')     CALL varsetf (VR,ABC2_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'SALTF_MAX')    CALL varsetf (VR,SALTF_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'SALTJ_MAX')    CALL varsetf (VR,SALTJ_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'SALTS_MAX')    CALL varsetf (VR,SALTS_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'IAEROLBC')     CALL varseti (VR,IAEROLBC(NV),NV,MAXGRDS,II,0,1)
  IF(VR.EQ.'ICO2LBC')      CALL varseti (VR,ICO2LBC(NV),NV,MAXGRDS,II,0,1)
  IF(VR.EQ.'BCTAU')        CALL varsetf (VR,BCTAU(NV),NV,MAXGRDS,FF,0.,1.E4)
- IF(VR.EQ.'IAERO_CHEM')   CALL varseti (VR,IAERO_CHEM(NV),NV,9,II,0,2)
- IF(VR.EQ.'AERO_EPSILON') CALL varsetf (VR,AERO_EPSILON(NV),NV,9,FF,0.,1.)
- IF(VR.EQ.'AERO_MEDRAD')  CALL varsetf (VR,AERO_MEDRAD(NV),NV,9,FF,0.,20.)
+ IF(VR.EQ.'IAERO_CHEM')   CALL varseti (VR,IAERO_CHEM(NV),NV,aerocat,II,0,2)
+ IF(VR.EQ.'AERO_EPSILON') CALL varsetf (VR,AERO_EPSILON(NV),NV,aerocat,FF,0.,1.)
+ IF(VR.EQ.'AERO_MEDRAD')  CALL varsetf (VR,AERO_MEDRAD(NV),NV,aerocat,FF,0.,20.)
  IF(VR.EQ.'ITRKEPSILON')  CALL varseti (VR,ITRKEPSILON,NV,1,II,0,1)
  IF(VR.EQ.'ITRKDUST')     CALL varseti (VR,ITRKDUST,NV,1,II,0,1)
  IF(VR.EQ.'ITRKDUSTIFN')  CALL varseti (VR,ITRKDUSTIFN,NV,1,II,0,1)
@@ -521,6 +525,7 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'IHAIL=',IHAIL                     &
  ,'NDTCOLL=',NDTCOLL                 &
  ,'IAEROSOL=',IAEROSOL               &
+ ,'IABCARB=',IABCARB                 &
  ,'ISALT=',ISALT                     &
  ,'IDUST=',IDUST                     &
  ,'IDUSTLOFT=',IDUSTLOFT             &
@@ -603,6 +608,8 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'GCCN_MAX=',GCCN_MAX               &
  ,'DUST1_MAX=',DUST1_MAX             &
  ,'DUST2_MAX=',DUST2_MAX             &
+ ,'ABC1_MAX=',ABC1_MAX               &
+ ,'ABC2_MAX=',ABC2_MAX               &
  ,'SALTF_MAX=',SALTF_MAX             &
  ,'SALTJ_MAX=',SALTJ_MAX             &
  ,'SALTS_MAX=',SALTS_MAX             &

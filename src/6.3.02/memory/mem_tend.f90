@@ -17,6 +17,7 @@ implicit none
         ,md1nt, md2nt, md1mt, md2mt                  &
         ,salt_film_nt,salt_jet_nt,salt_spum_nt       &
         ,salt_film_mt,salt_jet_mt,salt_spum_mt       &
+        ,abc1nt, abc2nt, abc1mt, abc2mt              &
         ,regen_aero1_nt,regen_aero1_mt               &
         ,regen_aero2_nt,regen_aero2_mt               &
         ,immerct, immerdt, immerrt ,ifnnuct          &
@@ -122,6 +123,10 @@ implicit none
    if (allocated(micro_g(1)%salt_film_mp))  allocate (tend%salt_film_mt(ntpts))
    if (allocated(micro_g(1)%salt_jet_mp))   allocate (tend%salt_jet_mt(ntpts))
    if (allocated(micro_g(1)%salt_spum_mp))  allocate (tend%salt_spum_mt(ntpts))
+   if (allocated(micro_g(1)%abc1np))   allocate (tend%abc1nt(ntpts))
+   if (allocated(micro_g(1)%abc2np))   allocate (tend%abc2nt(ntpts))
+   if (allocated(micro_g(1)%abc1mp))   allocate (tend%abc1mt(ntpts))
+   if (allocated(micro_g(1)%abc2mp))   allocate (tend%abc2mt(ntpts))
    if (allocated(micro_g(1)%regen_aero1_np)) allocate (tend%regen_aero1_nt(ntpts))
    if (allocated(micro_g(1)%regen_aero1_mp)) allocate (tend%regen_aero1_mt(ntpts))
    if (allocated(micro_g(1)%regen_aero2_np)) allocate (tend%regen_aero2_nt(ntpts))
@@ -247,6 +252,10 @@ integer :: nsc,ng,ngrs
    if (allocated(tend%salt_film_mt))   deallocate (tend%salt_film_mt)
    if (allocated(tend%salt_jet_mt))    deallocate (tend%salt_jet_mt)
    if (allocated(tend%salt_spum_mt))   deallocate (tend%salt_spum_mt)
+   if (allocated(tend%abc1nt)) deallocate (tend%abc1nt)
+   if (allocated(tend%abc2nt)) deallocate (tend%abc2nt)
+   if (allocated(tend%abc1mt)) deallocate (tend%abc1mt)
+   if (allocated(tend%abc2mt)) deallocate (tend%abc2mt)
    if (allocated(tend%regen_aero1_nt)) deallocate (tend%regen_aero1_nt)
    if (allocated(tend%regen_aero1_mt)) deallocate (tend%regen_aero1_mt)
    if (allocated(tend%regen_aero2_nt)) deallocate (tend%regen_aero2_nt)
@@ -414,6 +423,14 @@ implicit none
    if (allocated(tend%salt_spum_mt))  &
       CALL vtables_scalar (micro%salt_spum_mp(1,1,1) &
                           ,tend%salt_spum_mt(1),ng,'SALT_SPUM_MP')
+   if (allocated(tend%abc1nt))  &
+      CALL vtables_scalar (micro%abc1np(1,1,1),tend%abc1nt(1),ng,'ABC1NP')
+   if (allocated(tend%abc2nt))  &
+      CALL vtables_scalar (micro%abc2np(1,1,1),tend%abc2nt(1),ng,'ABC2NP')
+   if (allocated(tend%abc1mt))  &
+      CALL vtables_scalar (micro%abc1mp(1,1,1),tend%abc1mt(1),ng,'ABC1MP')
+   if (allocated(tend%abc2mt))  &
+      CALL vtables_scalar (micro%abc2mp(1,1,1),tend%abc2mt(1),ng,'ABC2MP')
    if (allocated(tend%regen_aero1_nt))  &
       CALL vtables_scalar (micro%regen_aero1_np(1,1,1) &
                           ,tend%regen_aero1_nt(1),ng,'REGEN_AERO1_NP')

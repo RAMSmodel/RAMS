@@ -36,12 +36,12 @@ integer, parameter ::  &
  !
  !Configuration for isentropic data analysis package maximum sizes
  ,maxpr        = 100   & ! Max # of vertical levels allowed in the pressure data
- ,maxisn       = 100   & ! Max # of vertical levels allowed in the isentropic analysis
+ ,maxisn       = 200   & ! Max # of vertical levels allowed in the isentropic analysis
  ,maxx         = 1000  & ! Max # of X (west-east) grid points in RAMS or pressure grids
  ,maxy         = 1000  & ! Max # of Y (north-south) grid points in RAMS or pressure grids
- ,maxtimes     = 100   & ! Max # of data analysis times that can be processed in a single run.
+ ,maxtimes     = 200   & ! Max # of data analysis times that can be processed in a single run.
  ,maxagrds     = 10    & ! Max # of RAMS grids that can have varfiles generated
- ,maxsigz      = 100   & ! Max # of vertical levels allowed in sigma-z analysis.
+ ,maxsigz      = 200   & ! Max # of vertical levels allowed in sigma-z analysis.
  ,maxlev       = 500   & ! Max # of levels in an input rawinsonde
  ,maxsname     = 10000 & ! Max # of input observations
  ,maxisfiles   = 1000  & ! Max # of input data times

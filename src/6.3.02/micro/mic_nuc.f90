@@ -82,8 +82,10 @@ elseif (jnmb(1) >= 5) then
          (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
          (acat==6 .and. isalt>0)    .or. &  ! Salt jet mode
          (acat==7 .and. isalt>0)    .or. &  ! Salt spume mode
-         (acat==8 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
-         (acat==9 .and. iccnlev>=2)) then   ! Large regenerated aerosol
+         (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+         (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+         (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
+         (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
 
        !Assign aerosol specs to local arrays
        concen_nuc = aerocon(k,acat)
@@ -92,16 +94,16 @@ elseif (jnmb(1) >= 5) then
        epsil      = aero_epsilon(acat)
 
        !Aerosol and solubility tracking
-       if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==8.or.acat==9) &
+       if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==aerocat-1.or.acat==aerocat) &
         .and. aeromas(k,acat)>0.) &
-          epsil = min(1.0,regenmas(k,acat-7)/aeromas(k,acat))
+          epsil = min(1.0,regenmas(k,acat-(aerocat-2))/aeromas(k,acat))
 
        !Temporary check to make sure regensol is not > regen        
-       if(acat==8.or.acat==9)then
-        if(regenmas(k,acat-7) > aeromas(k,acat))then
+       if(acat==aerocat-1.or.acat==aerocat)then
+        if(regenmas(k,acat-(aerocat-2)) > aeromas(k,acat))then
           print*,'Soluble regenerated mass > Regenerated mass' &
-          ,acat,k,i,j,regenmas(k,acat-7)/aeromas(k,acat) &
-          ,regenmas(k,acat-7),aeromas(k,acat)
+          ,acat,k,i,j,regenmas(k,acat-(aerocat-2))/aeromas(k,acat) &
+          ,regenmas(k,acat-(aerocat-2)),aeromas(k,acat)
         endif
        endif
 
@@ -195,8 +197,10 @@ elseif (jnmb(1) >= 5) then
        (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
        (acat==6 .and. isalt>0)    .or. &  ! Salt jet mode
        (acat==7 .and. isalt>0)    .or. &  ! Salt spume mode
-       (acat==8 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
-       (acat==9 .and. iccnlev>=2)) then   ! Large regenerated aerosol
+       (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+       (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+       (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
+       (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
        if(aerocon(k,acat) > mincon) then
         aero_vap(acat) = (4.0 * 3.14159 * aero_rg(acat)**2) * concen_tab(acat)
         sfcareatotal = sfcareatotal + aero_vap(acat)
@@ -223,8 +227,10 @@ elseif (jnmb(1) >= 5) then
         (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
         (acat==6 .and. isalt>0)    .or. &  ! Salt jet mode
         (acat==7 .and. isalt>0)    .or. &  ! Salt spume mode
-        (acat==8 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
-        (acat==9 .and. iccnlev>=2)) then   ! Large regenerated aerosol
+        (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+        (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+        (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
+        (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
       !Assign aerosol specs to local arrays
       concen_nuc = aerocon(k,acat)
       aeromass   = aeromas(k,acat)
@@ -234,9 +240,9 @@ elseif (jnmb(1) >= 5) then
       epsil      = aero_epsilon(acat)
 
       !Aerosol and solubility tracking
-      if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==8.or.acat==9) &
+      if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==aerocat-1.or.acat==aerocat) &
         .and. aeromas(k,acat)>0.) &
-          epsil = min(1.0,regenmas(k,acat-7)/aeromas(k,acat))
+          epsil = min(1.0,regenmas(k,acat-(aerocat-2))/aeromas(k,acat))
 
       !If not removing aerosols, subtract off Ice nuclei amount
       if(iifn==3 .and. iccnlev==0)then
@@ -366,12 +372,14 @@ elseif (jnmb(1) >= 5) then
            endif
            !Track immersion freezing droplets that contain large CCN, GCCN, or DUST
            ! Do not track immersion freezing for salt species (acat=5,6,7)
-           if(iifn==3.and.(acat==1.or.acat==2.or.acat==3.or.acat==4.or.acat==8.or.acat==9) &
+           if(iifn==3.and.(acat==1.or.acat==2.or.acat==3.or.acat==4.or.acat==8.or.acat==9 &
+               .or.acat==aerocat-1.or.acat==aerocat) &
                .and. rcm > 0.25e-6 .and. ic>1) num_ccn_ifn=ccncon(ic-1)
            !Track the amount of aerosol mass contained within new droplets 
            if(ccncon(ic)>=concen_tab(acat) .or. ccnmas(ic)>=aeromass .or. ic==itbin-1) then
              !Further immersion freezing tracking for (acat=1,2,3,4,8,9)
-             if(iifn==3.and.(acat==1.or.acat==2.or.acat==3.or.acat==4.or.acat==8.or.acat==9) & 
+             if(iifn==3.and.(acat==1.or.acat==2.or.acat==3.or.acat==4.or.acat==8.or.acat==9 &
+               .or.acat==aerocat-1.or.acat==aerocat) &
                .and. rcm > 0.25e-6 .and. ic>1) num_ccn_ifn=concen_tab(acat)
              ccnmass=ccnmas(ic-1)
              go to 111
@@ -403,8 +411,8 @@ elseif (jnmb(1) >= 5) then
             cnmhx(k,drop) = cnmhx(k,drop) + ccnmass
             if(itrkepsilon==1) then
              snmhx(k,drop) = snmhx(k,drop) + ccnmass * epsil
-             if(acat==8.or.acat==9) &
-              regenmas(k,acat-7) = regenmas(k,acat-7) - ccnmass * epsil
+             if(acat==aerocat-1.or.acat==aerocat) &
+              regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2)) - ccnmass * epsil
             endif
             if(itrkdust==1 .and. (acat==3 .or. acat==4)) &
               dnmhx(k,drop) = dnmhx(k,drop) + ccnmass

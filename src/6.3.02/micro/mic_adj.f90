@@ -32,7 +32,7 @@ use node_mod, only:mi0,mj0
 implicit none
 
 integer :: m1,m2,m3,toomany,i,j,k,lcat,ngr
-real :: frac
+real :: frac,cnmhx_num,zerocheck,rxloss
 real, dimension(m1,m2,m3) :: rtp
 real, dimension(m1) :: rtemp
 type (micro_vars) :: micro
@@ -135,23 +135,65 @@ do j = 1,m3
    !Zero out very small mixing ratios
    do lcat = 1,ncat
      do k = 1,m1
+
+       zerocheck=0
+       cxloss=0
+       rxloss=0
+
+       !Zero out hydrometeor fields if they are below a min threshold for 2-moment
        if(jnmb(lcat)>=5 .and. (rx(k,lcat) < rxmin .or. cx(k,lcat) <= 0.0)) then
+         zerocheck=1
+         cxloss = cx(k,lcat)
+         rxloss = rx(k,lcat)
          rx(k,lcat) = 0.
          cx(k,lcat) = 0.
          qx(k,lcat) = 0.
        endif
+       !Finish zeroing fields or do this if 1-moment
        if(rx(k,lcat) < rxmin) then
+         zerocheck=1
          rx(k,lcat) = 0.
          qx(k,lcat) = 0.
          pcpvx(k,lcat) = 0.
-         !Aerosol and solubility tracking
-         if(iccnlev>=2) then
-           cnmhx(k,lcat) = 0.
-           if(itrkepsilon==1) snmhx(k,lcat) = 0.
-           if(itrkdust==1)    dnmhx(k,lcat) = 0.
-           if(itrkdustifn==1) dinhx(k,lcat) = 0.
-         endif
        endif
+
+       !Aerosol and solubility tracking
+       if(zerocheck==1 .and. iccnlev>=2 .and. cnmhx(k,lcat)>0.0) then
+
+         !Determine how many number to restore
+         if(cxloss > 0.0) then
+           !If there are number to restore, compute median radius (rg)
+           rg=((0.23873/aero_rhosol(aerocat)*cnmhx(k,lcat) / &
+               max(1.e-10,cxloss))**(0.3333))/aero_rg2rm(aerocat)
+           if(rg < 0.01e-6) rg = 0.01e-6
+           if(rg > 6.50e-6) rg = 6.50e-6
+         else
+           !Compute a number to restore based on assumed 1 micron rg
+           rg = 1.0e-6
+         endif
+         !Compute the number to restore
+         cnmhx_num = cnmhx(k,lcat) * (0.23873/aero_rhosol(aerocat)) / &
+              ((rg * aero_rg2rm(aerocat)) ** 3.)
+
+         !Restore aerosols to regenerated category
+         if(rg <= 0.96e-6) then
+           micro%regen_aero1_mp(k,i,j) = micro%regen_aero1_mp(k,i,j) + cnmhx(k,lcat)
+           micro%regen_aero1_np(k,i,j) = micro%regen_aero1_np(k,i,j) + cnmhx_num
+         else
+           micro%regen_aero2_mp(k,i,j) = micro%regen_aero2_mp(k,i,j) + cnmhx(k,lcat)
+           micro%regen_aero2_np(k,i,j) = micro%regen_aero2_np(k,i,j) + cnmhx_num  
+         endif
+
+         !Statement to check the restoration of aerosol data
+         !print*,'rmin',rxloss,cnmhx(k,lcat),cxloss,cnmhx_num,rg*1.e6
+
+         !Zero out aerosol masses and such within hydrometeors
+         cnmhx(k,lcat) = 0.
+         if(itrkepsilon==1) snmhx(k,lcat) = 0.
+         if(itrkdust==1)    dnmhx(k,lcat) = 0.
+         if(itrkdustifn==1) dinhx(k,lcat) = 0.
+       endif
+
        !Aerosol and solubility tracking
        if(iccnlev>=2) then
          if(cnmhx(k,lcat)<minmashydro) cnmhx(k,lcat) = 0.
@@ -161,6 +203,7 @@ do j = 1,m3
          if(itrkepsilon==1 .and. snmhx(k,lcat)>cnmhx(k,lcat)) &
            snmhx(k,lcat)=0.99*cnmhx(k,lcat)
        endif
+
      enddo
    enddo
 
@@ -331,6 +374,16 @@ do j = 1,m3
      toomany=1
    endif
   endif
+  if(iabcarb>0) then
+   if(micro%abc1np(k,i,j) > maxaero) then
+     print*,"Too many Absorbing Carbon 1:",micro%abc1np(k,i,j)
+     toomany=1
+   endif
+   if(micro%abc2np(k,i,j) > maxaero) then
+     print*,"Too many Absorbing Carbon 2:",micro%abc2np(k,i,j)
+     toomany=1
+   endif
+  endif
   if(isalt>0) then
    if(micro%salt_film_np(k,i,j) > maxaero) then
      print*,"Too many Salt-Film:",micro%salt_film_np(k,i,j)
@@ -383,6 +436,16 @@ do j = 1,m3
    if(micro%md2np(k,i,j)<mincon .or. micro%md2mp(k,i,j)<minmas) then
       micro%md2np(k,i,j) = 0.0
       micro%md2mp(k,i,j) = 0.0
+   endif
+  endif
+  if(iabcarb>0) then
+   if(micro%abc1np(k,i,j)<mincon .or. micro%abc1mp(k,i,j)<minmas) then
+      micro%abc1np(k,i,j) = 0.0
+      micro%abc1mp(k,i,j) = 0.0
+   endif
+   if(micro%abc2np(k,i,j)<mincon .or. micro%abc2mp(k,i,j)<minmas) then
+      micro%abc2np(k,i,j) = 0.0
+      micro%abc2mp(k,i,j) = 0.0
    endif
   endif
   if(isalt>0) then

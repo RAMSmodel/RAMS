@@ -18,6 +18,7 @@ implicit none
                          ,md1np,md2np,md1mp,md2mp                   &
                          ,salt_film_np,salt_jet_np,salt_spum_np     &
                          ,salt_film_mp,salt_jet_mp,salt_spum_mp     &
+                         ,abc1np,abc2np,abc1mp,abc2mp               &
                          ,regen_aero1_np,regen_aero1_mp             &
                          ,regen_aero2_np,regen_aero2_mp             &
                          !Immersion freezing nuclei tracking
@@ -147,6 +148,12 @@ implicit none
             allocate (micro%salt_film_mp(n1,n2,n3))
             allocate (micro%salt_jet_mp(n1,n2,n3))
             allocate (micro%salt_spum_mp(n1,n2,n3))
+         endif
+         if(iabcarb > 0) then
+            allocate (micro%abc1np(n1,n2,n3))
+            allocate (micro%abc2np(n1,n2,n3))
+            allocate (micro%abc1mp(n1,n2,n3))
+            allocate (micro%abc2mp(n1,n2,n3))
          endif
       endif
 
@@ -501,6 +508,10 @@ implicit none
    if (allocated(micro%salt_film_mp))  deallocate (micro%salt_film_mp)
    if (allocated(micro%salt_jet_mp))   deallocate (micro%salt_jet_mp)
    if (allocated(micro%salt_spum_mp))  deallocate (micro%salt_spum_mp)
+   if (allocated(micro%abc1np))   deallocate (micro%abc1np)
+   if (allocated(micro%abc2np))   deallocate (micro%abc2np)
+   if (allocated(micro%abc1mp))   deallocate (micro%abc1mp)
+   if (allocated(micro%abc2mp))   deallocate (micro%abc2mp)
    if (allocated(micro%regen_aero1_np)) deallocate (micro%regen_aero1_np)
    if (allocated(micro%regen_aero1_mp)) deallocate (micro%regen_aero1_mp)
    if (allocated(micro%regen_aero2_np)) deallocate (micro%regen_aero2_np)
@@ -813,6 +824,22 @@ implicit none
       CALL vtables2 (micro%salt_spum_mp(1,1,1),microm%salt_spum_mp(1,1,1)  &
                  ,ng, npts, imean,  &
                  'SALT_SPUM_MP :3:anal:mpti:mpt1')
+   if (allocated(micro%abc1np)) &
+      CALL vtables2 (micro%abc1np(1,1,1),microm%abc1np(1,1,1)  &
+                 ,ng, npts, imean,  &
+                 'ABC1NP :3:anal:mpti:mpt1')
+   if (allocated(micro%abc2np)) &
+      CALL vtables2 (micro%abc2np(1,1,1),microm%abc2np(1,1,1)  &
+                 ,ng, npts, imean,  &
+                 'ABC2NP :3:anal:mpti:mpt1')
+   if (allocated(micro%abc1mp)) &
+      CALL vtables2 (micro%abc1mp(1,1,1),microm%abc1mp(1,1,1)  &
+                 ,ng, npts, imean,  &
+                 'ABC1MP :3:anal:mpti:mpt1')
+   if (allocated(micro%abc2mp)) &
+      CALL vtables2 (micro%abc2mp(1,1,1),microm%abc2mp(1,1,1)  &
+                 ,ng, npts, imean,  &
+                 'ABC2MP :3:anal:mpti:mpt1')
    if (allocated(micro%regen_aero1_np)) &
       CALL vtables2 (micro%regen_aero1_np(1,1,1),microm%regen_aero1_np(1,1,1)  &
                  ,ng, npts, imean,  &

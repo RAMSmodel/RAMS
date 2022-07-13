@@ -44,7 +44,7 @@ use mem_basic
 use mem_micro
 use rconstants
 use micro_prm
-use micphys, only: imbudget,ipris,igraup,ihail
+use micphys, only: imbudget,ipris,igraup,ihail,ccn_max
 
 IMPLICIT NONE
                      
@@ -75,6 +75,11 @@ real :: ndrop, subtot, frzfract, rndrop, tot_reg  ! for diagnostic CCN
 real :: sum_pris, sum_snow
 INTEGER :: k,i,j
 integer itimestep, kr, ikl
+
+do kr=1,nkr
+     fccn0(kr) =FCCNR0(KR)*1000.*xccn(kr)*ccn_max
+enddo
+
 
 !-------------BEGIN Loops over Space------------
 do k = 1,mzp
@@ -313,7 +318,8 @@ do k = 1,mzp
                           ,DEL1IN,DEL2IN,DIV1,DIV2 &
                           ,FF1R,FF1IN,XL,RLEC,RO1BL &
                           ,AA1_MY,BB1_MY,AA2_MY,BB2_MY &
-                          ,COL,DTCOND,ICEMAX,NKR)
+                          ,COL,DTCOND,ICEMAX,NKR &
+                          ,micro_g(ngrid)%vapcldt(k,i,j),micro_g(ngrid)%vapraint(k,i,j))
                   !If ice
                   ELSE IF(ISYM1.EQ.0.AND.(TT-273.15).LE.-0.187.AND. &
                      (ISYM2.EQ.1.OR.ISYM3.EQ.1.OR.ISYM4.EQ.1.OR.ISYM5.EQ.1))THEN
@@ -340,7 +346,8 @@ do k = 1,mzp
                           ,FF5R,FF5IN,XH,RHEC,RO5BL &
                           ,AA1_MY,BB1_MY,AA2_MY,BB2_MY &
                           ,COL,DTCOND,ICEMAX,NKR &
-                          ,ISYM1,ISYM2,ISYM3,ISYM4,ISYM5)
+                          ,ISYM1,ISYM2,ISYM3,ISYM4,ISYM5 &
+                          ,micro_g(ngrid)%vapcldt(k,i,j),micro_g(ngrid)%vapraint(k,i,j))
                   END IF
                   IF (ifastsbm==1) CALL fastsbm_reassign (FF2R,FF3R,FF4R,FF5R)
 
@@ -1337,10 +1344,14 @@ if (imbudget >= 1) then
           sum_mass(ff2r(:,1)+ff2r(:,2)+ff2r(:,3)+ff3r+ff4r+ff5r,xs,dens,1,nkr)
 endif
 if (imbudget >= 2) then
-    micro_g(ngrid)%vapcldt(k,i,j) = micro_g(ngrid)%vapcldt(k,i,j) +  &
-                 plusminus * sum_mass(ff1r,xl,dens,1,krdrop-1)
-    micro_g(ngrid)%vapraint(k,i,j) = micro_g(ngrid)%vapraint(k,i,j) + &
-                 plusminus * sum_mass(ff1r,xl,dens,krdrop-1,nkr)
+   ! micro_g(ngrid)%vapcldt(k,i,j) = micro_g(ngrid)%vapcldt(k,i,j) +  &
+   !              plusminus * sum_mass(ff1r,xl,dens,1,krdrop-1)
+   ! micro_g(ngrid)%vapraint(k,i,j) = micro_g(ngrid)%vapraint(k,i,j) + &
+   !              plusminus * sum_mass(ff1r,xl,dens,krdrop,nkr)
+    micro_g(ngrid)%cld2raint(k,i,j) = micro_g(ngrid)%cld2raint(k,i,j) + &
+                  plusminus * sum_mass(ff1r,xl,dens,krdrop,nkr) + &
+                  plusminus * -1. * micro_g(ngrid)%vapraint(k,i,j)
+
     if(iceprocs.eq.1) then
        if (ipris > 0) &
        micro_g(ngrid)%vapprist(k,i,j) = micro_g(ngrid)%vapprist(k,i,j) + &

@@ -98,8 +98,10 @@ do acat=1,aerocat
     (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
     (acat==6 .and. isalt>0)    .or. &  ! Salt jet mode
     (acat==7 .and. isalt>0)    .or. &  ! Salt spume mode
-    (acat==8 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
-    (acat==9 .and. iccnlev>=2)) then   ! Large regenerated aerosol
+    (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+    (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+    (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
+    (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
     rundep=1
     epsilonsol = aero_epsilon(acat)
 
@@ -130,8 +132,8 @@ do acat=1,aerocat
     aerocon(k,acat) = aerocon(k,acat) * dn0(k)
     aeromas(k,acat) = aeromas(k,acat) * dn0(k)
     !Aerosol and solubility tracking
-    if(iccnlev>=2.and.itrkepsilon==1.and.(acat==8.or.acat==9)) &
-      regenmas(k,acat-7) = regenmas(k,acat-7) * dn0(k)
+    if(iccnlev>=2.and.itrkepsilon==1.and.(acat==aerocat-1.or.acat==aerocat)) &
+      regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2)) * dn0(k)
   enddo
 
   !Radii in mic_init are in meters: we need these to be in um
@@ -181,9 +183,9 @@ do acat=1,aerocat
     rh = eee/es
 
     !Aerosol and solubility tracking
-    if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==8.or.acat==9) &
+    if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==aerocat-1.or.acat==aerocat) &
       .and. aeromas(k,acat)>0.) &
-        epsilonsol = min(1.0,regenmas(k,acat-7)/aeromas(k,acat))
+        epsilonsol = min(1.0,regenmas(k,acat-(aerocat-2))/aeromas(k,acat))
 
     !Set default density (kg/m3) in k loop and update if particle deliquesced
     rhodry=aero_rhosol(acat)
@@ -292,14 +294,15 @@ do acat=1,aerocat
        aeromas(k,acat) = aeromas(k,acat) - amas_remove(lcat)
        !Aerosol and solubility tracking
        if(iccnlev>=2) then
-         cnmhx(k,lcat) = cnmhx(k,lcat) + amas_remove(lcat)
+         !Do density conversion to kg/kg for added aerosol mass to "lcat" dependent variables
+         cnmhx(k,lcat) = cnmhx(k,lcat) + (amas_remove(lcat) / dn0(k))
          if(itrkepsilon==1) then
-          snmhx(k,lcat) = snmhx(k,lcat) + amas_remove(lcat) * epsilonsol
-          if(acat==8.or.acat==9) &
-            regenmas(k,acat-7)=regenmas(k,acat-7)-amas_remove(lcat)*epsilonsol
+          snmhx(k,lcat) = snmhx(k,lcat) + (amas_remove(lcat) / dn0(k)) * epsilonsol
+          if(acat==aerocat-1.or.acat==aerocat) &
+            regenmas(k,acat-(aerocat-2))=regenmas(k,acat-(aerocat-2))-amas_remove(lcat)*epsilonsol
          endif
          if(itrkdust==1 .and. (acat==3.or.acat==4)) &
-          dnmhx(k,lcat) = dnmhx(k,lcat) + amas_remove(lcat)
+          dnmhx(k,lcat) = dnmhx(k,lcat) + (amas_remove(lcat) / dn0(k))
        endif
      enddo
     endif !wet scavenge if micro level=3 at least mincon
@@ -457,8 +460,8 @@ endif
     endif
     aeromas(k,acat) = aeromas(k,acat) - gainmas(k)
     !Aerosol and solubility tracking
-    if(iccnlev>=2.and.itrkepsilon==1.and.(acat==8.or.acat==9)) &
-      regenmas(k,acat-7) = regenmas(k,acat-7)-gainmas(k)*epsilonsol
+    if(iccnlev>=2.and.itrkepsilon==1.and.(acat==aerocat-1.or.acat==aerocat)) &
+      regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2))-gainmas(k)*epsilonsol
    enddo !Wet and Dry deposition loop over all vertical layers
   endif !End conditional deposition over layers containing aerosols
 
@@ -469,10 +472,10 @@ endif
        aerocon(k,acat) = aerocon(k,acat) + gaincon(k+1)
        aeromas(k,acat) = aeromas(k,acat) + gainmas(k+1)
        !Aerosol and solubility tracking
-       if(iccnlev>=2.and.itrkepsilon==1.and.(acat==8.or.acat==9) &
+       if(iccnlev>=2.and.itrkepsilon==1.and.(acat==aerocat-1.or.acat==aerocat) &
          .and.aeromas(k+1,acat)>0.) then 
-         epsilonsol = min(1.0,regenmas(k+1,acat-7)/aeromas(k+1,acat))
-         regenmas(k,acat-7) = regenmas(k,acat-7)+gainmas(k+1)*epsilonsol
+         epsilonsol = min(1.0,regenmas(k+1,acat-(aerocat-2))/aeromas(k+1,acat))
+         regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2))+gainmas(k+1)*epsilonsol
        endif
      enddo
     else
@@ -480,10 +483,10 @@ endif
        aerocon(k,acat) = aerocon(k,acat) + gaincon(k+1)
        aeromas(k,acat) = aeromas(k,acat) + gainmas(k+1)
        !Aerosol and solubility tracking
-       if(iccnlev>=2.and.itrkepsilon==1.and.(acat==8.or.acat==9) &
+       if(iccnlev>=2.and.itrkepsilon==1.and.(acat==aerocat-1.or.acat==aerocat) &
          .and.aeromas(k+1,acat)>0.) then 
-         epsilonsol = min(1.0,regenmas(k+1,acat-7)/aeromas(k+1,acat))
-         regenmas(k,acat-7) = regenmas(k,acat-7)+gainmas(k+1)*epsilonsol
+         epsilonsol = min(1.0,regenmas(k+1,acat-(aerocat-2))/aeromas(k+1,acat))
+         regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2))+gainmas(k+1)*epsilonsol
        endif
      enddo
     endif
@@ -499,10 +502,10 @@ endif
       stop
     endif
     !Aerosol and solubility tracking
-    if(iccnlev>=2.and.itrkepsilon==1.and.(acat==8.or.acat==9)) then
-      regenmas(k,acat-7) = regenmas(k,acat-7) / dn0(k)
-      if(regenmas(k,acat-7)<0.)then
-        print*,'RegenNeg',k,i,j,regenmas(k,acat-7),aeromas(k,acat)
+    if(iccnlev>=2.and.itrkepsilon==1.and.(acat==aerocat-1.or.acat==aerocat)) then
+      regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2)) / dn0(k)
+      if(regenmas(k,acat-(aerocat-2))<0.)then
+        print*,'RegenNeg',k,i,j,regenmas(k,acat-(aerocat-2)),aeromas(k,acat)
         stop
       endif
     endif

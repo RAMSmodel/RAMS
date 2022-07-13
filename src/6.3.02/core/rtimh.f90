@@ -322,9 +322,9 @@ enddo
 endif
 
 !  only here for debugging purposes
-kp=21
-ip=54
-jp=101
+kp=19
+ip=25
+jp=17
 bp=1
 
 101    format ('DEBUG: NODE',i0,': LOC(',i0,',',i0,',',i0,') --> (' &
@@ -346,14 +346,12 @@ enddo
 endif
 
 if(ngrid==1000) then
-do k=29,13,-1
+  k = kp
   i = ip - mi0(ngrid)
   j = jp - mj0(ngrid)
-  !k = kp
   patch = 2
   if ((i.ge.1) .and. (i.le.mmxp(ngrid)) .and. &
       (j.ge.1) .and. (j.le.mmyp(ngrid))) then
-   if(k==29)print*,string,time
 !   print 101, my_rams_num, kp, ip, jp, k, i, j, 'THETA', string, time &
 !     ,basic_g(ngrid)%theta(k,i,j)
 !   print 101, my_rams_num, kp, ip, jp, k, i, j, 'THP', string, time &
@@ -365,12 +363,10 @@ do k=29,13,-1
 !   print 101, my_rams_num, kp, ip, jp, k, i, j, 'RV', string, time &
 !     ,basic_g(ngrid)%rv(k,i,j)
 
-   !print 101, my_rams_num, kp, ip, jp, k, i, j, 'RCP', string, time &
-   !  ,micro_g(ngrid)%rcp(k,i,j)
-   print*,k,zt(k),micro_g(ngrid)%rcp(k,i,j),basic_g(ngrid)%rtp(k,i,j)
-
-!   print 101, my_rams_num, kp, ip, jp, k, i, j, 'rct', string, time &
-!     ,valugp(mzp,mxp,myp,kp,ip,jp,tend%rct(1))
+   print 101, my_rams_num, kp, ip, jp, k, i, j, 'RRP', string, time &
+     ,micro_g(ngrid)%rrp(k,i,j)
+   print 101, my_rams_num, kp, ip, jp, k, i, j, 'rrt', string, time &
+     ,valugp(mzp,mxp,myp,kp,ip,jp,tend%rrt(1))
 !   print 101, my_rams_num, kp, ip, jp, k, i, j, 'RV', string, time &
 !     ,basic_g(ngrid)%rv(k,i,j)
 !   print 101, my_rams_num, kp, ip, jp, k, i, j, 'THT', string, time &
@@ -396,7 +392,6 @@ do k=29,13,-1
 !   print 101, my_rams_num, kp, ip, jp, k, i, j, 'PATCH_AREA', string, time &
 !     ,leaf_g(ngrid)%patch_area(i,j,patch)
   endif
-enddo
 endif
 
           !    , basic_g(ngrid)%up(1:mzp,ip,jp)

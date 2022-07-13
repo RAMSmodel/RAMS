@@ -352,6 +352,74 @@ return
 END SUBROUTINE init_dust
 
 !##############################################################################
+Subroutine init_absorbing_carbon (n1,n2,n3,abc1np,abc2np,abc1mp,abc2mp,dn0,ifm)
+
+use micphys
+use rconstants
+use mem_grid
+
+implicit none
+
+integer :: n1,n2,n3,i,j,k,ifm
+real, dimension(n1,n2,n3) :: abc1np,abc2np,abc1mp,abc2mp,dn0
+real :: abc1_maxt,abc2_maxt
+
+! Initialize Absorbing Carbon
+if(iaeroprnt==1 .and. print_msg) then
+ print*,'Start Initializing Absorbing Carbon concentration'
+ print*,'iabcarb,iaerorad',iabcarb,iaerorad
+endif
+
+!Convert RAMSIN #/mg to #/kg
+ abc1_maxt = abc1_max * 1.e6
+ abc2_maxt = abc2_max * 1.e6
+
+do j = 1,n3
+ do i = 1,n2
+  do k = 1,n1
+
+   !If not using absorbing carbon / smoke source model
+   if(iabcarb == 1) then
+     !Set up concentration of mode1 absorbing carbon (#/kg)
+     if(k<=2) abc1np(k,i,j)=abc1_maxt
+     if(k>2)  abc1np(k,i,j)=abc1_maxt*exp(-zt(k)/7000.)
+     !Set up concentration of mode2 absorbing carbon (#/kg)
+     if(k<=2) abc2np(k,i,j)=abc2_maxt
+     if(k>2)  abc2np(k,i,j)=abc2_maxt*exp(-zt(k)/7000.)
+
+     !Set up Field of mode1 absorbing carbon mass (kg/kg)
+     abc1mp(k,i,j) = ((aero_medrad(8)*aero_rg2rm(8))**3.) &
+                    *abc1np(k,i,j)/(0.23873/aero_rhosol(8))
+     !Set up Field of mode2 absorbing carbon mass (kg/kg)
+     abc2mp(k,i,j) = ((aero_medrad(9)*aero_rg2rm(9))**3.) &
+                    *abc2np(k,i,j)/(0.23873/aero_rhosol(9))
+
+   !Leaving this section here in case we add an absorbing carbon / smoke 
+   !source in the future
+   elseif(iabcarb == 2) then
+     abc1np(k,i,j) = 0.
+     abc2np(k,i,j) = 0.
+     abc1mp(k,i,j) = 0.
+     abc2mp(k,i,j) = 0.
+   endif
+
+   !Output sample initial profile
+   if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+     if(k==1) print*,' AbsorbingCarbon-init (k,zt,abc1/mg,abc2/mg) on Grid:',ifm
+     print'(a21,i5,f11.1,2f17.7)',' AbsorbingCarbon-init' &
+        ,k,zt(k),abc1np(k,i,j)/1.e6,abc2np(k,i,j)/1.e6
+   endif
+
+  enddo
+ enddo
+enddo
+
+if(iaeroprnt==1 .and. print_msg) print*,' '
+
+return
+END SUBROUTINE init_absorbing_carbon
+
+!##############################################################################
 Subroutine init_salt (n1,n2,n3,salt_film_np,salt_jet_np,salt_spum_np &
                        ,salt_film_mp,salt_jet_mp,salt_spum_mp,ifm)
 

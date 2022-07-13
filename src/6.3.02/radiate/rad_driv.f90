@@ -175,7 +175,11 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
             ,micro_g(ngrid)%salt_jet_np  (1,1,1)  &
             ,micro_g(ngrid)%salt_jet_mp  (1,1,1)  &
             ,micro_g(ngrid)%salt_spum_np (1,1,1)  &
-            ,micro_g(ngrid)%salt_spum_mp (1,1,1) )
+            ,micro_g(ngrid)%salt_spum_mp (1,1,1)  &
+            ,micro_g(ngrid)%abc1np     (1,1,1)  &
+            ,micro_g(ngrid)%abc1mp     (1,1,1)  &
+            ,micro_g(ngrid)%abc2np     (1,1,1)  &
+            ,micro_g(ngrid)%abc2mp     (1,1,1))
       endif
 
    endif
@@ -461,7 +465,7 @@ Subroutine radcomp3 (m1,m2,m3,ia,iz,ja,jz  &
    ,bext,swup,swdn,lwup,lwdn &
    ,cccnp,cccmp,gccnp,gccmp,md1np,md1mp,md2np,md2mp &
    ,salt_film_np,salt_film_mp,salt_jet_np,salt_jet_mp &
-   ,salt_spum_np,salt_spum_mp)
+   ,salt_spum_np,salt_spum_mp,abc1np,abc1mp,abc2np,abc2mp)
 
 use mem_grid
 use mem_micro
@@ -480,7 +484,8 @@ real, dimension(m2,m3) :: glat,rtgt,topt,cosz,albedt,rlongup,rshort,rlong,aodt
 real, dimension(m1,m2,m3) :: dn0,rv,fthrd,pi0,pp,theta,rcp
 real, dimension(m1,m2,m3) :: bext,swup,swdn,lwup,lwdn
 real, dimension(m1,m2,m3) :: cccnp,cccmp,gccnp,gccmp,md1np,md1mp,md2np,md2mp &
-  ,salt_film_np,salt_film_mp,salt_jet_np,salt_jet_mp,salt_spum_np,salt_spum_mp
+  ,salt_film_np,salt_film_mp,salt_jet_np,salt_jet_mp,salt_spum_np,salt_spum_mp &
+  ,abc1np,abc1mp,abc2np,abc2mp
 real, external :: gammln
 
 ! Fill cloud parameters if not running microphysics
@@ -538,7 +543,9 @@ do j = ja,jz
            ,md2np(1,i,j),md2mp(1,i,j) &
            ,salt_film_np(1,i,j),salt_film_mp(1,i,j) &
            ,salt_jet_np(1,i,j) ,salt_jet_mp(1,i,j)  &
-           ,salt_spum_np(1,i,j),salt_spum_mp(1,i,j))
+           ,salt_spum_np(1,i,j),salt_spum_mp(1,i,j) &
+           ,abc1np(1,i,j),abc1mp(1,i,j) &
+           ,abc2np(1,i,j),abc2mp(1,i,j))
       endif
 
       CALL radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &

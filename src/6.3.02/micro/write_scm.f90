@@ -159,6 +159,13 @@ if(idust > 0) then
  if(idust == 2) CALL iofil ('dustfrac.txt',micro_g(ng)%dustfrac(i,j),1,wf,fln)
 endif
 
+if(iabcarb > 0) then
+ CALL iofil ('abc1np.txt',micro_g(ng)%abc1np(:,i,j),m1,wf,fln)
+ CALL iofil ('abc2np.txt',micro_g(ng)%abc2np(:,i,j),m1,wf,fln)
+ CALL iofil ('abc1mp.txt',micro_g(ng)%abc1mp(:,i,j),m1,wf,fln)
+ CALL iofil ('abc2mp.txt',micro_g(ng)%abc2mp(:,i,j),m1,wf,fln)
+endif
+
 if(isalt > 0) then
  CALL iofil ('salt_film_np.txt',micro_g(ng)%salt_film_np(:,i,j),m1,wf,fln)
  CALL iofil ('salt_jet_np.txt' ,micro_g(ng)%salt_jet_np (:,i,j),m1,wf,fln)

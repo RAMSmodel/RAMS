@@ -57,6 +57,13 @@ do k = 1,mzp
         isnanr(micro_g(ngrid)%md2np(k,i,j)) .or. &
         isnanr(micro_g(ngrid)%md2mp(k,i,j)) ) prtflg=1
    endif
+   !CHECK ABSORBING CARBON MODES
+   if(iabcarb > 0)then
+     if(isnanr(micro_g(ngrid)%abc1np(k,i,j)) .or. &
+        isnanr(micro_g(ngrid)%abc1mp(k,i,j)) .or. &
+        isnanr(micro_g(ngrid)%abc2np(k,i,j)) .or. &
+        isnanr(micro_g(ngrid)%abc2mp(k,i,j)) ) prtflg=1
+   endif
    !CHECK SEA SALT MODES
    if(isalt > 0)then
      if(isnanr(micro_g(ngrid)%salt_film_np(k,i,j)) .or. &
@@ -383,6 +390,12 @@ do k = 1,mzp
       print*,'md1mp:         ',micro_g(ngrid)%md1mp(k,i,j)
       print*,'md2np:         ',micro_g(ngrid)%md2np(k,i,j)
       print*,'md2mp:         ',micro_g(ngrid)%md2mp(k,i,j)
+    endif
+    if(iabcarb > 0)then
+      print*,'abc1np:         ',micro_g(ngrid)%abc1np(k,i,j)
+      print*,'abc1mp:         ',micro_g(ngrid)%abc1mp(k,i,j)
+      print*,'abc2np:         ',micro_g(ngrid)%abc2np(k,i,j)
+      print*,'abc2mp:         ',micro_g(ngrid)%abc2mp(k,i,j)
     endif
     if(isalt > 0)then
       print*,'salt_film_np:  ',micro_g(ngrid)%salt_film_np(k,i,j)

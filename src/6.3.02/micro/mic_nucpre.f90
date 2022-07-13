@@ -21,8 +21,10 @@ do acat=1,aerocat
      (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
      (acat==6 .and. isalt>0)    .or. &  ! Salt jet mode
      (acat==7 .and. isalt>0)    .or. &  ! Salt spume mode
-     (acat==8 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
-     (acat==9 .and. iccnlev>=2)) then   ! Large regenerated aerosol
+     (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+     (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+     (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
+     (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
 
      !Assign aerosol specs to local arrays
      aeromass   = aeromas(k,acat)
@@ -40,8 +42,8 @@ do acat=1,aerocat
        aeromas(k,acat) = ((aero_rg(acat)*aero_rg2rm(acat))**3.) &
                        *aerocon(k,acat)/(0.23873/rhosol)
 
-       if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==8.or.acat==9)) &
-         regenmas(k,acat-7) = regenmas(k,acat-7) * (aeromas(k,acat) / aeromass)
+       if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==aerocat-1.or.acat==aerocat)) &
+         regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2)) * (aeromas(k,acat) / aeromass)
 
      endif
 
@@ -85,8 +87,10 @@ real, dimension(m1) :: dn0,rv
       (acat==2)                  .or. &  ! GCCN
       (acat==3 .and. idust>0)    .or. &  ! Small dust mode
       (acat==4 .and. idust>0)    .or. &  ! Large dust mode
-      (acat==8 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
-      (acat==9 .and. iccnlev>=2)) then   ! Large regenerated aerosol
+      (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+      (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+      (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
+      (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
 
     concen_nuc = aerocon(k,acat)
     aeromass   = aeromas(k,acat)
@@ -254,15 +258,17 @@ real, dimension(m1) :: dn0,rv
        (acat==2)                  .or. &  ! GCCN
        (acat==3 .and. idust>0)    .or. &  ! Small dust mode
        (acat==4 .and. idust>0)    .or. &  ! Large dust mode
-       (acat==8 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
-       (acat==9 .and. iccnlev>=2)) then   ! Large regenerated aerosol
+       (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+       (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+       (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
+       (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
       !Assign aerosol specs to local arrays
       epsil      = aero_epsilon(acat)
 
       !Aerosol and solubility tracking
-      if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==8.or.acat==9) &
+      if(iccnlev>=2 .and. itrkepsilon==1 .and. (acat==aerocat-1.or.acat==aerocat) &
        .and. aeromas(k,acat)>0.) then
-         epsil = min(1.0,regenmas(k,acat-7)/aeromas(k,acat))
+         epsil = min(1.0,regenmas(k,acat-(aerocat-2))/aeromas(k,acat))
       endif
 
       aerocon(k,acat) = aerocon(k,acat) - totifnn(k,acat)
@@ -276,8 +282,8 @@ real, dimension(m1) :: dn0,rv
        cnmhx(k,3) = cnmhx(k,3) + totifnm(k,acat)
        if(itrkepsilon==1) then
          snmhx(k,3) = snmhx(k,3) + totifnm(k,acat) * epsil
-         if(acat==8.or.acat==9) &
-          regenmas(k,acat-7) = regenmas(k,acat-7) - totifnm(k,acat) * epsil         
+         if(acat==aerocat-1.or.acat==aerocat) &
+          regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2)) - totifnm(k,acat) * epsil         
        endif
        if(itrkdust==1 .and. (acat==3 .or. acat==4)) &
          dnmhx(k,3) = dnmhx(k,3) + totifnm(k,acat)

@@ -179,16 +179,22 @@ do k = 2,m1-1
     aerocon(k,7) = micro%salt_spum_np(k,i,j)
     aeromas(k,7) = micro%salt_spum_mp(k,i,j)
   endif
+  if (iabcarb > 0) then
+    aerocon(k,8) = micro%abc1np(k,i,j)
+    aeromas(k,8) = micro%abc1mp(k,i,j)
+    aerocon(k,9) = micro%abc2np(k,i,j)
+    aeromas(k,9) = micro%abc2mp(k,i,j)
+  endif
 enddo
 
 !Aerosol and solubility tracking variables scratch arrays
 if (iccnlev>=2) then
  do k = 2,m1-1
    !Regenerated aerosol and solubility
-   aerocon(k,8) = micro%regen_aero1_np(k,i,j)
-   aeromas(k,8) = micro%regen_aero1_mp(k,i,j)
-   aerocon(k,9) = micro%regen_aero2_np(k,i,j)
-   aeromas(k,9) = micro%regen_aero2_mp(k,i,j)
+   aerocon(k,aerocat-1) = micro%regen_aero1_np(k,i,j)
+   aeromas(k,aerocat-1) = micro%regen_aero1_mp(k,i,j)
+   aerocon(k,aerocat) = micro%regen_aero2_np(k,i,j)
+   aeromas(k,aerocat) = micro%regen_aero2_mp(k,i,j)
    if(itrkepsilon==1) then
      regenmas(k,1) = micro%resol_aero1_mp(k,i,j)
      regenmas(k,2) = micro%resol_aero2_mp(k,i,j)
@@ -1298,7 +1304,12 @@ do k = k1,k2
       if(iplaws==0) densrtgt = 10.0 * sqrt(dn0i(k)) / rtgt
       if(iplaws==1) densrtgt = 10.0 * (0.7*dn0i(k))**0.362 / rtgt
       if(iplaws==2) densrtgt = 10.0 * (0.7*dn0i(k))**bdenpowfac / rtgt
-      if(int(densrtgt)<1 .or. int(densrtgt)>40)then
+      if(ISCM>=1)then
+       !SaleebySCM: CCPP models can go to really high altitude and low density which
+       !can cause "densrtgt" >> ndensrtgt, so we cap this value.
+       densrtgt = min(ndensrtgt,int(densrtgt))
+      endif
+      if(int(densrtgt)<1 .or. int(densrtgt)>ndensrtgt)then
         print*,'Bad sedimentation densrtgt index.'
         stop
       endif

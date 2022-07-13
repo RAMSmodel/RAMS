@@ -150,7 +150,7 @@ dimnames(3) = 'z'
 ! note that compression levels higher than 1 from REVU output
 ! can produce odd results in some fields such as reflectivity.
 ! Please use caution with this variable.
-deflvl=1
+deflvl=6
 
 CALL rams_hdf5_select_var_data (a,n1,n2,n3,nib,nie,niinc &
          ,njb,nje,njinc,nnb,nne,nninc,ivtype,sdims,vdata)

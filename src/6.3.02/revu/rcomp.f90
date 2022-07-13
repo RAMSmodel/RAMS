@@ -525,6 +525,26 @@ return
 END SUBROUTINE rams_comp_horizdiv
 
 !##############################################################################
+Subroutine rams_comp_vertmin (n1,n2,n3,a,c)
+
+implicit none
+
+integer :: n1,n2,n3,i,j,k
+real, dimension(n1,n2,n3) :: a,c
+
+do j = 1,n2
+   do i = 1,n1
+      a(i,j,1) = 0.
+      do k = 2,n3-5
+         a(i,j,1) = min(a(i,j,1),c(i,j,k))
+      enddo
+   enddo
+enddo
+
+return
+END SUBROUTINE rams_comp_vertmin
+
+!##############################################################################
 Subroutine rams_comp_vertmax (n1,n2,n3,a,c)
 
 implicit none
@@ -966,8 +986,8 @@ do k=1,n3
  !"a" is hydrometeor mass concentration in kg/m3
  !"c" is hydrometeor number concentration in #/m3
 
- !If mixing ratio is large enough, proceed
- if(a(i,j,k) .gt. 0.00001)then
+ !If mixing ratio is large enough (>= .001 g/kg), proceed
+ if(a(i,j,k) .ge. 0.000001)then
  
   !Mean mass diameter (meters)
   dmean = (a(i,j,k) / (c(i,j,k) * ccfmas))**(1./ppwmas)
@@ -1020,7 +1040,7 @@ do k=1,n3
   !Standard deviation of mass spectrum (mm)
   Sigma_m = sqrt(Sum2nd/SumMd)
 
-  !Compute volumetic mean diameter (mm)
+  !Compute volumetric mean diameter (mm)
   !Use (gnu-1) since RAMS' gnu is different than Williams et al.
   D0 = Dm * (3.67 + (gnu-1.)) / (4.0 + (gnu-1.))
 
@@ -1029,7 +1049,7 @@ do k=1,n3
 
   !***************************************************************************
   !Assign values to output variable "a"
-  if(z==1) a(i,j,k) = Dm !mass weighted mean diamer (mm)
+  if(z==1) a(i,j,k) = Dm !mass weighted mean diameter (mm)
   if(z==2) a(i,j,k) = D0 !volumetric mean diameter (mm)
   if(z==3) a(i,j,k) = Nw !normalized intercept parameter (1/mm * 1/m3)
   if(z==4) a(i,j,k) = Sigma_m !standard deviation of mass spectrum (mm)
@@ -1471,6 +1491,85 @@ enddo
 return
 END SUBROUTINE rams_comp_noneg
 
+!##############################################################################
+Subroutine rams_comp_nonegm (n1,n2,n3,a)
+
+implicit none
+
+integer :: n1,n2,n3,i,j,k
+real :: a(n1,n2,n3)
+
+do k=1,n3
+   do j=1,n2
+      do i=1,n1
+       !If value is very small make it zero to save output space.
+       !For native hydrometeor mixing ratio this is 1.e-6 kg/kg or 1.e-3 g/kg.
+       !Note that 3 rain drops of 1mm diameter ~ 0.0015 grams, so 3 rain
+       !drops per kg of air would meet the sampling criteria for mixing ratio.
+       if(a(i,j,k) .lt. 0.000001)then
+         a(i,j,k)=0.
+       endif
+      enddo
+   enddo
+enddo
+
+return
+END SUBROUTINE rams_comp_nonegm
+
+!##############################################################################
+Subroutine rams_comp_nonegp (n1,n2,n3,a)
+
+implicit none
+
+integer :: n1,n2,n3,i,j,k
+real :: a(n1,n2,n3)
+
+do k=1,n3
+   do j=1,n2
+      do i=1,n1
+       !Like "nonegm" above, we set a minimum for the microphysical process
+       !rate to output from revu so we can keep files smaller. No need to 
+       !analyze super small values that are typically thresholded out anyway.
+       !Applying minimum of 0.0000001 kg/kg/time = 0.0001 g/kg/time
+
+       !Apply threshold to both negative and positive values to account for
+       !evaporation (negative) and deposition (positive) in the budget 
+       !variables like "vapliqt".
+       if( a(i,j,k) .gt. -0.0000001  .and.  a(i,j,k) .lt. 0.0000001 ) then
+         a(i,j,k)=0.
+       endif
+      enddo
+   enddo
+enddo
+
+return
+END SUBROUTINE rams_comp_nonegp
+
+!##############################################################################
+Subroutine rams_comp_nonegn (n1,n2,n3,a,b)
+
+implicit none
+
+integer :: n1,n2,n3,i,j,k
+real :: a(n1,n2,n3) !number concentration
+real :: b(n1,n2,n3) !mixing ratio
+
+do k=1,n3
+   do j=1,n2
+      do i=1,n1
+       !If value is very small make it zero to save output space.
+       !For native hydrometeor mixing ratio this is 1.e-6 kg/kg or 1.e-3 g/kg.
+       !Note that 3 rain drops of 1mm diameter ~ 0.0015 grams, so 3 rain
+       !drops per kg of air would meet the sampling criteria for mixing ratio.
+       if(b(i,j,k) .lt. 0.000001)then  !hydrometeor mixing ratio (kg/kg)
+         a(i,j,k)=0. !hydrometeor number concentration (#/kg)
+       endif
+      enddo
+   enddo
+enddo
+
+return
+END SUBROUTINE rams_comp_nonegn
 
 !##############################################################################
 Subroutine rams_comp_subt (n1,n2,n3,a,b)

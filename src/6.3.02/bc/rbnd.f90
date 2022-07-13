@@ -471,6 +471,9 @@ if(iaerolbc(ngrid)==1)then
      ((sname == 'MD1NP' .or. sname == 'MD1MP' .or. &
        sname == 'MD2NP' .or. sname == 'MD2MP') .and. &
        idust==1) .or. &
+     ((sname == 'ABC1NP' .or. sname == 'ABC1MP' .or. &
+       sname == 'ABC2NP' .or. sname == 'ABC2MP') .and. &
+       iabcarb==1) .or. &
      ((sname == 'SALT_FILM_NP' .or. sname == 'SALT_FILM_MP' .or. &
        sname == 'SALT_JET_NP'  .or. sname == 'SALT_JET_MP'  .or. &
        sname == 'SALT_SPUM_NP' .or. sname == 'SALT_SPUM_MP') .and. &

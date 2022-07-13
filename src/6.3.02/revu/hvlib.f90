@@ -52,7 +52,7 @@ if(cvar(1:lv).eq.'empty3d') then
    cdunits='none;'
 
 !######################################################################
-! AOD DATA FROM OFFLINE CODE - 18 variables
+! AOD DATA FROM OFFLINE CODE
 !######################################################################
 elseif(cvar(1:lv).eq.'ccn_dry_AOD_550') then
    ivar_type=2
@@ -181,7 +181,7 @@ elseif(cvar(1:lv).eq.'Total_wet_AOD_550') then
    cdunits='AOD;'
 
 !######################################################################
-! EXTINCTION COEFFICIENT DATA FROM OFFLINE CODE - 18 variables
+! EXTINCTION COEFFICIENT DATA FROM OFFLINE CODE
 !######################################################################
 elseif(cvar(1:lv).eq.'ccn_dry_ext_550') then
    ivar_type=3
@@ -310,7 +310,7 @@ elseif(cvar(1:lv).eq.'Total_wet_ext_550') then
    cdunits='1/Mm;'
 
 !###########################################################################
-! 3D VELOCITY AND VORTICITY VARIABLES - 21 variables
+! 3D VELOCITY AND VORTICITY VARIABLES
 !###########################################################################
 elseif(cvar(1:lv).eq.'u') then
    ivar_type=3
@@ -504,7 +504,7 @@ elseif(cvar(1:lv).eq.'horiz_div') then
    cdunits='/s;'
 
 !#####################################################################
-! 3D THERMODYNAMIC PROPERTIES OF AIR - 18 variables
+! 3D THERMODYNAMIC PROPERTIES OF AIR
 !#####################################################################
 elseif(cvar(1:lv).eq.'pi') then
    ivar_type=3
@@ -693,7 +693,7 @@ elseif(cvar(1:lv).eq.'tempc2m') then
    cdunits='C;'
 
 !#####################################################################
-!3D HYDROMETEOR GAMMA DISTRIBUTION INFO - 20 variables
+!3D HYDROMETEOR GAMMA DISTRIBUTION INFO
 !#####################################################################
 elseif(cvar(1:lv).eq.'cloud_gam_dm') then
    ivar_type=3
@@ -719,6 +719,7 @@ elseif(cvar(1:lv).eq.'cloud_gam_d0') then
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    cdname='cloud-gamma-d0;'
    cdunits='microns;'
+
 elseif(cvar(1:lv).eq.'rain_gam_dm') then
    ivar_type=3
    ierr=rams_getvar('RRP',idim_type,ngrd,a,flnm)
@@ -763,6 +764,31 @@ elseif(cvar(1:lv).eq.'rain_gam_sigma') then
    CALL rams_comp_hydrogamma (n1,n2,n3,a,f,cfmas(2),pwmas(2),gnu(2),4)
    cdname='rain-gamma-sigma;'
    cdunits='mm;'
+
+elseif(cvar(1:lv).eq.'pris_gam_dm') then
+   ivar_type=3
+   ierr=rams_getvar('RPP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CPP',idim_type,ngrd,f,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_mult (n1,n2,n3,f,d)
+   CALL rams_comp_hydrogamma (n1,n2,n3,a,f,cfmas(3),pwmas(3),gnu(3),1)
+   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   cdname='pris-gamma-dm;'
+   cdunits='microns;'
+elseif(cvar(1:lv).eq.'pris_gam_d0') then
+   ivar_type=3
+   ierr=rams_getvar('RPP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CPP',idim_type,ngrd,f,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_mult (n1,n2,n3,f,d)
+   CALL rams_comp_hydrogamma (n1,n2,n3,a,f,cfmas(3),pwmas(3),gnu(3),2)
+   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   cdname='pris-gamma-d0;'
+   cdunits='microns;'
 
 elseif(cvar(1:lv).eq.'snow_gam_dm') then
    ivar_type=3
@@ -944,8 +970,34 @@ elseif(cvar(1:lv).eq.'hail_gam_sigma') then
    cdname='hail-gamma-sigma;'
    cdunits='mm;'
 
+elseif(cvar(1:lv).eq.'driz_gam_dm') then
+   ivar_type=3
+   ierr=rams_getvar('RDP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CDP',idim_type,ngrd,f,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_mult (n1,n2,n3,f,d)
+   CALL rams_comp_hydrogamma (n1,n2,n3,a,f,cfmas(8),pwmas(8),gnu(8),1)
+   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   cdname='driz-gamma-dm;'
+   cdunits='microns;'
+elseif(cvar(1:lv).eq.'driz_gam_d0') then
+   ivar_type=3
+   ierr=rams_getvar('RDP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CDP',idim_type,ngrd,f,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_mult (n1,n2,n3,f,d)
+   CALL rams_comp_hydrogamma (n1,n2,n3,a,f,cfmas(8),pwmas(8),gnu(8),2)
+   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   cdname='driz-gamma-d0;'
+   cdunits='microns;'
+
+
 !#####################################################################
-! 3D MOISTURE MASS MIXING RATIOS AND HUMIDITY - 37 variables
+! 3D MOISTURE MASS MIXING RATIOS AND HUMIDITY
 !#####################################################################
 elseif(cvar(1:lv).eq.'vapr_press') then
    ivar_type=3
@@ -998,6 +1050,7 @@ elseif(cvar(1:lv).eq.'cloud') then
    ivar_type=3
    ierr=rams_getvar('RCP',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
@@ -1010,6 +1063,7 @@ elseif(cvar(1:lv).eq.'cloud_m3') then
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='cloud-mixing-ratio;'
@@ -1019,6 +1073,7 @@ elseif(cvar(1:lv).eq.'rain') then
    ivar_type=3
    ierr=rams_getvar('RRP',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
@@ -1031,6 +1086,7 @@ elseif(cvar(1:lv).eq.'rain_m3') then
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='rain-mixing-ratio;'
@@ -1040,6 +1096,7 @@ elseif(cvar(1:lv).eq.'pristine') then
    ivar_type=3
    ierr=rams_getvar('RPP',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
@@ -1052,6 +1109,7 @@ elseif(cvar(1:lv).eq.'pristine_m3') then
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='pristine-mixing-ratio;'
@@ -1061,6 +1119,7 @@ elseif(cvar(1:lv).eq.'snow') then
    ivar_type=3
    ierr=rams_getvar('RSP',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
@@ -1073,6 +1132,7 @@ elseif(cvar(1:lv).eq.'snow_m3') then
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='snow-mixing-ratio;'
@@ -1082,6 +1142,7 @@ elseif(cvar(1:lv).eq.'aggregates') then
    ivar_type=3
    ierr=rams_getvar('RAP',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
@@ -1094,6 +1155,7 @@ elseif(cvar(1:lv).eq.'aggregates_m3') then
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='aggregate-mixing-ratio;'
@@ -1103,6 +1165,7 @@ elseif(cvar(1:lv).eq.'graupel') then
    ivar_type=3
    ierr=rams_getvar('RGP',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
@@ -1115,6 +1178,7 @@ elseif(cvar(1:lv).eq.'graupel_m3') then
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='graupel-mixing-ratio;'
@@ -1124,6 +1188,7 @@ elseif(cvar(1:lv).eq.'hail') then
    ivar_type=3
    ierr=rams_getvar('RHP',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
@@ -1136,6 +1201,7 @@ elseif(cvar(1:lv).eq.'hail_m3') then
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='hail-mixing-ratio;'
@@ -1145,6 +1211,7 @@ elseif(cvar(1:lv).eq.'drizzle') then
    ivar_type=3
    ierr=rams_getvar('RDP',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
@@ -1157,6 +1224,7 @@ elseif(cvar(1:lv).eq.'drizzle_m3') then
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='drizzle-mixing-ratio;'
@@ -1171,6 +1239,7 @@ elseif(cvar(1:lv).eq.'prissnowagg') then
    if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
    ierr=rams_getvar('RAP',idim_type,ngrd,c,flnm)
    if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='snowprisagg-mixing-ratio;'
@@ -1183,6 +1252,7 @@ elseif(cvar(1:lv).eq.'grauphail') then
    if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
    ierr=rams_getvar('RHP',idim_type,ngrd,c,flnm)
    if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='grauphail-mixing-ratio;'
@@ -1219,6 +1289,7 @@ elseif(cvar(1:lv).eq.'liquid') then
       CALL rams_comp_accum (n1,n2,n3,a,c)
     endif
 
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='liquid-mixing-ratio;'
@@ -1255,10 +1326,67 @@ elseif(cvar(1:lv).eq.'ice') then
       CALL rams_comp_accum (n1,n2,n3,a,c)
    endif
 
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='ice-mixing-ratio;'
    cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'total_cond' .or. cvar(1:lv).eq.'total_cond_m3') then
+   ivar_type=3
+   iany=1
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RCP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   ierr=rams_getvar('RDP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   ierr=rams_getvar('RRP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   ierr=rams_getvar('RPP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   ierr=rams_getvar('RSP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   ierr=rams_getvar('RAP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   ierr=rams_getvar('RGP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   ierr=rams_getvar('RHP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+
+   if(cvar(1:lv).eq.'total_cond_m3')then
+     ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+     CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+     CALL rams_comp_mult (n1,n2,n3,a,d)
+   endif
+
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
+   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   CALL rams_comp_noneg (n1,n2,n3,a)
+   cdname='total-condensate-mixing-ratio;'
+
+   if(cvar(1:lv).eq.'total_cond')    cdunits='g/kg;'
+   if(cvar(1:lv).eq.'total_cond_m3') cdunits='g/m3;'
+
+elseif(cvar(1:lv).eq.'total_mixr') then
+   ivar_type=3
+   ierr=rams_getvar('RTP',idim_type,ngrd,a,flnm)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
+   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   CALL rams_comp_noneg (n1,n2,n3,a)
+   cdname='total-water-mixing-ratio-RTP;'
+   cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'total_mixr_m3') then
+   ivar_type=3
+   ierr=rams_getvar('RTP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegm (n1,n2,n3,a)  !##### "nonegm" minimum
+   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   CALL rams_comp_noneg (n1,n2,n3,a)
+   cdname='total-water-mixing-ratio-RTP;'
+   cdunits='g/m3;'
 
 elseif(cvar(1:lv).eq.'ctop_tempc_sstbase') then
    ivar_type=2
@@ -1325,75 +1453,6 @@ elseif(cvar(1:lv).eq.'ctop_tempc_nobase') then
 
    cdname='cloud-top-temperature-nosurface;'
    cdunits='C;'
-
-elseif(cvar(1:lv).eq.'total_cond' .or. &
-       cvar(1:lv).eq.'total_cond_m3') then
-   ivar_type=3
-   iany=1
-   CALL rams_comp_zero (n1,n2,n3,a)
-   ierr=rams_getvar('RCP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RDP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RRP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RPP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RSP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RAP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RGP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RHP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-
-   if(cvar(1:lv).eq.'total_cond_m3')then
-     ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
-     CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
-     CALL rams_comp_mult (n1,n2,n3,a,d)
-   endif
-
-   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
-   CALL rams_comp_noneg (n1,n2,n3,a)
-   cdname='total-condensate-mixing-ratio;'
-
-   if(cvar(1:lv).eq.'total_cond')    cdunits='g/kg;'
-   if(cvar(1:lv).eq.'total_cond_m3') cdunits='g/m3;'
-
-elseif(cvar(1:lv).eq.'r_total') then
-   ivar_type=3
-   iany=1
-   ierr=rams_getvar('RV',idim_type,ngrd,a,flnm)
-   ierr=rams_getvar('RCP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RDP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RRP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RPP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RSP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RAP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RGP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-   ierr=rams_getvar('RHP',idim_type,ngrd,c,flnm)
-   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
-
-   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
-   CALL rams_comp_noneg (n1,n2,n3,a)
-   cdname='total-mixing-ratio;'
-   cdunits='g/kg;'
-
-elseif(cvar(1:lv).eq.'rtotal_orig') then
-   ivar_type=3
-   ierr=rams_getvar('RTP',idim_type,ngrd,a,flnm)
-   CALL rams_comp_mults (n1,n2,n3,a,1.e3)
-   CALL rams_comp_noneg (n1,n2,n3,a)
-   cdname='total-water-mixing-ratio-RTP;'
-   cdunits='g/kg;'
 
 elseif(cvar(1:lv).eq.'dewptk') then
    ivar_type=3
@@ -1470,11 +1529,13 @@ elseif(cvar(1:lv).eq.'cloud_frac') then
    cdunits='frac;'
 
 !#####################################################################
-!3D HYDROMETEOR NUMBER CONCENTRATIONS - 22 variables
+!3D HYDROMETEOR NUMBER CONCENTRATIONS
 !#####################################################################
 elseif(cvar(1:lv).eq.'cloud_concen_mg') then
    ivar_type=3
    ierr=rams_getvar('CCP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RCP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='cloud-concen;'
@@ -1483,6 +1544,8 @@ elseif(cvar(1:lv).eq.'cloud_concen_mg') then
 elseif(cvar(1:lv).eq.'cloud_concen_kg') then
    ivar_type=3
    ierr=rams_getvar('CCP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RCP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='cloud-concen;'
    cdunits='#/kg;'
@@ -1490,6 +1553,8 @@ elseif(cvar(1:lv).eq.'cloud_concen_kg') then
 elseif(cvar(1:lv).eq.'rain_concen_kg') then
    ivar_type=3
    ierr=rams_getvar('CRP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RRP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='rain-concen;'
    cdunits='#/kg;'
@@ -1497,6 +1562,8 @@ elseif(cvar(1:lv).eq.'rain_concen_kg') then
 elseif(cvar(1:lv).eq.'pris_concen_mg') then
    ivar_type=3
    ierr=rams_getvar('CPP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RPP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='pristine-concen;'
@@ -1505,6 +1572,8 @@ elseif(cvar(1:lv).eq.'pris_concen_mg') then
 elseif(cvar(1:lv).eq.'pris_concen_kg') then
    ivar_type=3
    ierr=rams_getvar('CPP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RPP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='pristine-concen;'
    cdunits='#/kg;'
@@ -1512,6 +1581,8 @@ elseif(cvar(1:lv).eq.'pris_concen_kg') then
 elseif(cvar(1:lv).eq.'snow_concen_kg') then
    ivar_type=3
    ierr=rams_getvar('CSP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RSP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='snow-concen;'
    cdunits='#/kg;'
@@ -1519,6 +1590,8 @@ elseif(cvar(1:lv).eq.'snow_concen_kg') then
 elseif(cvar(1:lv).eq.'agg_concen_kg') then
    ivar_type=3
    ierr=rams_getvar('CAP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RAP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='aggregate-concen;'
    cdunits='#/kg;'
@@ -1526,6 +1599,8 @@ elseif(cvar(1:lv).eq.'agg_concen_kg') then
 elseif(cvar(1:lv).eq.'graup_concen_kg') then
    ivar_type=3
    ierr=rams_getvar('CGP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RGP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='graupel-concen;'
    cdunits='#/kg;'
@@ -1533,6 +1608,8 @@ elseif(cvar(1:lv).eq.'graup_concen_kg') then
 elseif(cvar(1:lv).eq.'hail_concen_kg') then
    ivar_type=3
    ierr=rams_getvar('CHP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RHP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='hail-concen;'
    cdunits='#/kg;'
@@ -1540,6 +1617,8 @@ elseif(cvar(1:lv).eq.'hail_concen_kg') then
 elseif(cvar(1:lv).eq.'drizzle_concen_mg') then
    ivar_type=3
    ierr=rams_getvar('CDP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RDP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='drizzle-concen;'
@@ -1548,6 +1627,8 @@ elseif(cvar(1:lv).eq.'drizzle_concen_mg') then
 elseif(cvar(1:lv).eq.'drizzle_concen_kg') then
    ivar_type=3
    ierr=rams_getvar('CDP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RDP',idim_type,ngrd,f,flnm)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='drizzle-concen;'
    cdunits='#/kg;'
@@ -1555,9 +1636,11 @@ elseif(cvar(1:lv).eq.'drizzle_concen_kg') then
 elseif(cvar(1:lv).eq.'cloud_concen_cm3') then
    ivar_type=3
    ierr=rams_getvar('CCP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RCP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='cloud-concen;'
@@ -1566,9 +1649,11 @@ elseif(cvar(1:lv).eq.'cloud_concen_cm3') then
 elseif(cvar(1:lv).eq.'rain_concen_m3') then
    ivar_type=3
    ierr=rams_getvar('CRP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RRP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='rain-concen;'
    cdunits='#/m3;'
@@ -1576,9 +1661,11 @@ elseif(cvar(1:lv).eq.'rain_concen_m3') then
 elseif(cvar(1:lv).eq.'rain_concen_dm3') then
    ivar_type=3
    ierr=rams_getvar('CRP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RRP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e-3)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='rain-concen;'
@@ -1587,9 +1674,11 @@ elseif(cvar(1:lv).eq.'rain_concen_dm3') then
 elseif(cvar(1:lv).eq.'pris_concen_m3') then
    ivar_type=3
    ierr=rams_getvar('CPP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RPP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='pristine-concen;'
    cdunits='#/m3;'
@@ -1597,9 +1686,11 @@ elseif(cvar(1:lv).eq.'pris_concen_m3') then
 elseif(cvar(1:lv).eq.'pris_concen_cm3') then
    ivar_type=3
    ierr=rams_getvar('CPP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RPP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='pristine-concen;'
@@ -1608,9 +1699,11 @@ elseif(cvar(1:lv).eq.'pris_concen_cm3') then
 elseif(cvar(1:lv).eq.'snow_concen_m3') then
    ivar_type=3
    ierr=rams_getvar('CSP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RSP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='snow-concen;'
    cdunits='#/m3;'
@@ -1618,9 +1711,11 @@ elseif(cvar(1:lv).eq.'snow_concen_m3') then
 elseif(cvar(1:lv).eq.'snow_concen_cm3') then
    ivar_type=3
    ierr=rams_getvar('CSP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RSP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='snow-concen;'
@@ -1629,9 +1724,11 @@ elseif(cvar(1:lv).eq.'snow_concen_cm3') then
 elseif(cvar(1:lv).eq.'agg_concen_m3') then
    ivar_type=3
    ierr=rams_getvar('CAP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RAP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='aggregates-concen;'
    cdunits='#/m3;'
@@ -1639,9 +1736,11 @@ elseif(cvar(1:lv).eq.'agg_concen_m3') then
 elseif(cvar(1:lv).eq.'graup_concen_m3') then
    ivar_type=3
    ierr=rams_getvar('CGP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RGP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='graupel-concen;'
    cdunits='#/m3;'
@@ -1649,9 +1748,11 @@ elseif(cvar(1:lv).eq.'graup_concen_m3') then
 elseif(cvar(1:lv).eq.'hail_concen_m3') then
    ivar_type=3
    ierr=rams_getvar('CHP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RHP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='hail-concen;'
    cdunits='#/m3;'
@@ -1659,16 +1760,18 @@ elseif(cvar(1:lv).eq.'hail_concen_m3') then
 elseif(cvar(1:lv).eq.'drizzle_concen_cm3') then
    ivar_type=3
    ierr=rams_getvar('CDP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('RDP',idim_type,ngrd,f,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
    CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_nonegn (n1,n2,n3,a,f)  !##### "nonegn" minimum
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
    cdname='drizzle-concen;'
    cdunits='#/cm3;'
 
 !#####################################################################
-!HUCM-SBM EXTRA HYDROMETEOR QUANTITIES - 18 variables
+!HUCM-SBM EXTRA HYDROMETEOR QUANTITIES
 !#####################################################################
 elseif(cvar(1:lv).eq.'ice_plates') then
    ivar_type=3
@@ -1806,7 +1909,7 @@ elseif(cvar(1:lv).eq.'accpid') then
    cdunits='kg/m2;'
 
 !#####################################################################
-!3D AEROSOLS NUMBER, MASS, SIZE, SOLUBILITY - 37 variables
+!3D AEROSOLS NUMBER, MASS, SIZE, SOLUBILITY
 !#####################################################################
 elseif(cvar(1:lv).eq.'ifn_concen_mg') then
    ivar_type=3
@@ -1897,6 +2000,32 @@ elseif(cvar(1:lv).eq.'dust2_concen') then
    cdname='dust2-concentration;'
    cdunits='#/cm3;'
 
+elseif(cvar(1:lv).eq.'abs_carbon1_concen') then
+   ivar_type=3
+   ierr=rams_getvar('ABC1NP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   if(ierr.eq.0) then
+    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+    CALL rams_comp_mult (n1,n2,n3,a,d)
+    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
+    CALL rams_comp_noneg (n1,n2,n3,a)
+   endif
+   cdname='absorbing-carbon1-concentration;'
+   cdunits='#/cm3;'
+
+elseif(cvar(1:lv).eq.'abs_carbon2_concen') then
+   ivar_type=3
+   ierr=rams_getvar('ABC2NP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   if(ierr.eq.0) then
+    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+    CALL rams_comp_mult (n1,n2,n3,a,d)
+    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
+    CALL rams_comp_noneg (n1,n2,n3,a)
+   endif
+   cdname='absorbing-carbon2-concentration;'
+   cdunits='#/cm3;'
+
 elseif(cvar(1:lv).eq.'salt_film_concen') then
    ivar_type=3
    ierr=rams_getvar('SALT_FILM_NP',idim_type,ngrd,a,flnm)
@@ -1930,10 +2059,11 @@ elseif(cvar(1:lv).eq.'salt_spume_concen') then
    if(ierr.eq.0) then
     CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
     CALL rams_comp_mult (n1,n2,n3,a,d)
+    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
     CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='salt-spume-concentration;'
-   cdunits='#/m3;'
+   cdunits='#/cm3;'
 
 elseif(cvar(1:lv).eq.'regen_aero1_concen') then
    ivar_type=3
@@ -2038,6 +2168,32 @@ elseif(cvar(1:lv).eq.'dust2_massd10') then
    endif
    cdname='dust2-mass;'
    cdunits='micro-grams/m3/10.0;'
+
+elseif(cvar(1:lv).eq.'abs_carbon1_mass') then
+   ivar_type=3
+   ierr=rams_getvar('ABC1MP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   if(ierr.eq.0) then
+    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+    CALL rams_comp_mult (n1,n2,n3,a,d)
+    CALL rams_comp_mults (n1,n2,n3,a,1.e9)
+    CALL rams_comp_noneg (n1,n2,n3,a)
+   endif
+   cdname='absorbing-carbon1-mass;'
+   cdunits='micro-grams/m3;'
+
+elseif(cvar(1:lv).eq.'abs_carbon2_mass') then
+   ivar_type=3
+   ierr=rams_getvar('ABC2MP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   if(ierr.eq.0) then
+    CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
+    CALL rams_comp_mult (n1,n2,n3,a,d)
+    CALL rams_comp_mults (n1,n2,n3,a,1.e9)
+    CALL rams_comp_noneg (n1,n2,n3,a)
+   endif
+   cdname='absorbing-carbon2-mass;'
+   cdunits='micro-grams/m3;'
 
 elseif(cvar(1:lv).eq.'salt_film_mass') then
    ivar_type=3
@@ -2245,7 +2401,7 @@ elseif(cvar(1:lv).eq.'regen_aero2_medrad') then
    cdunits='microns;'
 
 !#####################################################################
-!3D AEROSOLS TRACKING VARIABLES - 41 variables
+!3D AEROSOLS TRACKING VARIABLES
 !#####################################################################
 elseif(cvar(1:lv).eq.'aerosol_cloud_mass') then
    ivar_type=3
@@ -2876,9 +3032,9 @@ elseif(cvar(1:lv).eq.'ifn_inrain') then
    cdname='IFN-dust-within-rain-DeMott;'
    cdunits='#/cm3;'
 
-!#####################################################################
-!3D VERTICAL VELOCITY AND MICROPHYSICAL BUDGETS - 15 variables
-!#####################################################################
+!###############################################################################
+!3D VERTICAL VELOCITY AND MICROPHYSICAL BUDGETS (INSTANTANEOUS)
+!###############################################################################
 elseif(cvar(1:lv).eq.'wp_advdif') then       ! 1 - instant
    ivar_type=3
    ierr=rams_getvar('WP_ADVDIF',idim_type,ngrd,a,flnm)
@@ -3007,440 +3163,493 @@ elseif(cvar(1:lv).eq.'aggregate') then
    cdname='Aggregation-of-Pris-Snow-inst;'
    cdunits='g/kg;'
 
-!#####################################################################
-!3D VERTICAL VELOCITY AND MICROPHYSICAL TOTAL BUDGETS - 55 variables
-!#####################################################################
+!###############################################################################
+!3D VERTICAL VELOCITY AND MICROPHYSICAL TOTAL BUDGETS
+!These are the accumulated variables between analysis file output times
+!###############################################################################
+
+! Microphysics budget variables for IMBUDGET == 1
+
 elseif(cvar(1:lv).eq.'nuccldrt') then
    ivar_type=3
    ierr=rams_getvar('NUCCLDRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Cloud-Nucleated-Mixing-Ratio-Total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'cld2raint') then
    ivar_type=3
    ierr=rams_getvar('CLD2RAINT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Cloud-to-rain-water-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'ice2raint') then
    ivar_type=3
    ierr=rams_getvar('ICE2RAINT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Ice-to-rain-water-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'nucicert') then
    ivar_type=3
    ierr=rams_getvar('NUCICERT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Ice-Nucleated-Mixing-Ratio-Total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapliqt') then
+elseif(cvar(1:lv).eq.'vapliqt') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPLIQT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Liquid-Vapor-diff-evap-Mixing-Ratio-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapicet') then
+elseif(cvar(1:lv).eq.'vapicet') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPICET',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Ice-Vapor-diff-evap-Mixing-Ratio-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'melticet') then
    ivar_type=3
    ierr=rams_getvar('MELTICET',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Melting-of-ice-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rimecldt') then
    ivar_type=3
    ierr=rams_getvar('RIMECLDT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Rimed-Amount-from-Cloud-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rain2icet') then
    ivar_type=3
    ierr=rams_getvar('RAIN2ICET',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Rain-Water-Collected-by-Ice-Species-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'aggregatet') then
    ivar_type=3
    ierr=rams_getvar('AGGREGATET',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Aggregation-of-Pris-Snow-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'latheatvapt') then
    ivar_type=3
    ierr=rams_getvar('LATHEATVAPT',idim_type,ngrd,a,flnm)
    cdname='Lat-Heat-Vap-ThetaChange-total;'
-   cdunits='dTheta;'
+   cdunits='dTheta/time;'
 
 elseif(cvar(1:lv).eq.'latheatfrzt') then
    ivar_type=3
    ierr=rams_getvar('LATHEATFRZT',idim_type,ngrd,a,flnm)
    cdname='Lat-Heat-Frz-ThetaChange-total;'
-   cdunits='dTheta;'
+   cdunits='dTheta/time;'
+
+! Extra microphysics budget variables for IMBUDGET == 2
 
 elseif(cvar(1:lv).eq.'inuchomrt') then
    ivar_type=3
    ierr=rams_getvar('INUCHOMRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e6)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Homogeous-ice-nucleation-total;'
-   cdunits='mg/kg;'
+   cdunits='mg/kg/time;'
 
 elseif(cvar(1:lv).eq.'inuccontrt') then
    ivar_type=3
    ierr=rams_getvar('INUCCONTRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e6)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Contact-ice-nucleation-total;'
-   cdunits='mg/kg;'
+   cdunits='mg/kg/time;'
 
 elseif(cvar(1:lv).eq.'inucifnrt') then
    ivar_type=3
    ierr=rams_getvar('INUCIFNRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e6)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='IFN-ice-nucleation-total;'
-   cdunits='mg/kg;'
+   cdunits='mg/kg/time;'
 
 elseif(cvar(1:lv).eq.'inuchazrt') then
    ivar_type=3
    ierr=rams_getvar('INUCHAZRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e6)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Haze-ice-nucleation-total;'
-   cdunits='mg/kg;'
+   cdunits='mg/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapcldt') then
+elseif(cvar(1:lv).eq.'vapcldt') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPCLDT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Vapor-DepEvap-Cloud-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapraint') then
+elseif(cvar(1:lv).eq.'vapraint') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPRAINT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Vapor-DepEvap-Rain-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapprist') then
+elseif(cvar(1:lv).eq.'vapprist') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPPRIST',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Vapor-DepEvap-Pristine-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapsnowt') then
+elseif(cvar(1:lv).eq.'vapsnowt') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPSNOWT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Vapor-DepEvap-Snow-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapaggrt') then
+elseif(cvar(1:lv).eq.'vapaggrt') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPAGGRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Vapor-DepEvap-Aggregate-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapgraut') then
+elseif(cvar(1:lv).eq.'vapgraut') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPGRAUT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Vapor-DepEvap-Graupel-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vaphailt') then
+elseif(cvar(1:lv).eq.'vaphailt') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPHAILT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Vapor-DepEvap-Hail-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
-elseif(cvar(1:lv).eq.'vapdrizt') then
+elseif(cvar(1:lv).eq.'vapdrizt') then ! can be -/+ for evap vs vapdep
    ivar_type=3
    ierr=rams_getvar('VAPDRIZT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
    endif
    cdname='Vapor-DepEvap-Drizzle-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'meltprist') then
    ivar_type=3
    ierr=rams_getvar('MELTPRIST',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Melt-pristine-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'meltsnowt') then
    ivar_type=3
    ierr=rams_getvar('MELTSNOWT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Melt-snow-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'meltaggrt') then
    ivar_type=3
    ierr=rams_getvar('MELTAGGRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Melt-aggregates-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'meltgraut') then
    ivar_type=3
    ierr=rams_getvar('MELTGRAUT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Melt-graupel-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'melthailt') then
    ivar_type=3
    ierr=rams_getvar('MELTHAILT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Melt-hail-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rimecldsnowt') then
    ivar_type=3
    ierr=rams_getvar('RIMECLDSNOWT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Snow-rime-cloud-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rimecldaggrt') then
    ivar_type=3
    ierr=rams_getvar('RIMECLDAGGRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Aggr-rime-cloud-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rimecldgraut') then
    ivar_type=3
    ierr=rams_getvar('RIMECLDGRAUT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Graupel-rime-cloud-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rimecldhailt') then
    ivar_type=3
    ierr=rams_getvar('RIMECLDHAILT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Hail-rime-cloud-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rain2prt') then
    ivar_type=3
    ierr=rams_getvar('RAIN2PRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Pristine-rime-rain-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rain2snt') then
    ivar_type=3
    ierr=rams_getvar('RAIN2SNT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Snow-rime-rain-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rain2agt') then
    ivar_type=3
    ierr=rams_getvar('RAIN2AGT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Aggr-rime-rain-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rain2grt') then
    ivar_type=3
    ierr=rams_getvar('RAIN2GRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Graupel-rime-rain-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'rain2hat') then
    ivar_type=3
    ierr=rams_getvar('RAIN2HAT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Hail-rime-rain-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'aggrselfprist') then
    ivar_type=3
    ierr=rams_getvar('AGGRSELFPRIST',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Pristine-Selfcollect-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'aggrselfsnowt') then
    ivar_type=3
    ierr=rams_getvar('AGGRSELFSNOWT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Snow-Selfcollect-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'aggrprissnowt') then
    ivar_type=3
    ierr=rams_getvar('AGGRPRISSNOWT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Pristine-Snow-collect-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
+
+! Extra microphysics budget variables for IMBUDGET == 3
 
 elseif(cvar(1:lv).eq.'dust1cldrt') then
    ivar_type=3
    ierr=rams_getvar('DUST1CLDRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Dust1-cloud-nucleation-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'dust2cldrt') then
    ivar_type=3
    ierr=rams_getvar('DUST2CLDRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Dust2-cloud-nucleation-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'dust1drzrt') then
    ivar_type=3
    ierr=rams_getvar('DUST1DRZRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Dust1-drizzle-nucleation-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
 
 elseif(cvar(1:lv).eq.'dust2drzrt') then
    ivar_type=3
    ierr=rams_getvar('DUST2DRZRT',idim_type,ngrd,a,flnm)
    if(ierr.eq.0) then
+      CALL rams_comp_nonegp (n1,n2,n3,a)  !##### "nonegp" minimum
       CALL rams_comp_mults (n1,n2,n3,a,1.e3)
       CALL rams_comp_noneg (n1,n2,n3,a)
    endif
    cdname='Dust2-drizzle-nucleation-total;'
-   cdunits='g/kg;'
+   cdunits='g/kg/time;'
+
+! Vertically integrated variables for IMBUDGET == 1
 
 elseif(cvar(1:lv).eq.'vt_nuccldrt') then
    ivar_type=2
@@ -3452,7 +3661,7 @@ elseif(cvar(1:lv).eq.'vt_nuccldrt') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-nuccldrt;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_cld2raint') then
    ivar_type=2
@@ -3464,7 +3673,7 @@ elseif(cvar(1:lv).eq.'vt_cld2raint') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-cld2raint;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_ice2raint') then
    ivar_type=2
@@ -3476,7 +3685,7 @@ elseif(cvar(1:lv).eq.'vt_ice2raint') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-ice2raint;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_nucicert') then
    ivar_type=2
@@ -3488,7 +3697,7 @@ elseif(cvar(1:lv).eq.'vt_nucicert') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-nucicert;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_vapliqt') then
    ivar_type=2
@@ -3500,7 +3709,7 @@ elseif(cvar(1:lv).eq.'vt_vapliqt') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-vapliqt;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_vapicet') then
    ivar_type=2
@@ -3512,7 +3721,7 @@ elseif(cvar(1:lv).eq.'vt_vapicet') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-vapicet;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_melticet') then
    ivar_type=2
@@ -3524,7 +3733,7 @@ elseif(cvar(1:lv).eq.'vt_melticet') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-melticet;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_rimecldt') then
    ivar_type=2
@@ -3536,7 +3745,7 @@ elseif(cvar(1:lv).eq.'vt_rimecldt') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-rimecldt;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_rain2icet') then
    ivar_type=2
@@ -3548,7 +3757,7 @@ elseif(cvar(1:lv).eq.'vt_rain2icet') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-rain2icet;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
 
 elseif(cvar(1:lv).eq.'vt_aggregatet') then
    ivar_type=2
@@ -3560,10 +3769,410 @@ elseif(cvar(1:lv).eq.'vt_aggregatet') then
    CALL rams_comp_mult (n1,n2,n3,a,d)
    CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
    cdname='vertically-integrated-aggregatet;'
-   cdunits='mm;'
+   cdunits='kg/m2/time;'
+
+! Extra vertically integrated variables for IMBUDGET == 2
+
+elseif(cvar(1:lv).eq.'vt_inuchomrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('INUCHOMRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-inuchomrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_inuccontrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('INUCCONTRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-inuccontrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_inucifnrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('INUCIFNRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-inucifnrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_inuchazrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('INUCHAZRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-inuchazrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_vapcldt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('VAPCLDT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-vapcldt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_vapraint') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('VAPRAINT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-vapraint;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_vapprist') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('VAPPRIST',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-vapprist;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_vapsnowt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('VAPSNOWT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-vapsnowt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_vapaggrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('VAPAGGRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-vapaggrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_vapgraut') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('VAPGRAUT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-vapgraut;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_vaphailt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('VAPHAILT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-vaphailt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_vapdrizt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('VAPDRIZT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-vapdrizt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_meltprist') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('MELTPRIST',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-meltprist;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_meltsnowt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('MELTSNOWT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-meltsnowt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_meltaggrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('MELTAGGRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-meltaggrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_meltgraut') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('MELTGRAUT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-meltgraut;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_melthailt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('MELTHAILT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-melthailt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rimecldsnowt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RIMECLDSNOWT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rimecldsnowt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rimecldaggrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RIMECLDAGGRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rimecldaggrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rimecldgraut') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RIMECLDGRAUT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rimecldgraut;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rimecldhailt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RIMECLDHAILT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rimecldhailt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rain2prt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RAIN2PRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rain2prt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rain2snt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RAIN2SNT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rain2snt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rain2agt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RAIN2AGT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rain2agt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rain2grt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RAIN2GRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rain2grt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_rain2hat') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('RAIN2HAT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-rain2hat;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_aggrselfprist') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('AGGRSELFPRIST',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-aggrselfprist;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_aggrselfsnowt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('AGGRSELFSNOWT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-aggrselfsnowt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_aggrprissnowt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('AGGRPRISSNOWT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-aggrprissnowt;'
+   cdunits='kg/m2/time;'
+
+! Extra vertically integrated variables for IMBUDGET == 3
+
+elseif(cvar(1:lv).eq.'vt_dust1cldrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('DUST1CLDRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-dust1cldrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_dust2cldrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('DUST2CLDRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-dust2cldrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_dust1drzrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('DUST1DRZRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-dust1drzrt;'
+   cdunits='kg/m2/time;'
+
+elseif(cvar(1:lv).eq.'vt_dust2drzrt') then
+   ivar_type=2
+   ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
+   CALL rams_comp_dn0 (n1,n2,n3,c,b,d,e,ngrd)
+   CALL rams_comp_zero (n1,n2,n3,a)
+   ierr=rams_getvar('DUST2DRZRT',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) CALL rams_comp_accum (n1,n2,n3,a,c)
+   CALL rams_comp_mult (n1,n2,n3,a,d)
+   CALL rams_comp_vertint (n1,n2,n3,a,e,ngrd)
+   cdname='vertically-integrated-dust2drzrt;'
+   cdunits='kg/m2/time;'
 
 !######################################################################
-! 3D HYDROMETEOR DIAMETERS - 9 variables
+! 3D HYDROMETEOR DIAMETERS
 !######################################################################
 elseif(cvar(1:lv).eq.'cloudtop_diam') then
    ivar_type=2
@@ -3656,7 +4265,7 @@ elseif(cvar(1:lv).eq.'drizzle_diam') then
    cdunits='microns;'
 
 !######################################################################
-! 3D HYDROMETEOR TEMP, THERMAL ENERGY, LIQUID FRACTION - 11 variables
+! 3D HYDROMETEOR TEMP, THERMAL ENERGY, LIQUID FRACTION
 !######################################################################
 elseif(cvar(1:lv).eq.'q2') then
    ivar_type=3
@@ -3748,7 +4357,7 @@ elseif(cvar(1:lv).eq.'hail_fracliq') then
    cdunits='fraction;'
 
 !######################################################################
-! 3D MISCELLANEOUS FIELDS - 4 variables
+! 3D MISCELLANEOUS FIELDS
 !######################################################################
 elseif(cvar(1:lv).eq.'geo') then
    ivar_type=3
@@ -3853,7 +4462,7 @@ elseif(cvar(1:lv).eq.'reflect_all') then
              ,tant,reflc,tden)
 
 !######################################################################
-! CUMULUS PARAMETERIZATION - RADIATION - TURBULENCE - 15 variables
+! CUMULUS PARAMETERIZATION - RADIATION - TURBULENCE
 !######################################################################
 elseif(cvar(1:lv).eq.'cuparm_thetasrc') then
    ivar_type=3
@@ -3995,7 +4604,7 @@ elseif(cvar(1:lv).eq.'lw_heat_rate') then
    cdunits='K/day;'
 
 !######################################################################
-! 2D SURFACE PRECIP and VERTICALLY INTEGRATED FIELDS - 55 variables
+! 2D SURFACE PRECIP and VERTICALLY INTEGRATED FIELDS
 !######################################################################
 elseif(cvar(1:lv).eq.'accpr') then
    ivar_type=2
@@ -4267,13 +4876,6 @@ elseif(cvar(1:lv).eq.'acccon') then
    cdname='accum-convective-pcp;'
    cdunits='mm;'
 
-elseif(cvar(1:lv).eq.'vertmax_w') then
-   ivar_type=2
-   ierr=rams_getvar('WP',idim_type,ngrd,c,flnm)
-   CALL rams_comp_vertmax (n1,n2,n3,a,c)
-   cdname='maximum-vertical-motion;'
-   cdunits='m/s;'
-
 elseif(cvar(1:lv).eq.'vertavg_w') then
    ivar_type=2
    ierr=rams_getvar('WP',idim_type,ngrd,c,flnm)
@@ -4281,9 +4883,102 @@ elseif(cvar(1:lv).eq.'vertavg_w') then
    cdname='average-vertical-motion;'
    cdunits='m/s;'
 
+elseif(cvar(1:lv).eq.'vertmax_w') then
+   ivar_type=2
+   ierr=rams_getvar('WP',idim_type,ngrd,c,flnm)
+   CALL rams_comp_vertmax (n1,n2,n3,a,c)
+   cdname='maximum-vertical-motion;'
+   cdunits='m/s;'
+
+elseif(cvar(1:lv).eq.'vertmin_w') then
+   ivar_type=2
+   ierr=rams_getvar('WP',idim_type,ngrd,c,flnm)
+   CALL rams_comp_vertmin (n1,n2,n3,a,c)
+   cdname='minimum-vertical-motion;'
+   cdunits='m/s;'
+
+elseif(cvar(1:lv).eq.'vertmax_cloud') then
+   ivar_type=2
+   ierr=rams_getvar('RCP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) then
+      CALL rams_comp_vertmax (n1,n2,n3,a,c)
+      CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   endif
+   cdname='maximum-cloud-mixing-ratio;'
+   cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'vertmax_rain') then
+   ivar_type=2
+   ierr=rams_getvar('RRP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) then
+      CALL rams_comp_vertmax (n1,n2,n3,a,c)
+      CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   endif
+   cdname='maximum-rain-mixing-ratio;'
+   cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'vertmax_pris') then
+   ivar_type=2
+   ierr=rams_getvar('RPP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) then
+      CALL rams_comp_vertmax (n1,n2,n3,a,c)
+      CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   endif
+   cdname='maximum-pristine-ice-mixing-ratio;'
+   cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'vertmax_snow') then
+   ivar_type=2
+   ierr=rams_getvar('RSP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) then
+      CALL rams_comp_vertmax (n1,n2,n3,a,c)
+      CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   endif
+   cdname='maximum-snow-mixing-ratio;'
+   cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'vertmax_aggr') then
+   ivar_type=2
+   ierr=rams_getvar('RAP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) then
+      CALL rams_comp_vertmax (n1,n2,n3,a,c)
+      CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   endif
+   cdname='maximum-aggregates-mixing-ratio;'
+   cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'vertmax_grau') then
+   ivar_type=2
+   ierr=rams_getvar('RGP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) then
+      CALL rams_comp_vertmax (n1,n2,n3,a,c)
+      CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   endif
+   cdname='maximum-graupel-mixing-ratio;'
+   cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'vertmax_hail') then
+   ivar_type=2
+   ierr=rams_getvar('RHP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) then
+      CALL rams_comp_vertmax (n1,n2,n3,a,c)
+      CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   endif
+   cdname='maximum-hail-mixing-ratio;'
+   cdunits='g/kg;'
+
+elseif(cvar(1:lv).eq.'vertmax_driz') then
+   ivar_type=2
+   ierr=rams_getvar('RDP',idim_type,ngrd,c,flnm)
+   if(ierr.eq.0) then
+      CALL rams_comp_vertmax (n1,n2,n3,a,c)
+      CALL rams_comp_mults (n1,n2,n3,a,1.e3)
+   endif
+   cdname='maximum-drizzle-mixing-ratio;'
+   cdunits='g/kg;'
+
 ! Vertically-integrated atmospheric moisture
-elseif(cvar(1:lv).eq.'vertint_rt' .or. &
-       cvar(1:lv).eq.'vertint_cond') then
+elseif(cvar(1:lv).eq.'vertint_rt' .or. cvar(1:lv).eq.'vertint_cond') then
    ivar_type=2
    iany=1
 
@@ -4522,7 +5217,7 @@ elseif(cvar(1:lv).eq.'vertint_dust_hydro') then
    cdunits='micro-grams/m2;'
 
 !######################################################################
-! 2D SEA ICE COVERAGE, DEPTH, ROUGHNESS, TEMP, SNOW COVER - 5 variables
+! 2D SEA ICE COVERAGE, DEPTH, ROUGHNESS, TEMP, SNOW COVER
 !######################################################################
 elseif(cvar(1:lv).eq.'snowdepthonice') then
    ivar_type=2
@@ -4555,7 +5250,7 @@ elseif(cvar(1:lv).eq.'cicerough') then
    cdunits='#;'
 
 !######################################################################
-! 2D SURFACE HEAT, MOISTURE, MOMENTUM AND RADIATIVE FLUX - 12 variables
+! 2D SURFACE HEAT, MOISTURE, MOMENTUM AND RADIATIVE FLUX
 !######################################################################
 elseif(cvar(1:lv).eq.'sens_flux') then
    ivar_type=2
@@ -4640,7 +5335,7 @@ elseif(cvar(1:lv).eq.'albedt') then
    cdunits='fraction;'
 
 !######################################################################
-! 2D TOPOGRAPHY AND GEOGRAPHIC VALUES - 3 variables
+! 2D TOPOGRAPHY AND GEOGRAPHIC VALUES
 !######################################################################
 elseif(cvar(1:lv).eq.'topt') then
    ivar_type=2
@@ -4661,7 +5356,7 @@ elseif(cvar(1:lv).eq.'lon') then
    cdunits='deg;'
 
 !######################################################################
-! 2D MISCELLANEOUS FIELDS - 3 variables
+! 2D MISCELLANEOUS FIELDS
 !######################################################################
 elseif(cvar(1:lv).eq.'sea_press') then
    ivar_type=2
@@ -4690,7 +5385,7 @@ elseif(cvar(1:lv).eq.'sst') then
    cdunits='C;'
 
 !######################################################################
-! LEAF3/SIB variables section - 34 variables
+! LEAF3/SIB variables section
 !######################################################################
 elseif(cvar(1:lv).eq.'patch_area') then
    ivar_type=6
@@ -5065,7 +5760,7 @@ elseif(cvar(1:lv).eq.'5050_tempc_ps' .or. &
    endif
 
 !######################################################################
-! SIB variables section - 40 variables
+! SIB variables section
 !######################################################################
 elseif(cvar(1:lv).eq.'co2_concen') then
    ivar_type=3
@@ -5506,7 +6201,7 @@ elseif(cvar(1:lv).eq.'psy_ps') then
    cdunits='hPa/deg;'
 
 !######################################################################
-! KPP OCEAN MIXED LAYER MODEL FIELDS - 10 variables
+! KPP OCEAN MIXED LAYER MODEL FIELDS
 !######################################################################
 elseif(cvar(1:lv).eq.'kpp_hmix') then
    ivar_type=2
