@@ -4,30 +4,30 @@
          {
             "affiliation": "Colorado State University", 
             "name": "van den Heever, Susan C.",
-            "orcid": "0000-0001-9843-3864",
+            "orcid": "0000-0001-9843-3864"
           }, 
           {
             "affiliation": "Colorado State University", 
             "name": "Saleeby, Stephen M.",
-            "orcid":"0000-0001-8708-008X",
+            "orcid":"0000-0001-8708-008X"
           }, 
           {
             "affiliation": "Colorado State University", 
             "name": "Grant, Leah D.",
-            "orcid": "0000-0002-3510-2141",
+            "orcid": "0000-0002-3510-2141"
           }, 
           {
             "affiliation": "University of California, Davis", 
             "name": "Igel, Adele L.",
-            "orcid": "0000-0002-4845-594X",
+            "orcid": "0000-0002-4845-594X"
           }, 
           {
             "affiliation": "Colorado State University", 
             "name": "Freeman, Sean W.",
-            "orcid": "0000-0002-7398-1597",
+            "orcid": "0000-0002-7398-1597"
           }
     
      ],
      "keywords": ["cloud modeling"],
-     "upload_type": "software",
+     "upload_type": "software"
  }
