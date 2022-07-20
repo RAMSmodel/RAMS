@@ -6,8 +6,8 @@ MAKE=/usr/bin/make
 #############################################################################
 # Set your RAMS root path and version number.
 #############################################################################
-RAMS_ROOT=/home/smsaleeb/rams_20201201_dev
-RAMS_VERSION=6.3.01
+RAMS_ROOT=/home/smsaleeb/rams_20210806_dev
+RAMS_VERSION=6.3.02
 
 #############################################################################
 # Set root locations for HDF5 I/O software.

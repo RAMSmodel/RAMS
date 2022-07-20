@@ -30,10 +30,10 @@
 # please become familiar with its flags, settings, and functionality. It cannot
 # be used for every runtime situation.
 ###############################################################################
-# Set you RAMS root path
+# Set your RAMS root path
 rd=`pwd`/..
 # RAMS version (ie. 6.1.6)
-vs=6.3.01
+vs=6.3.02
 # Set flag for type of test (0=sequential, 1=parallel)
 runtype=0
 # Set number of nodes for parallel run.
@@ -52,23 +52,19 @@ a1=/home/smsaleeb/software/mpich-3.3.2/bin/mpiexec
 a2=$rd/bin.rams/machs
 # Set RAMS executable path and name
 a3=$rd/bin.rams/rams-$vs
-if [ -f $a3.serial ]; then
-  a3=$a3.serial
-fi
-if [ $runtype -eq 1 -a -f $a3.parallel ]; then
-  a3=$a3.parallel
-fi
-# Set REVU executable path and name
+# Set REVU post-processor executable path and name
 a4=$rd/bin.revu/revu-$vs
-if [ -f $a4.serial ]; then
-  a4=$a4.serial
+
+#Check to see that RAMSIN namelist exists
+if [ ! -f $rd/bin.rams/RAMSIN.supercell ]; then
+ echo "Input paths for this file is incorrect: RAMSIN.supercell"
+ exit
 fi
 
-#Check to see all above exist
-if [ ! -f $rd/bin.rams/RAMSIN.supercell ] || [ ! -f $a3 ] || [ ! -f $a4 ]; then
- echo "One of your input paths is incorrect. Stopping!"
- echo "Check RAMSIN, RAMS executable, and REVU executable!"
- echo "Need to compile RAMS and REVU for this script to fully work"
+#Check to see that RAMS executable exists
+if [ ! -f $a3 ]; then
+ echo "Cannot find RAMS executable such as: bin.rams/rams-6.3.02"
+ echo "Need to compile RAMS for this script to work."
  exit
 fi
 
@@ -84,10 +80,10 @@ if [ $runtype -eq 1 ]; then
   fi
 fi
 
-#Check to see all above exist for a parallel test
+#Check to see that MPI executable and machines files exist for a parallel test
 if [ $runtype -eq 1 ]; then
  if [ ! -f $a1 ] || [ ! -f $a2 ]; then
-  echo "One of your input paths is incorrect. Stopping!"
+  echo "One of your parallel simulation input paths is incorrect. Stopping!"
   echo "MPI executable or machs file"
   exit
  fi
@@ -120,6 +116,7 @@ fi
 
 $rc1 $rd/bin.rams/RAMSIN.supercell
 
-#You can uncomment this executable if you want to test the REVU
-#post-processor, but you must compile REVU in directory bin.revu.
-$a4 -f $rd/bin.rams/REVUIN.supercell
+#Try running REVU on test simulation output if REVU is compiled
+if [ -f $a4 ]; then
+ $a4 -f $rd/bin.rams/REVUIN.supercell
+fi
