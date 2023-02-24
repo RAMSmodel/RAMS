@@ -63,7 +63,7 @@ CALL date_add_to_big (totdate_init,timmax,'s',totdatem)
    
 nvsstf(ifm)=0
 do itime = 1,nsst
-   read(25,'(A80)') line
+   read(25,'(A256)') line
    CALL char_strip_var (line,flnm,line2)
    read (line2,*) issty,isstm,isstd,issth
    
