@@ -525,7 +525,8 @@ Subroutine cal_dwet (T,rh,ddry,dwet,vhoff,epsilonsol,rhodry,rhowet)
 !Equation r = A * rd ** B requires radius in microns
 !r100 growth equation computes in meters and needs converstion
 !to microns before applying to "ddry" which is in microns
-!Then return radius in microns
+!Then return radius in microns. ddry and dwet are actually radii
+!and not diameter.
 
 implicit none
 
@@ -598,7 +599,7 @@ endif
 dwet = min(10.,dwet)
 
 !If particle swells, compute density of particle + water
-volumeratio = ddry**3 / dwet**3
+volumeratio = min(1.00, ddry**3 / dwet**3)
 rhowet = rhodry * volumeratio + 1000. * (1.-volumeratio)
 
 if(rhowet<1000.0 .or. rhowet>2659.0 .or.rhodry<1000.0 .or. rhodry>2659.0) then
