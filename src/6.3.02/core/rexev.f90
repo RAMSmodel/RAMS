@@ -410,7 +410,7 @@ do i=1,mxp
   enddo
 enddo
 
-imono = 0 !flag for monotonic flux limiter in Z only
+imono = 1 !flag for monotonic flux limiter in Z only
 
 CALL fa_xc (mzp,mxp,myp,ia,iz                     &
            ,thetav,srthtv                         &
