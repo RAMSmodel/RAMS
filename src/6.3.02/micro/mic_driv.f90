@@ -749,6 +749,10 @@ if(imbudget>=1) then
   CALL ae1kmic (1,m1,micro%nucicert(1,i,j),xnucicert(1))
   CALL ae1kmic (1,m1,micro%vapliqt(1,i,j),xvapliqt(1))
   CALL ae1kmic (1,m1,micro%vapicet(1,i,j),xvapicet(1))
+  CALL ae1kmic (1,m1,micro%evapliqt(1,i,j),xevapliqt(1))
+  CALL ae1kmic (1,m1,micro%evapicet(1,i,j),xevapicet(1))
+  CALL ae1kmic (1,m1,micro%freezingt(1,i,j),xfreezingt(1))
+  CALL ae1kmic (1,m1,micro%meltingt(1,i,j),xmeltingt(1))
   CALL ae1kmic (1,m1,micro%melticet(1,i,j),xmelticet(1))
   CALL ae1kmic (1,m1,micro%rimecldt(1,i,j),xrimecldt(1))
   CALL ae1kmic (1,m1,micro%rain2icet(1,i,j),xrain2icet(1))
@@ -769,6 +773,14 @@ if(imbudget>=2) then
   CALL ae1kmic (1,m1,micro%vapgraut(1,i,j),xvapgraut(1))
   CALL ae1kmic (1,m1,micro%vaphailt(1,i,j),xvaphailt(1))
   CALL ae1kmic (1,m1,micro%vapdrizt(1,i,j),xvapdrizt(1))
+  CALL ae1kmic (1,m1,micro%evapcldt(1,i,j),xevapcldt(1))
+  CALL ae1kmic (1,m1,micro%evapraint(1,i,j),xevapraint(1))
+  CALL ae1kmic (1,m1,micro%evapprist(1,i,j),xevapprist(1))
+  CALL ae1kmic (1,m1,micro%evapsnowt(1,i,j),xevapsnowt(1))
+  CALL ae1kmic (1,m1,micro%evapaggrt(1,i,j),xevapaggrt(1))
+  CALL ae1kmic (1,m1,micro%evapgraut(1,i,j),xevapgraut(1))
+  CALL ae1kmic (1,m1,micro%evaphailt(1,i,j),xevaphailt(1))
+  CALL ae1kmic (1,m1,micro%evapdrizt(1,i,j),xevapdrizt(1))
   CALL ae1kmic (1,m1,micro%meltprist(1,i,j),xmeltprist(1))
   CALL ae1kmic (1,m1,micro%meltsnowt(1,i,j),xmeltsnowt(1))
   CALL ae1kmic (1,m1,micro%meltaggrt(1,i,j),xmeltaggrt(1))
@@ -804,6 +816,10 @@ if(imbudget>=1) then
   micro%nucicert(1,i,j)    = micro%nucicert(2,i,j)
   micro%vapliqt(1,i,j)     = micro%vapliqt(2,i,j)
   micro%vapicet(1,i,j)     = micro%vapicet(2,i,j)
+  micro%evapliqt(1,i,j)    = micro%evapliqt(2,i,j)
+  micro%evapicet(1,i,j)    = micro%evapicet(2,i,j)
+  micro%freezingt(1,i,j)   = micro%freezingt(2,i,j)
+  micro%meltingt(1,i,j)    = micro%meltingt(2,i,j)
   micro%melticet(1,i,j)    = micro%melticet(2,i,j)
   micro%rimecldt(1,i,j)    = micro%rimecldt(2,i,j)
   micro%rain2icet(1,i,j)   = micro%rain2icet(2,i,j)
@@ -824,6 +840,14 @@ if(imbudget>=2) then
   micro%vapgraut(1,i,j)      = micro%vapgraut(2,i,j)
   micro%vaphailt(1,i,j)      = micro%vaphailt(2,i,j)
   micro%vapdrizt(1,i,j)      = micro%vapdrizt(2,i,j)
+  micro%evapcldt(1,i,j)      = micro%evapcldt(2,i,j)
+  micro%evapraint(1,i,j)     = micro%evapraint(2,i,j)
+  micro%evapprist(1,i,j)     = micro%evapprist(2,i,j)
+  micro%evapsnowt(1,i,j)     = micro%evapsnowt(2,i,j)
+  micro%evapaggrt(1,i,j)     = micro%evapaggrt(2,i,j)
+  micro%evapgraut(1,i,j)     = micro%evapgraut(2,i,j)
+  micro%evaphailt(1,i,j)     = micro%evaphailt(2,i,j)
+  micro%evapdrizt(1,i,j)     = micro%evapdrizt(2,i,j)
   micro%meltprist(1,i,j)     = micro%meltprist(2,i,j)
   micro%meltsnowt(1,i,j)     = micro%meltsnowt(2,i,j)
   micro%meltaggrt(1,i,j)     = micro%meltaggrt(2,i,j)
@@ -870,7 +894,7 @@ implicit none
 
 integer :: lcat,k
 integer, dimension(11) :: k1,k2
-real :: temp,fracliq1,fracliq2,latheat
+real :: temp,fracliq1,fracliq2,latheat,rxchange
 
 if(imbudget>=1)then
 
@@ -921,14 +945,22 @@ if(imbudget>=1)then
 
         ! Now calculate melting
         if (lhrtheta) then
-            latheat = (alli/pitot(k)) * (rx(k,lcat) &
-                    *(1.-fracliq2)-rx(k,lcat)*(1.-fracliq1))
+            latheat = (alli/pitot(k)) * &
+              (rx(k,lcat)*(1.-fracliq2)-rx(k,lcat)*(1.-fracliq1))
         else
-            latheat = alli * cpi * (rx(k,lcat) &
-                    *(1.-fracliq2)-rx(k,lcat)*(1.-fracliq1))
+            latheat = alli * cpi * &
+              (rx(k,lcat)*(1.-fracliq2)-rx(k,lcat)*(1.-fracliq1))
         endif
         xlatheatfrz(k) = xlatheatfrz(k) + latheat
         xlatheatfrzt(k) = xlatheatfrzt(k) + latheat
+
+        ! Compute total freezing or melting and enter as positive values 
+        rxchange = (rx(k,lcat)*(1.-fracliq2)-rx(k,lcat)*(1.-fracliq1))
+        if (rxchange >= 0.0) then
+          xfreezingt(k) = xfreezingt(k) + rxchange
+        else
+          xmeltingt(k)  = xmeltingt(k)  - rxchange
+        endif
       endif
 
     enddo
@@ -999,6 +1031,12 @@ if(imbudget>=1)then
    else
     xlatheatfrz(k) = xlatheatfrz(k) +  alli * cpi * (rice2(k)-rice1(k))
     xlatheatfrzt(k) = xlatheatfrzt(k) +  alli * cpi * (rice2(k)-rice1(k))
+   endif
+   ! Compute total freezing or melting and enter as positive values
+   if (rice2(k)-rice1(k) >= 0.0) then
+     xfreezingt(k) = xfreezingt(k) + (rice2(k)-rice1(k))
+   else
+     xmeltingt(k)  = xmeltingt(k)  - (rice2(k)-rice1(k))
    endif
  enddo
 
