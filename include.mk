@@ -7,7 +7,6 @@ MAKE=/usr/bin/make
 # Set your RAMS root path and version number.
 #############################################################################
 RAMS_ROOT=/home/smsaleeb/rams_steve/RAMS
-RAMS_VERSION=6.3.02
 
 #############################################################################
 # Set root locations for HDF5 I/O software.
@@ -26,7 +25,7 @@ MPI_ROOT=/home/smsaleeb/software/mpich-3.3.2
 #############################################################################
 # Do not change these 2. They point from RAMS_ROOT to the source code.
 #############################################################################
-MODEL=$(RAMS_ROOT)/src/$(RAMS_VERSION)
+MODEL=$(RAMS_ROOT)/src
 UTILS_INCS=-I$(MODEL)/include
 
 #############################################################################
