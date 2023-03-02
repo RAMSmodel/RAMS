@@ -92,7 +92,7 @@ if (varn .eq. 'T' .or. varn .eq. 'ALL') THEN
    !imono=1 option should be considered experimental.
    !May need bug fixing (Saleeby Oct 5, 2020).
    !pp and pm terms might not have density multiplied correctly.
-   imono = 0
+   imono = 1
 
    do n=1,num_scalar(ngrid)
       

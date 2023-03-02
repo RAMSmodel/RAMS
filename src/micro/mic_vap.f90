@@ -339,14 +339,22 @@ do k = k1,k2
      endif
    endif
 
-   !Vapor deposition and evaporation budgets for all species
+   !Vapor deposition and evaporation budgets for all species.
+   !Deposition, condensation, evaporation, sublimation are all given positive
+   ! values as process rates.
    if(imbudget >= 1) then
-     if(lcat.eq.1 .or. lcat.eq.2 .or. lcat.eq.8) &
-       xvapliqt(k) = xvapliqt(k) + vap(k,lcat)*budget_scalet
-     if(lcat.ge.3 .and. lcat.le.7) &
-       xvapicet(k) = xvapicet(k) + vap(k,lcat)*budget_scalet
+    if(lcat.eq.1 .or. lcat.eq.2 .or. lcat.eq.8) then
+     if(vap(k,lcat) > 0.00) xvapliqt(k)  = xvapliqt(k)  + vap(k,lcat)*budget_scalet
+     if(vap(k,lcat) < 0.00) xevapliqt(k) = xevapliqt(k) - vap(k,lcat)*budget_scalet
+    endif
+    if(lcat.ge.3 .and. lcat.le.7) then
+     if(vap(k,lcat) > 0.00) xvapicet(k)  = xvapicet(k)  + vap(k,lcat)*budget_scalet
+     if(vap(k,lcat) < 0.00) xevapicet(k) = xevapicet(k) - vap(k,lcat)*budget_scalet
+    endif
    endif
+
    if(imbudget >= 2) then
+    if(vap(k,lcat) > 0.00) then
      if(lcat==1) xvapcldt(k)  = xvapcldt(k)  + vap(k,lcat)*budget_scalet
      if(lcat==2) xvapraint(k) = xvapraint(k) + vap(k,lcat)*budget_scalet
      if(lcat==3) xvapprist(k) = xvapprist(k) + vap(k,lcat)*budget_scalet
@@ -355,6 +363,17 @@ do k = k1,k2
      if(lcat==6) xvapgraut(k) = xvapgraut(k) + vap(k,lcat)*budget_scalet
      if(lcat==7) xvaphailt(k) = xvaphailt(k) + vap(k,lcat)*budget_scalet
      if(lcat==8) xvapdrizt(k) = xvapdrizt(k) + vap(k,lcat)*budget_scalet
+    endif
+    if(vap(k,lcat) < 0.00) then
+     if(lcat==1) xevapcldt(k)  = xevapcldt(k)  - vap(k,lcat)*budget_scalet
+     if(lcat==2) xevapraint(k) = xevapraint(k) - vap(k,lcat)*budget_scalet
+     if(lcat==3) xevapprist(k) = xevapprist(k) - vap(k,lcat)*budget_scalet
+     if(lcat==4) xevapsnowt(k) = xevapsnowt(k) - vap(k,lcat)*budget_scalet
+     if(lcat==5) xevapaggrt(k) = xevapaggrt(k) - vap(k,lcat)*budget_scalet
+     if(lcat==6) xevapgraut(k) = xevapgraut(k) - vap(k,lcat)*budget_scalet
+     if(lcat==7) xevaphailt(k) = xevaphailt(k) - vap(k,lcat)*budget_scalet
+     if(lcat==8) xevapdrizt(k) = xevapdrizt(k) - vap(k,lcat)*budget_scalet
+    endif
    endif
 
 229     continue

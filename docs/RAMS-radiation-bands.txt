@@ -1,0 +1,17 @@
+! Wavelengths for RAMS: Harrington's 8-band model
+
+! Solar: (visible and the near infrared)
+
+! Band 1:  1.53 - 4.64 microns (mid pt 3.085)
+! Band 2: 0.7 - 1.53 microns   (mid pt 1.115)
+! Band 3: 0.245 - 0.7 microns  (mid pt 0.4725)
+
+! Infrared:
+
+! Band 4: 20.0 - 104.5 microns (assume mid pt of 40)
+! Band 5: 12.5 - 20.0 microns  (mid pt 16.25)
+! Band 6: 8.33 - 9.01 microns  (mid pt 8.67)
+! Band 7: 9.01 - 10.3 microns  (mid pt 9.655)
+! Band 8: 4.64 - 8.33 microns  (mid pt 6.485)
+
+

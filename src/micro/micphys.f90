@@ -104,13 +104,16 @@ real, dimension(ndccr,nrrcr,ndrcr,4) :: r1tabci,c1tabci,r2tabci,c2tabci &
 !******Variables Needed for COMPUTING BUDGETS ******************************
 !For imbudget>=1
 real, dimension(nzpmax) :: xlatheatvap,xlatheatfrz,xnuccldrt,xcld2raint &
-,xice2raint,xnucicert,xvapliqt,xvapicet,xmelticet,xrimecldt,xaggregatet &
+,xice2raint,xnucicert,xvapliqt,xvapicet,xevapliqt,xevapicet &
+,xmelticet,xrimecldt,xaggregatet,xfreezingt,xmeltingt &
 ,xrain2icet,xlatheatvapt,xlatheatfrzt
 
 !For imbudget>=2
 real, dimension(nzpmax) :: xinuchomrt,xinuccontrt,xinucifnrt,xinuchazrt   &
 ,xvapcldt,xvapraint,xvapprist,xvapsnowt,xvapaggrt,xvapgraut,xvaphailt     &
-,xvapdrizt,xmeltprist,xmeltsnowt,xmeltaggrt,xmeltgraut,xmelthailt         &
+,xvapdrizt,xevapcldt,xevapraint,xevapprist,xevapsnowt,xevapaggrt          &
+,xevapgraut,xevaphailt,xevapdrizt                                         &
+,xmeltprist,xmeltsnowt,xmeltaggrt,xmeltgraut,xmelthailt                   &
 ,xrimecldsnowt,xrimecldaggrt,xrimecldgraut,xrimecldhailt,xrain2prt        &
 ,xrain2snt,xrain2agt,xrain2grt,xrain2hat,xaggrselfprist                   &
 ,xaggrselfsnowt,xaggrprissnowt

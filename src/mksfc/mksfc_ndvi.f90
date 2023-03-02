@@ -58,7 +58,7 @@ endif
 ! read prefix list and times 
 
 do itime = 1,nvndvif(ifm)
-   read(25,'(A80)') line
+   read(25,'(A256)') line
    CALL char_strip_var (line,flnm,line2)
    read (line2,*) iyearvn(itime,ifm),imonthvn(itime,ifm)  &
       ,idatevn(itime,ifm),ihourvn(itime,ifm)
