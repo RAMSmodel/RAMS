@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-##############################################################################################
-# Script to restart the 1 grid TS Debby simulation
-
-cd $HOME/Sims/TSD_SD_1KM
-restart_job run_rams RAMSIN ./RAMS/TSD_SD_1G-A-2006-08-24-140000-head.txt
