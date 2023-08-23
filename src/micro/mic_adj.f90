@@ -141,7 +141,7 @@ do j = 1,m3
        rxloss=0
 
        !Zero out hydrometeor fields if they are below a min threshold for 2-moment
-       if(jnmb(lcat)>=5 .and. (rx(k,lcat) < rxmin .or. cx(k,lcat) <= 0.0)) then
+       if(jnmb(lcat)>=5 .and. (rx(k,lcat) < rxmin .or. cx(k,lcat) < cxmin)) then
          zerocheck=1
          cxloss = cx(k,lcat)
          rxloss = rx(k,lcat)

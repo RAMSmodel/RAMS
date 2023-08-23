@@ -348,7 +348,7 @@ do k = 1,mzp
 
  if(prtflg==1)then
     print*,'Checked After: ',string
-    print*,'NAN Check (ngrid,k,j,i)',ngrid,k,j+mj0(ngrid),i+mi0(ngrid)
+    print*,'NAN Check (ngrid,k,i,j)',ngrid,k,i+mi0(ngrid),j+mj0(ngrid)
 
     print*,'wp:            ',basic_g(ngrid)%wp(k,i,j)
     print*,'wc:            ',basic_g(ngrid)%wc(k,i,j)

@@ -185,7 +185,7 @@ real, dimension(m1) :: dn0,rv
  !DeMott IN activation based on total number of all aerosol
  !greater than 0.5 micron diameter.
  nifn(k) = 0.0
- if(tairc(k) .lt. 0.0 .and. total_in(k) .gt. mincon) then
+ if(tairc(k) < 0.0 .and. tairc(k) > -35.0 .and. total_in(k) > mincon) then
    !For DeMott Eqn, the aerosol number to put into the eqn needs to be
    !the remaining of unprocessed aerosols > 0.5 microns + the remaining
    !aerosols > 0.5 microns contained in droplets + 

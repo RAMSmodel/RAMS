@@ -19,7 +19,7 @@ integer, parameter :: nthz=26,nrhhz=10,ngam=5000,ninc=201   &
                      ,nembc=20
 real, parameter    :: dtc=1.,ddnc=2.e-6 ,dthz=1.,drhhz=.02
 real, parameter    :: budget_scalet=1.
-real, parameter    :: rxmin=1.e-9,cxmin=1.e-3
+real, parameter    :: rxmin=1.e-16,cxmin=1.e-5
 
 !IDIFFPERTS
 !0=normal scalar diffusion

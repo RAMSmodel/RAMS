@@ -765,7 +765,7 @@ do k = 2,m1-1
    !use DeMott(2010) IN nucleation NIFN(#/kg) from PPARM
    elseif(iifn==2) then
      excessrv = rv(k) - 1.0001 * rvlsair(k)
-     if (excessrv > 0. .and. tairc(k) < 0.0) then
+     if (excessrv > 0. .and. tairc(k) < 0.0 .and. tairc(k) > -35.0) then
        !Convert tot_in from #/kg to #/cm3
        tot_in = cifnx(k) * dn0(k) / 1.e6
        !Convert to STP
@@ -812,15 +812,15 @@ do k = 2,m1-1
    vapnuc=0.0
    if(jnmb(1)>=5)then
      if(iccnlev==0) then
-       vapnuc = max(0.,haznuc + diagni - cx(k,3))
+       vapnuc = max(0.,haznuc + diagni - cx(k,3) - cx(k,4))
      elseif(iccnlev>=1 .and. iifn==3) then 
        vapnuc = max(0.,haznuc + diagni)
      elseif(iccnlev>=1 .and. iifn<=2) then 
        vapnuc = max(0.,haznuc)
-       vapnuc = vapnuc + max(0.,diagni - cx(k,3))
+       vapnuc = vapnuc + max(0.,diagni - cx(k,3) - cx(k,4))
      endif
    else
-     vapnuc = max(0.,haznuc + diagni - cx(k,3))
+     vapnuc = max(0.,haznuc + diagni - cx(k,3) - cx(k,4))
    endif
 
    !Modify haze nucleation and IN nucleation if not enough vapor available
@@ -896,7 +896,7 @@ do k = 2,m1-1
       if(immerhx(k,lcat) > cx(k,lcat)) immerhx(k,lcat) = 0.9999 * cx(k,lcat)
 
       !If conditions allow for droplet immersion freezing
-      if(tairc(k) < 0.0 .and. immerhx(k,lcat) > mincon) then
+      if(tairc(k) < 0.0 .and. tairc(k) > -35.0 .and. immerhx(k,lcat) > mincon) then
        !For DeMott Eqn, the aerosol number to put into the eqn needs to be
        !the remaining of unprocessed aerosols > 0.5 microns + the remaining
        !aerosols > 0.5 microns contained in droplets +
