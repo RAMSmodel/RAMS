@@ -185,7 +185,7 @@ real, dimension(m1) :: dn0,rv
  !DeMott IN activation based on total number of all aerosol
  !greater than 0.5 micron diameter.
  nifn(k) = 0.0
- if(tairc(k) < 0.0 .and. tairc(k) > -35.0 .and. total_in(k) > mincon) then
+ if(tairc(k) < 0.0 .and. total_in(k) > mincon) then
    !For DeMott Eqn, the aerosol number to put into the eqn needs to be
    !the remaining of unprocessed aerosols > 0.5 microns + the remaining
    !aerosols > 0.5 microns contained in droplets + 
@@ -204,12 +204,12 @@ real, dimension(m1) :: dn0,rv
    !Input aerosols in #/cm3 and outputs #/L activated
    if(iifn_formula==1) then
     !Original Demott(2010) formula
-    nifn(k) = 0.0000594 * (-tairc(k))**3.33 &
-            * (tot_in)**(0.0264*(-tairc(k))+0.0033)
+    nifn(k) = 0.0000594 * ( -max(-35.0,tairc(k)) )**3.33 &
+            * (tot_in)**(0.0264*( -max(-35.0,tairc(k)) )+0.0033)
    elseif(iifn_formula==2) then
     !Modified Demott(2010) for dust-dominated cases
     !Paul suggested an additional factor of 3 multiplier
-    nifn(k) = 3.0 * 0.0008 * 10 ** (-0.2*(tairc(k)+9.7)) * tot_in ** 1.25
+    nifn(k) = 3.0 * 0.0008 * 10 ** (-0.2*(max(-35.0,tairc(k))+9.7)) * tot_in ** 1.25
    endif
 
    !Adjust units and such

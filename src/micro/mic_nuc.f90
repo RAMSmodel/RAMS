@@ -765,7 +765,7 @@ do k = 2,m1-1
    !use DeMott(2010) IN nucleation NIFN(#/kg) from PPARM
    elseif(iifn==2) then
      excessrv = rv(k) - 1.0001 * rvlsair(k)
-     if (excessrv > 0. .and. tairc(k) < 0.0 .and. tairc(k) > -35.0) then
+     if (excessrv > 0. .and. tairc(k) < 0.0) then
        !Convert tot_in from #/kg to #/cm3
        tot_in = cifnx(k) * dn0(k) / 1.e6
        !Convert to STP
@@ -777,12 +777,12 @@ do k = 2,m1-1
        !Input aerosols in #/cm3 and outputs #/L activated
        if(iifn_formula==1) then
         !Original Demott(2010) formula
-        nifn(k) = 0.0000594 * (-tairc(k))**3.33 &
-                * (tot_in)**(0.0264*(-tairc(k))+0.0033)
+        nifn(k) = 0.0000594 * ( -max(-35.0,tairc(k)) )**3.33 &
+                * (tot_in)**(0.0264*( -max(-35.0,tairc(k)) )+0.0033)
        elseif(iifn_formula==2) then
         !Modified Demott(2010) for dust-dominated cases
         !Paul suggested an additional factor of 3 multiplier
-        nifn(k) = 3.0 * 0.0008 * 10 ** (-0.2*(tairc(k)+9.7)) * tot_in ** 1.25
+        nifn(k) = 3.0 * 0.0008 * 10 ** (-0.2*(max(-35.0,tairc(k))+9.7)) * tot_in ** 1.25
        endif
 
        !Adjust units and such
@@ -896,7 +896,7 @@ do k = 2,m1-1
       if(immerhx(k,lcat) > cx(k,lcat)) immerhx(k,lcat) = 0.9999 * cx(k,lcat)
 
       !If conditions allow for droplet immersion freezing
-      if(tairc(k) < 0.0 .and. tairc(k) > -35.0 .and. immerhx(k,lcat) > mincon) then
+      if(tairc(k) < 0.0 .and. immerhx(k,lcat) > mincon) then
        !For DeMott Eqn, the aerosol number to put into the eqn needs to be
        !the remaining of unprocessed aerosols > 0.5 microns + the remaining
        !aerosols > 0.5 microns contained in droplets +
@@ -909,12 +909,12 @@ do k = 2,m1-1
        !Input aerosols in #/cm3 and outputs #/L activated
        if(iifn_formula==1) then
         !Original Demott(2010) formula
-        ifntemp = 0.0000594 * (-tairc(k))**3.33 &
-                * (tot_in)**(0.0264*(-tairc(k))+0.0033)
+        ifntemp = 0.0000594 * ( -max(-35.0,tairc(k)) )**3.33 &
+                * (tot_in)**(0.0264*( -max(-35.0,tairc(k)) )+0.0033)
        elseif(iifn_formula==2) then
         !Modified Demott(2010) for dust-dominated cases
         !Paul suggested an additional factor of 3 multiplier
-        ifntemp = 3.0 * 0.0008 * 10 ** (-0.2*(tairc(k)+9.7)) * tot_in ** 1.25
+        ifntemp = 3.0 * 0.0008 * 10 ** (-0.2*(max(-35.0,tairc(k))+9.7)) * tot_in ** 1.25
        endif
 
        !Adjust units and such
