@@ -50,7 +50,7 @@ if (jnmb(1) == 1 .or. jnmb(1) == 4) then
    enddo
 
 !*************************************************************************
-!Saleeby(6/3/02) Prognosing number concentration of cloud and drizzle ****
+!Saleeby(6/3/2002) Prognosing number concentration of cloud and drizzle ****
 !*************************************************************************
 elseif (jnmb(1) >= 5) then
  do k = 2,m1-1
@@ -181,6 +181,15 @@ elseif (jnmb(1) >= 5) then
         endif
         concen_tab(acat) = concen_nuc * tab * epstemp
 
+        !Saleeby(2023-06-06)
+        !Override nucleation if median radius (rg) less than minimum lookup
+        !table size. In the past we simply forced rg up to the minimum and
+        !continued activation of aerosols with rg < 10nm. Perhaps we need to
+        !limit this activation. So, no activation if rg < 10nm. In this respect,
+        !some aerosols may be carried around without nucleating. They can still
+        !be radiatively important and undergo depositin.
+        if (rg < 0.01e-6) concen_tab(acat) = 0.0
+
        endif !if concen_nuc > mincon
       endif !if acat aerosol type is valid
    enddo !looping over aerocat
@@ -256,6 +265,11 @@ elseif (jnmb(1) >= 5) then
 
         !Vapor allocated to a given aerosol species
         vaprccn = 0.5*excessrv*cldrat !Sum of all nucleation <= 1/2 excessrv
+        !Saleeby(2023-06-01): Replacing line above to try and limit new nucleation.
+        !Anecdotal evidence suggests that we nucleate too many aerosols, so we are
+        !seeing if this will switch more to growth of existing droplets over making
+        !more new ones.
+        !vaprccn = 0.25*excessrv*cldrat !Sum of all nucleation <= 1/4 excessrv
 
         !Determine if nucleated droplets go to cloud or drizzle
         drop=1
@@ -266,8 +280,9 @@ elseif (jnmb(1) >= 5) then
         if(concen_tab(acat) > vaprccn / emb0(drop)) concen_tab(acat) = vaprccn / emb0(drop)
         if(concen_tab(acat) < vaprccn / emb1(drop)) vaprccn = concen_tab(acat) * emb1(drop)
 
-!Nucleate to 2-micron diameter droplets whose mass is emb0
-!if(concen_tab(acat) * emb0(drop) <= vaprccn) vaprccn=concen_tab(acat) * emb0(drop)
+        !Saleeby(2023-05-30)
+        !Nucleate to minimum drop diameter (cloud or drizzle) droplets whose mass is emb0
+        if(concen_tab(acat) * emb0(drop) <= vaprccn) vaprccn=concen_tab(acat) * emb0(drop)
 
         !Accumulated nucleated particles if not removing them
         if(iccnlev==0) then

@@ -36,7 +36,9 @@ do acat=1,aerocat
        aero_rg(acat)=((0.23873/rhosol*aeromas(k,acat)/aerocon(k,acat)) &
                     **(1./3.))/aero_rg2rm(acat)
 
-       if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
+       !Saleeby(2023-06-06):Do not limit minimum rg (median radius)
+       !if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
+
        if(aero_rg(acat) > 6.50e-6) aero_rg(acat) = 6.50e-6
 
        aeromas(k,acat) = ((aero_rg(acat)*aero_rg2rm(acat))**3.) &
@@ -296,7 +298,10 @@ real, dimension(m1) :: dn0,rv
        rhosol=aero_rhosol(acat)
        aero_rg(acat)=((0.23873/rhosol*aeromas(k,acat)/aerocon(k,acat)) &
              **(1./3.))/aero_rg2rm(acat)
-       if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
+
+       !Saleeby(2023-06-06):Do not limit minimum rg (median radius)
+       !if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
+
        if(aero_rg(acat) > 6.50e-6) aero_rg(acat) = 6.50e-6
        aeromas(k,acat) = ((aero_rg(acat)*aero_rg2rm(acat))**3.) &
              *aerocon(k,acat)/(0.23873/rhosol)
