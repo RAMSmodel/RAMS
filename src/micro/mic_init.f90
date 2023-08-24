@@ -151,8 +151,16 @@ use mem_grid
 implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm
+real :: e_a,e_b,e_t,e_k,e_c
 real, dimension(n1,n2,n3) :: cifnp,dn0
 real :: cin_maxt
+
+!CREATE YOUR OWN CUSTOM POTENTIAL IFN/INP PROFILE BELOW. OUR SORT OF
+!DEFAULT IS THE EXPONENTIALLY DECREASING PROFILE, BUT THIS IS BY ALL
+!MEANS NOT A DEFINITIVE PROFILE, JUST A NECESSARY PLACEHOLDER SO THAT
+!SOME HETEROGENEOUS ICE NUCLEATION CAN OCCUR IF IIFN==1or2. IIFN==3
+!USES ONE OF THE DEMOTT FORMULAS AND IS BASED ON LARGE AEROSOLS DETERMINED 
+!FROM THE CLOUD DROPLET NUCLEATING AEROSOL DISTRIBUTIONS.
 
 ! Initialize IFN
 if(iaeroprnt==1 .and. print_msg) then
@@ -167,17 +175,64 @@ do j = 1,n3
    cin_maxt = cin_max * 1.e6
 
    !Set up Vertical profile 
-   if(k<=2) cifnp(k,i,j)=cin_maxt
-   ! Exponential decrease that scales with pressure decrease
-   if(k>2)  cifnp(k,i,j)=cin_maxt*exp(-zt(k)/7000.)
 
-   !Output initial sample profile
-   if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' Ice Nuclei - init (k,zt,ifn/kg,ifn/L) on Grid:',ifm
+   !*************************************************************************** 
+   !Exponential decrease that scales with pressure decrease.
+   if (cin_max >= 0.0) then
+    if(k<=2) cifnp(k,i,j)=cin_maxt
+    if(k >2) cifnp(k,i,j)=cin_maxt*exp(-zt(k)/7000.)
+    !Output initial sample profile
+    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+     if(k==1) print*,' Ice Nuclei - init (k,zt,ifn/mg,ifn/L) on Grid:',ifm
      print'(a9,i5,f11.1,2f17.7)',' IFN-init' &
-        ,k,zt(k),cifnp(k,i,j),cifnp(k,i,j)/1.e3*dn0(k,i,j)
+        ,k,zt(k),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
+    endif
+   !*************************************************************************** 
+   !Use SPICULE INP profile if cin_maxt ~ -1.0
+   !Profile from aircraft obs during the SPICULE field campaign.
+   !To mimic the SPICULE profile in magnitude, need to set the following parameters.
+   !and use IIFN=2 for DeMott scheme, and IFN_FORMULA=2 for DeMott(2015) dust formula.
+   !Perhaps using this profile is more realistic given that is has basis
+   !in reality from observations of the central-western continental U.S. 
+   elseif (cin_max > -1.01 .and. cin_max < -0.99) then
+    e_t = 0.10 ! Controls the shape of the profile
+    e_a = 2.50 ! approximately cin_maxt
+    e_k = 3.80 
+    e_b = 5.80 ! Level where you want profile to start decreasing
+    e_c = 1.32 ! Necessary so you do not get negative numbers (changes with "a")
+    cifnp(k,i,j)=(-1.0*(e_a/2.0)*(erf(((zt(k)/1000)-e_b)/sqrt(4.0*e_k*e_t)))+e_c)
+    !NOTE THAT THIS CURVE FIT TO DATA IS BASED ON #/CM3 UNITS, SO CONVERT BELOW
+    cifnp(k,i,j) = cifnp(k,i,j) * 1.e6 / dn0(k,i,j) ! convert #/cm3 to #/kg
+    !Output initial sample profile
+    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+     if(k==1) print*,' Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
+     print'(a9,i5,f11.1,3f12.3)',' IFN-init',k,zt(k) &
+       ,cifnp(k,i,j)/1.e6*dn0(k,i,j),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
+    endif
+   !*************************************************************************** 
+   !Use MC3E INP profile if cin_maxt ~ 2.0
+   !Profile from aircraft obs during the MC3E field project. (Marinescu et al. 2016)
+   !To mimic the MC3E profile in magnitude, need to set the following parameters.
+   !and use IIFN=2 for DeMott scheme, and IFN_FORMULA=1 for DeMott(2010) general formula.
+   !Perhaps using this profile is more realistic given that is has basis
+   !in reality from observations in the southern great plains of the continental U.S. 
+   elseif (cin_max > -2.01 .and. cin_max < -1.99) then
+    e_t = 0.35 ! Controls the shape of the profile
+    e_a = 3.28 ! approximately cin_maxt
+    e_k = 3.00
+    e_b = 2.27 ! Level where you want profile to start decreasing
+    e_c = 1.96 ! Necessary so you do not get negative numbers (changes with "a")
+    cifnp(k,i,j)=(-1.0*(e_a/2.0)*(erf(((zt(k)/1000)-e_b)/sqrt(4.0*e_k*e_t)))+e_c)
+    !NOTE THAT THIS CURVE FIT TO DATA IS BASED ON #/MG UNITS, SO CONVERT BELOW
+    cifnp(k,i,j) = cifnp(k,i,j) * 1.e6 ! convert #/mg to #/kg
+    !Output initial sample profile
+    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+     if(k==1) print*,' Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
+     print'(a9,i5,f11.1,3f12.3)',' IFN-init',k,zt(k) &
+       ,cifnp(k,i,j)/1.e6*dn0(k,i,j),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
+    endif
+   !***************************************************************************
    endif
-
 
   enddo
  enddo
@@ -219,7 +274,7 @@ do j = 1,n3
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
      if(k==1) print*,' CCN-1-init (k,zt,ccn1/mg,ccn1/cc) on Grid:',ifm
-     print'(a9,i5,f11.1,2f17.7)',' CCN-1-init' &
+     print'(a11,i5,f11.1,2f17.7)',' CCN-1-init' &
         ,k,zt(k),cn1np(k,i,j)/1.e6,cn1np(k,i,j)/1.e6*dn0(k,i,j)
    endif
 
@@ -267,7 +322,7 @@ do j = 1,n3
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
      if(k==1) print*,' CCN-2-init (k,zt,ccn2/mg,ccn2/cc) on Grid:',ifm
-     print'(a10,i5,f11.1,2f17.7)',' CCN-2-init' &
+     print'(a11,i5,f11.1,2f17.7)',' CCN-2-init' &
         ,k,zt(k),cn2np(k,i,j)/1.e6,cn2np(k,i,j)/1.e6*dn0(k,i,j)
    endif
 
