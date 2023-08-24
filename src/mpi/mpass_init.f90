@@ -32,7 +32,7 @@ implicit none
   nwords = 219 * 1                 & !single values
          +   1 * 8                 & !micro (8-hydromet types for gnu)
          +   3 * aerocat           & !micro (number aerosol species)
-         +  42 * maxgrds           & !grid-dependent (max grids)
+         +  44 * maxgrds           & !grid-dependent (max grids)
          +   3 * nzpmax            & !max vertical levels
          +   3 * nzgmax            & !max soil levels
          +   1 * maxisn            & !max isentropic levels
@@ -190,6 +190,8 @@ implicit none
     CALL par_put_int   (ICORFLG,1)
     CALL par_put_int   (IBND,1)
     CALL par_put_int   (JBND,1)
+    CALL par_put_int   (ISPONGE_PTS,MAXGRDS)
+    CALL par_put_float (SPONGE_TAU,MAXGRDS)
     CALL par_put_float (CPHAS,1)
     CALL par_put_int   (LSFLG,1)
     CALL par_put_int   (NFPT,1)
@@ -522,6 +524,8 @@ implicit none
     CALL par_get_int   (ICORFLG,1)
     CALL par_get_int   (IBND,1)
     CALL par_get_int   (JBND,1)
+    CALL par_get_int   (ISPONGE_PTS,MAXGRDS)
+    CALL par_get_float (SPONGE_TAU,MAXGRDS)
     CALL par_get_float (CPHAS,1)
     CALL par_get_int   (LSFLG,1)
     CALL par_get_int   (NFPT,1)

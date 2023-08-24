@@ -3,7 +3,7 @@ Subroutine nstbtnd (m1,m2,m3,ia,iz,ja,jz,ibcon,ngrid  &
      ,scp,sct,bx,by,bz,vnam,tymeinv,nstbot,nsttop,jdim)
 
 use node_mod, only: mi0, mj0
-use mem_grid, only: nnxp, nnyp
+use mem_grid, only: nnxp, nnyp, isponge_pts, sponge_tau
 
 implicit none
 
@@ -38,15 +38,14 @@ real, dimension(m2,m3) :: wgtW,wgtE,wgtS,wgtN
 
 
 ! set up sponge zone time scale and calculate inverse nudging timescale
-tau_sponge = 30. ! s
+tau_sponge = sponge_tau(ngrid) !30. ! s
 !tau_sponge = 60. ! s ! PJM change for testing
 !tau_sponge = 10. ! s ! PJM change for testing
 itau_spg = 1./tau_sponge
 ! set up number of points in the sponge zone. Can vary for different grids
 ! Here, use 5 points on grid2 and 8 points on grid3
-npts_sponge = 5
+npts_sponge = isponge_pts(ngrid) !5
 !if (ngrid .eq. 3) npts_sponge = 8
-
 ! check that subdomain lengths are not smaller than the sponge zone width
 ! these are conservative estimates since they use ia/ja and iz/jz
 if ( iand(ibcon,1) .ne. 0 .or. iand(ibcon,2) .ne. 0 ) then ! W or E boundary
