@@ -68,15 +68,15 @@ elseif (jnmb(1) >= 5) then
    !Set aside ice nuclei for DeMott scheme and recomute aerosol stats 
    if(iifn==3) CALL prenuc_ifn (m1,k,dn0,rv)
 
-!**********LOOP OVER CCN, GCCN, 2 DUST MODES, 3 SALT MODES ***************
+!**********LOOP OVER 2 CCN MODES, 2 DUST MODES, 3 SALT MODES ***************
    !Use the acat loop for turning on aerosol nucleation
    do acat=1,aerocat
 
       concen_tab(acat) = 0.0
       concen_nuc = 0.0
 
-      if((acat==1)                  .or. &  ! CCN
-         (acat==2)                  .or. &  ! GCCN
+      if((acat==1)                  .or. &  ! CCN-1
+         (acat==2)                  .or. &  ! CCN-2
          (acat==3 .and. idust>0)    .or. &  ! Small dust mode
          (acat==4 .and. idust>0)    .or. &  ! Large dust mode
          (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
@@ -199,8 +199,8 @@ elseif (jnmb(1) >= 5) then
    do acat=1,aerocat
     aero_ratio(acat) = 0.0  ! Aerosol fraction
     aero_vap(acat)   = 0.0  ! Total surface area of aerosol category
-    if((acat==1)                  .or. &  ! CCN
-       (acat==2)                  .or. &  ! GCCN
+    if((acat==1)                  .or. &  ! CCN-1
+       (acat==2)                  .or. &  ! CCN-2
        (acat==3 .and. idust>0)    .or. &  ! Small dust mode
        (acat==4 .and. idust>0)    .or. &  ! Large dust mode
        (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
@@ -229,8 +229,8 @@ elseif (jnmb(1) >= 5) then
    total_drz_nucr=0.0
    do acat=1,aerocat
      ctc = 0
-     if((acat==1)                  .or. &  ! CCN
-        (acat==2)                  .or. &  ! GCCN
+     if((acat==1)                  .or. &  ! CCN-1
+        (acat==2)                  .or. &  ! CCN-2
         (acat==3 .and. idust>0)    .or. &  ! Small dust mode
         (acat==4 .and. idust>0)    .or. &  ! Large dust mode
         (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
@@ -385,7 +385,7 @@ elseif (jnmb(1) >= 5) then
             ccncon(ic) = ccncon(ic) + ccncon(ic-1)
             ccnmas(ic) = ccnmas(ic) + ccnmas(ic-1)
            endif
-           !Track immersion freezing droplets that contain large CCN, GCCN, or DUST
+           !Track immersion freezing droplets that contain large CCN1, CCN2, or DUST
            ! Do not track immersion freezing for salt species (acat=5,6,7)
            if(iifn==3.and.(acat==1.or.acat==2.or.acat==3.or.acat==4.or.acat==8.or.acat==9 &
                .or.acat==aerocat-1.or.acat==aerocat) &

@@ -603,10 +603,10 @@ endif
 
 !Copyback AEROSOLS
 if (iaerosol > 0) then
-   CALL ae1kmic (2,m1-1,micro%cccnp(1,i,j),aerocon(1,1))
-   CALL ae1kmic (2,m1-1,micro%cccmp(1,i,j),aeromas(1,1))
-   CALL ae1kmic (2,m1-1,micro%gccnp(1,i,j),aerocon(1,2))
-   CALL ae1kmic (2,m1-1,micro%gccmp(1,i,j),aeromas(1,2))
+   CALL ae1kmic (2,m1-1,micro%cn1np(1,i,j),aerocon(1,1))
+   CALL ae1kmic (2,m1-1,micro%cn1mp(1,i,j),aeromas(1,1))
+   CALL ae1kmic (2,m1-1,micro%cn2np(1,i,j),aerocon(1,2))
+   CALL ae1kmic (2,m1-1,micro%cn2mp(1,i,j),aeromas(1,2))
 endif
 if (idust > 0) then
    CALL ae1kmic (2,m1-1,micro%md1np(1,i,j),aerocon(1,3))

@@ -71,8 +71,8 @@ DATA INDAT/  &
      ,'IGRAUP','IHAIL','CPARM','DPARM','RPARM','PPARM','SPARM','APARM'   &
      ,'GPARM','HPARM','GNU','HUCMFILE','NDTCOLL','IAEROSOL','ISALT'      &
      ,'IDUST','IDUSTLOFT','DUSTFILE','ICCNLEV','IIFN','IIFN_FORMULA'     &
-     ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','CCN_MAX'  &
-     ,'GCCN_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'         &
+     ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','CCN1_MAX' &
+     ,'CCN2_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'         &
      ,'SALTS_MAX','IAEROLBC','ICO2LBC','BCTAU','IAERO_CHEM'              &
      ,'AERO_EPSILON','AERO_MEDRAD','ITRKEPSILON','ITRKDUST'              &
      ,'ITRKDUSTIFN','SCMTIME','ISCMX','ISCMY','FRACSAT','IABCARB'        &
@@ -361,8 +361,8 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'IAEROPRNT')    CALL varseti (VR,IAEROPRNT,NV,1,II,0,1)
  IF(VR.EQ.'IAEROHIST')    CALL varseti (VR,IAEROHIST,NV,1,II,0,1)
  IF(VR.EQ.'CIN_MAX')      CALL varsetf (VR,CIN_MAX,NV,1,FF,0.,1.E4)
- IF(VR.EQ.'CCN_MAX')      CALL varsetf (VR,CCN_MAX,NV,1,FF,0.,1.E4)
- IF(VR.EQ.'GCCN_MAX')     CALL varsetf (VR,GCCN_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'CCN1_MAX')     CALL varsetf (VR,CCN1_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'CCN2_MAX')     CALL varsetf (VR,CCN2_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST1_MAX')    CALL varsetf (VR,DUST1_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST2_MAX')    CALL varsetf (VR,DUST2_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'ABC1_MAX')     CALL varsetf (VR,ABC1_MAX,NV,1,FF,0.,1.E4)
@@ -604,8 +604,8 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'GPARM=',GPARM                     &
  ,'HPARM=',HPARM                     &
  ,'CIN_MAX=',CIN_MAX                 &
- ,'CCN_MAX=',CCN_MAX                 &
- ,'GCCN_MAX=',GCCN_MAX               &
+ ,'CCN1_MAX=',CCN1_MAX               &
+ ,'CCN2_MAX=',CCN2_MAX               &
  ,'DUST1_MAX=',DUST1_MAX             &
  ,'DUST2_MAX=',DUST2_MAX             &
  ,'ABC1_MAX=',ABC1_MAX               &

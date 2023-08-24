@@ -189,7 +189,7 @@ return
 END SUBROUTINE init_ifn
 
 !##############################################################################
-Subroutine init_ccn (n1,n2,n3,cccnp,cccmp,dn0,ifm)
+Subroutine init_ccn1 (n1,n2,n3,cn1np,cn1mp,dn0,ifm)
 
 use micphys
 use rconstants
@@ -198,34 +198,34 @@ use mem_grid
 implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm
-real, dimension(n1,n2,n3) :: cccnp,cccmp,dn0
-real :: ccn_maxt
+real, dimension(n1,n2,n3) :: cn1np,cn1mp,dn0
+real :: ccn1_maxt
 
-! Initialize CCN
-if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN concentration'
+! Initialize CCN mode 1
+if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN mode 1 concen'
 
 !Convert RAMSIN #/mg to #/kg
- ccn_maxt = ccn_max * 1.e6 
+ ccn1_maxt = ccn1_max * 1.e6 
 
 do j = 1,n3
  do i = 1,n2
   do k = 1,n1
 
    !Set up Vertical profile
-   if(k<=2) cccnp(k,i,j)=ccn_maxt
+   if(k<=2) cn1np(k,i,j)=ccn1_maxt
    !Exponential decrease that scales with pressure decrease
-   if(k>2)  cccnp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+   if(k>2)  cn1np(k,i,j)=ccn1_maxt*exp(-zt(k)/7000.)
 
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' CCN-init (k,zt,ccn/mg,ccn/cc) on Grid:',ifm
-     print'(a9,i5,f11.1,2f17.7)',' CCN-init' &
-        ,k,zt(k),cccnp(k,i,j)/1.e6,cccnp(k,i,j)/1.e6*dn0(k,i,j)
+     if(k==1) print*,' CCN-1-init (k,zt,ccn1/mg,ccn1/cc) on Grid:',ifm
+     print'(a9,i5,f11.1,2f17.7)',' CCN-1-init' &
+        ,k,zt(k),cn1np(k,i,j)/1.e6,cn1np(k,i,j)/1.e6*dn0(k,i,j)
    endif
 
-   !Set up Field of CCN mass mixing ratio (kg/kg)
-   cccmp(k,i,j) = ((aero_medrad(1)*aero_rg2rm(1))**3.) &
-                *cccnp(k,i,j)/(0.23873/aero_rhosol(1))
+   !Set up Field of CCN-mode-1 mass mixing ratio (kg/kg)
+   cn1mp(k,i,j) = ((aero_medrad(1)*aero_rg2rm(1))**3.) &
+                *cn1np(k,i,j)/(0.23873/aero_rhosol(1))
 
   enddo
  enddo
@@ -234,10 +234,10 @@ enddo
 if(iaeroprnt==1 .and. print_msg) print*,' '
 
 return
-END SUBROUTINE init_ccn
+END SUBROUTINE init_ccn1
 
 !##############################################################################
-Subroutine init_gccn (n1,n2,n3,gccnp,gccmp,dn0,ifm)
+Subroutine init_ccn2 (n1,n2,n3,cn2np,cn2mp,dn0,ifm)
 
 use micphys
 use rconstants
@@ -246,34 +246,34 @@ use mem_grid
 implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm
-real, dimension(n1,n2,n3) :: gccnp,gccmp,dn0
-real :: gccn_maxt
+real, dimension(n1,n2,n3) :: cn2np,cn2mp,dn0
+real :: ccn2_maxt
 
-! Initialize Giant-CCN
-if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing GCCN concentration'
+! Initialize CCN mode 2
+if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN mode 2 concen'
 
 !Convert RAMSIN #/mg to #/kg
- gccn_maxt = gccn_max * 1.e6 
+ ccn2_maxt = ccn2_max * 1.e6 
 
 do j = 1,n3
  do i = 1,n2
   do k = 1,n1
 
    !Set up Vertical profile
-   if(k<=2) gccnp(k,i,j)=gccn_maxt
+   if(k<=2) cn2np(k,i,j)=ccn2_maxt
    ! Exponential decrease that scales with pressure decrease
-   if(k>2)  gccnp(k,i,j)=gccn_maxt*exp(-zt(k)/7000.)
+   if(k>2)  cn2np(k,i,j)=ccn2_maxt*exp(-zt(k)/7000.)
 
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' GCCN-init (k,zt,gccn/mg,gccn/cc) on Grid:',ifm
-     print'(a10,i5,f11.1,2f17.7)',' GCCN-init' &
-        ,k,zt(k),gccnp(k,i,j)/1.e6,gccnp(k,i,j)/1.e6*dn0(k,i,j)
+     if(k==1) print*,' CCN-2-init (k,zt,ccn2/mg,ccn2/cc) on Grid:',ifm
+     print'(a10,i5,f11.1,2f17.7)',' CCN-2-init' &
+        ,k,zt(k),cn2np(k,i,j)/1.e6,cn2np(k,i,j)/1.e6*dn0(k,i,j)
    endif
 
-   !Set up Field of GCCN mass mixing ratio (kg/kg)
-   gccmp(k,i,j) = ((aero_medrad(2)*aero_rg2rm(2))**3.) &
-                *gccnp(k,i,j)/(0.23873/aero_rhosol(2))
+   !Set up Field of CCN-mode-2 mass mixing ratio (kg/kg)
+   cn2mp(k,i,j) = ((aero_medrad(2)*aero_rg2rm(2))**3.) &
+                *cn2np(k,i,j)/(0.23873/aero_rhosol(2))
 
   enddo
  enddo
@@ -282,7 +282,7 @@ enddo
 if(iaeroprnt==1 .and. print_msg) print*,' '
 
 return
-END SUBROUTINE init_gccn
+END SUBROUTINE init_ccn2
 
 !##############################################################################
 Subroutine init_dust (n1,n2,n3,md1np,md2np,md1mp,md2mp,dn0,ifm)
@@ -510,13 +510,13 @@ implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm,nsc,ii,jj
 real, dimension(n1,n2,n3) :: tracerp,dn0
-real :: ccn_maxt
+real :: ccn1_maxt
 
 ! Initialize Tracers
 if(print_msg) print*,'Start Initializing Tracers, Grid:',ifm,' Tracer:',nsc
 
 !Convert RAMSIN #/mg to #/kg
- ccn_maxt = ccn_max * 1.e6 
+ ccn1_maxt = ccn1_max * 1.e6 
 
 do j = 1,n3
  do i = 1,n2
@@ -528,8 +528,8 @@ do j = 1,n3
 
    !Set up Vertical profile, Exponential decrease that scales with pressure
    if(nsc==1) then
-    if(k<=2) tracerp(k,i,j)=ccn_maxt
-    if(k>2)  tracerp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+    if(k<=2) tracerp(k,i,j)=ccn1_maxt
+    if(k>2)  tracerp(k,i,j)=ccn1_maxt*exp(-zt(k)/7000.)
    endif
    !Set up Field of CCN mass mixing ratio (kg/kg)
    if(nsc==2) then
@@ -720,8 +720,11 @@ if(print_msg) then
  print*,''
 endif
 
+! 125 micron max diameter ice crystal size for participating
+! in Hallet-Mossop 2ndary ice splintering process.
 dps = 125.e-6
 dps2 = dps ** 2
+
 rictmin = 1.0001
 rictmax = 0.9999 * float(nembc)
 

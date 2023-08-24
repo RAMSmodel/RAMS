@@ -44,7 +44,7 @@ use mem_basic
 use mem_micro
 use rconstants
 use micro_prm
-use micphys, only: imbudget,ipris,igraup,ihail,ccn_max
+use micphys, only: imbudget,ipris,igraup,ihail,ccn1_max
 
 IMPLICIT NONE
                      
@@ -77,7 +77,7 @@ INTEGER :: k,i,j
 integer itimestep, kr, ikl
 
 do kr=1,nkr
-     fccn0(kr) =FCCNR0(KR)*1000.*xccn(kr)*ccn_max
+     fccn0(kr) =FCCNR0(KR)*1000.*xccn(kr)*ccn1_max
 enddo
 
 
@@ -455,7 +455,7 @@ use node_mod
 use micro_prm
 use mem_micro
 use mem_grid
-use micphys, only:ccn_max,cin_max,iaero_chem,aero_medrad,iifn
+use micphys, only:ccn1_max,cin_max,iaero_chem,aero_medrad,iifn
 use module_hujisbm
 
 IMPLICIT NONE
@@ -547,23 +547,23 @@ endif
 
 ! Initialize arrays for the initial run. Do not run this for history restart.
 if(bininit==1) then
-!Factor of 1000 is to convert to CGS units. ccn_max is #/mg
+!Factor of 1000 is to convert to CGS units. ccn1_max is #/mg
    DO k=1,mzp
       DO i=1,mxp
          DO j=1,myp
             DO KR=1,NKR
                IF (k<=2) THEN
-                  micro_g(ngrid)%fncn(k,i,j,KR)=FCCNR0(KR)*1000.*xccn(kr)*ccn_max
+                  micro_g(ngrid)%fncn(k,i,j,KR)=FCCNR0(KR)*1000.*xccn(kr)*ccn1_max
                ELSE
                   micro_g(ngrid)%fncn(k,i,j,KR)=FCCNR0(KR)*1000.*xccn(kr)* &
-                                                ccn_max*exp(-zt(k)/7000.)
+                                                ccn1_max*exp(-zt(k)/7000.)
                ENDIF
             ENDDO
          ENDDO
       END DO
    END DO
    if (iceprocs == 1 .and. iifn == 2) then
-      fracin = cin_max/ccn_max
+      fracin = cin_max/ccn1_max
       micro_g(ngrid)%ffin=micro_g(ngrid)%fncn*fracin
    endif
 endif

@@ -488,8 +488,8 @@ atau=max(bctau(ngrid),dtlt) !prevent from being less than dtlt
 if(iaerolbc(ngrid)==1)then
  if( ((sname == 'CIFNP') .and. &
        (jnmb(3)>=5 .and. (iifn==1.or.iifn==2))) .or. &
-     ((sname == 'CCCNP' .or. sname == 'CCCMP' .or. &
-       sname == 'GCCNP' .or. sname == 'GCCMP') .and. &
+     ((sname == 'CN1NP' .or. sname == 'CN1MP' .or. &
+       sname == 'CN2NP' .or. sname == 'CN2MP') .and. &
        iaerosol==1) .or. &
      ((sname == 'MD1NP' .or. sname == 'MD1MP' .or. &
        sname == 'MD2NP' .or. sname == 'MD2MP') .and. &
