@@ -19,7 +19,7 @@ integer, parameter :: nthz=26,nrhhz=10,ngam=5000,ninc=201   &
                      ,nembc=20
 real, parameter    :: dtc=1.,ddnc=2.e-6 ,dthz=1.,drhhz=.02
 real, parameter    :: budget_scalet=1.
-real, parameter    :: rxmin=1.e-9,cxmin=1.e-3
+real, parameter    :: rxmin=1.e-16,cxmin=1.e-5
 
 !IDIFFPERTS
 !0=normal scalar diffusion
@@ -131,7 +131,7 @@ real :: cxrad,cyrad,czrad,cdivmax,ctau,ctmax
 
 !******Variables Needed for CCN nucleation and restore *********************
 integer :: iccnlev,ic,rgb
-real :: cin_max,ccn_max,gccn_max,dust1_max,dust2_max,saltf_max,saltj_max &
+real :: cin_max,ccn1_max,ccn2_max,dust1_max,dust2_max,saltf_max,saltj_max &
  ,salts_max,enxferratio,rxferratio,ccnmass,ccnnum,rxtemp,cxtemp,fracmass &
  ,cxloss,concen_nuc,aeromass,rg,rhosol,cldrat,epsil,ant,rcm,rmlar,rmsma &
  ,power,scnmass,dcnmass,dinmass,abc1_max,abc2_max
@@ -166,8 +166,8 @@ data rg_ccn / 0.01e-6,0.02e-6,0.04e-6,0.08e-6 &
 !Make sure you change both if you alter number of species
 !Each category can have the soluble component be either
 !Ammonium sulfate (NH4-2SO4) or Sodium chloride (NaCl)
-! 1 = Sub-micron CCN
-! 2 = Super-micron GCCN
+! 1 = CCN mode 1
+! 2 = CCN mode 2
 ! 3 = Small mode mineral dust (soluble coating)
 ! 4 = Large mode mineral dust (soluble coating)
 ! 5 = Film mode sea salt
@@ -197,8 +197,8 @@ real, parameter :: mincon=1.0e-1         &
 !tables with parcel model runs using a new sigma. The median radii bins
 !in nucleation and pre_nucleation routines (rg, rmsma, rmlar) are also
 !specifically set for sigma=1.8. These would need to be updated as well.
-data aero_sigma  / 1.80 &       !CCN 
-                  ,1.80 &       !GCCN 
+data aero_sigma  / 1.80 &       !CCN mode 1 
+                  ,1.80 &       !CCN mode 2
                   ,1.80 &       !small mineral dust
                   ,1.80 &       !large mineral dust
                   ,1.80 &       !salt film mode 
@@ -211,8 +211,8 @@ data aero_sigma  / 1.80 &       !CCN
 !Set the relationship between median radius and mean mass radius 
 !based on aerosol distribution spectral width
 !exp(1.5 * (alog(sigma))**2)
-data aero_rg2rm  / 1.6791 &     !CCN 
-                  ,1.6791 &     !GCCN 
+data aero_rg2rm  / 1.6791 &     !CCN mode 1
+                  ,1.6791 &     !CCN mode 2
                   ,1.6791 &     !small mineral dust
                   ,1.6791 &     !large mineral dust
                   ,1.6791 &     !salt film mode 

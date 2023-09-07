@@ -8,7 +8,7 @@
 # this script in parallel or serial.
 #
 # A couple of important items here for this test simulation.
-# 1. RAMSIN.supercell - produces a 3D 1-grid supercell simulation with
+# 1. RAMSIN.testrunonly - produces a 3D 1-grid supercell simulation with
 #  LEVEL=3 microphysics
 # 2. This idealized simulation does not require geographical data (sfctypehdf5)
 #  for running since geography does not matter. Also, we do not need gridded
@@ -19,25 +19,29 @@
 #  but NOT on a supercomputer using a PBS QSUB queuing system. Consult their
 #  userguides for running parallel jobs on their systems. Each system is unique.
 # /home/smsaleeb/software/mpich-3.3.2/bin/mpiexec -machinefile machs -np 8 \
-# ./bin.rams/rams-6.3.01 -f RAMSIN.supercell
-# Note: might have to add (-ifrace eth0) to this executable statement or
+# ./bin.rams/rams-6.3.01 -f RAMSIN.testrunonly
+# Note: might have to add (-iface eth0) to this executable statement or
 #  something similar depending on how your compute nodes communicate. Use
 #  utility (ifconfig) to find out how your nodes communicate (ie. eth0 or eth1).
 #
 # Do not blindly use this script for running every simulation. It is simply
 # included here as a starting point and because I use this frequently on my
 # desktop Linux workstation for RAMS tests and debugging. If using this script
-# please become familiar with its flags, settings, and functionality. It cannot
-# be used for every runtime situation.
+# and RAMSIN namelist, please become familiar with its flags, settings, and
+# functionality. They cannot be used for every runtime situation. Many RAMSIN
+# flags in this test example are turned on for testing only and are not
+# appropriate for a real simulation to study.
 ###############################################################################
 # Set your RAMS root path
 rd=`pwd`/..
+# RAMSIN name
+ramsin="RAMSIN.testrunonly"
 # RAMS version (ie. 6.1.6)
-vs=6.3.02
+vs=6.3.04
 # Set flag for type of test (0=sequential, 1=parallel)
-runtype=0
+runtype=1
 # Set number of nodes for parallel run.
-n=10
+n=8
 # Set delete flag (0 = do not delete, 1 = delete and start over)
 del=1
 
@@ -56,8 +60,8 @@ a3=$rd/bin.rams/rams-$vs
 a4=$rd/bin.revu/revu-$vs
 
 #Check to see that RAMSIN namelist exists
-if [ ! -f $rd/bin.rams/RAMSIN.supercell ]; then
- echo "Input paths for this file is incorrect: RAMSIN.supercell"
+if [ ! -f $rd/bin.rams/$ramsin ]; then
+ echo "Input paths for this file is incorrect: RAMSIN.testrunonly"
  exit
 fi
 
@@ -92,11 +96,10 @@ fi
 # DONE WITH NECESSARY USER CHANGES
 ###############################################################################
 
-for dirname in $rd/bin.rams/test.supercell
+for dirname in $rd/bin.rams/testrun.output
 do
   if [ -d $dirname -a $del -eq 1 ]; then
-   rm -f $dirname/*.h5 $dirname/*.txt $dirname/*.tag \
-         $dirname/r.* $dirname/ct.* $dirname/out
+   rm -f $dirname/*.h5 $dirname/*.txt
   else
    if [ ! -d $dirname ]; then mkdir $dirname; fi;
   fi
@@ -114,9 +117,4 @@ else
   exit
 fi
 
-$rc1 $rd/bin.rams/RAMSIN.supercell
-
-#Try running REVU on test simulation output if REVU is compiled
-if [ -f $a4 ]; then
- $a4 -f $rd/bin.rams/REVUIN.supercell
-fi
+$rc1 $rd/bin.rams/$ramsin

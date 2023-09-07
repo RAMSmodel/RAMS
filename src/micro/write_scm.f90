@@ -145,10 +145,10 @@ if(iswrtyp == 3 .or. ilwrtyp == 3) then
 endif
 
 if(iaerosol > 0) then
- CALL iofil ('cccnp.txt',micro_g(ng)%cccnp(:,i,j),m1,wf,fln)
- CALL iofil ('cccmp.txt',micro_g(ng)%cccmp(:,i,j),m1,wf,fln)
- CALL iofil ('gccnp.txt',micro_g(ng)%gccnp(:,i,j),m1,wf,fln)
- CALL iofil ('gccmp.txt',micro_g(ng)%gccmp(:,i,j),m1,wf,fln)
+ CALL iofil ('cn1np.txt',micro_g(ng)%cn1np(:,i,j),m1,wf,fln)
+ CALL iofil ('cn1mp.txt',micro_g(ng)%cn1mp(:,i,j),m1,wf,fln)
+ CALL iofil ('cn2np.txt',micro_g(ng)%cn2np(:,i,j),m1,wf,fln)
+ CALL iofil ('cn2mp.txt',micro_g(ng)%cn2mp(:,i,j),m1,wf,fln)
 endif
 
 if(idust > 0) then

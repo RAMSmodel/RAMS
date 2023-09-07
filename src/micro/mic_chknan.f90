@@ -73,22 +73,22 @@ do k = 1,mzp
         isnanr(micro_g(ngrid)%salt_jet_mp(k,i,j))  .or. &
         isnanr(micro_g(ngrid)%salt_spum_mp(k,i,j)) ) prtflg=1
    endif
-   !CHECK CCN AND GCCN
+   !CHECK CCN Modes
    if(iaerosol > 0)then
-     if(isnanr(micro_g(ngrid)%cccnp(k,i,j)) .or. &
-        isnanr(micro_g(ngrid)%cccmp(k,i,j)) .or. &
-        isnanr(micro_g(ngrid)%gccnp(k,i,j)) .or. &
-        isnanr(micro_g(ngrid)%gccmp(k,i,j)) ) prtflg=1
-     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cccnt(1))
+     if(isnanr(micro_g(ngrid)%cn1np(k,i,j)) .or. &
+        isnanr(micro_g(ngrid)%cn1mp(k,i,j)) .or. &
+        isnanr(micro_g(ngrid)%cn2np(k,i,j)) .or. &
+        isnanr(micro_g(ngrid)%cn2mp(k,i,j)) ) prtflg=1
+     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn1nt(1))
      if(isnanr(tempvar)) prtflg=1
      if(tempvar>1.e30) prtflg=1
-     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cccmt(1))
+     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn1mt(1))
      if(isnanr(tempvar)) prtflg=1
      if(tempvar>1.e30) prtflg=1
-     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%gccnt(1))
+     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn2nt(1))
      if(isnanr(tempvar)) prtflg=1
      if(tempvar>1.e30) prtflg=1
-     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%gccmt(1))
+     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn2mt(1))
      if(isnanr(tempvar)) prtflg=1
      if(tempvar>1.e30) prtflg=1
    endif
@@ -348,7 +348,7 @@ do k = 1,mzp
 
  if(prtflg==1)then
     print*,'Checked After: ',string
-    print*,'NAN Check (ngrid,k,j,i)',ngrid,k,j+mj0(ngrid),i+mi0(ngrid)
+    print*,'NAN Check (ngrid,k,i,j)',ngrid,k,i+mi0(ngrid),j+mj0(ngrid)
 
     print*,'wp:            ',basic_g(ngrid)%wp(k,i,j)
     print*,'wc:            ',basic_g(ngrid)%wc(k,i,j)
@@ -376,14 +376,14 @@ do k = 1,mzp
       print*,'cifnp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cifnt(1))
     endif
     if(iaerosol > 0)then
-      print*,'cccnp:         ',micro_g(ngrid)%cccnp(k,i,j)
-      print*,'cccnp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cccnt(1))
-      print*,'cccmp:         ',micro_g(ngrid)%cccmp(k,i,j)
-      print*,'cccmp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cccmt(1))
-      print*,'gccnp:         ',micro_g(ngrid)%gccnp(k,i,j)
-      print*,'gccnp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%gccnt(1))
-      print*,'gccmp:         ',micro_g(ngrid)%gccmp(k,i,j)
-      print*,'gccmp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%gccmt(1))
+      print*,'cn1np:         ',micro_g(ngrid)%cn1np(k,i,j)
+      print*,'cn1np-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn1nt(1))
+      print*,'cn1mp:         ',micro_g(ngrid)%cn1mp(k,i,j)
+      print*,'cn1mp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn1mt(1))
+      print*,'cn2np:         ',micro_g(ngrid)%cn2np(k,i,j)
+      print*,'cn2np-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn2nt(1))
+      print*,'cn2mp:         ',micro_g(ngrid)%cn2mp(k,i,j)
+      print*,'cn2mp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn2mt(1))
     endif
     if(idust > 0)then
       print*,'md1np:         ',micro_g(ngrid)%md1np(k,i,j)

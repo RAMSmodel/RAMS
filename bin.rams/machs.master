@@ -9,28 +9,8 @@
 #SINGLE MACHINE
 #`hostname`
 
-#Using "ccn" cluster with MPICH
-#node01:1
-#node02:8
-#node03:8
-#node04:8
-#node05:8
-#node06:8
-#node07:8
-#node08:8
-
-#Using "ccn" cluster with openMPI
-#node01 slots=1
-#node02 slots=8
-#node03 slots=8
-#node04 slots=8
-#node05 slots=8
-#node06 slots=8
-#node07 slots=8
-#node08 slots=8
-
 #Using "frost" cluster with MPICH
-#frost:1
+#frost:16
 #frost1:16
 #frost2:16
 #frost3:16
@@ -40,12 +20,18 @@
 #frost7:16
 #frost8:16
 
-#Using "ice" cluster (infiniband) MPICH
-#icehome_ib:8
-#ice1_ib:12
-#ice2_ib:12
-#ice3_ib:12
-#ice4_ib:12
+#Using "ice" cluster
+#ice:8
+#ice1:12
+#ice2:12
+#ice3:12
+#ice4:12
+
+#Using "snow" cluster
+#snow:1
+#snowfall1:64
+#snowfall2:64
+#snowfall3:64
 
 #Ciracluster (head node is cm00, but do not include that in list)
 #cc00:12

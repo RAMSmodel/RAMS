@@ -1,11 +1,14 @@
 !##############################################################################
-Subroutine nstbtnd (m1,m2,m3,ia,iz,ja,jz,ibcon  &
+Subroutine nstbtnd (m1,m2,m3,ia,iz,ja,jz,ibcon,ngrid  &
      ,scp,sct,bx,by,bz,vnam,tymeinv,nstbot,nsttop,jdim)
+
+use node_mod, only: mi0, mj0
+use mem_grid, only: nnxp, nnyp, isponge_pts, sponge_tau
 
 implicit none
 
-integer :: m1,m2,m3,ia,iz,ja,jz,ibcon,nstbot,nsttop,jdim,i,j,k  &
-   ,nzfm,nxfm,nyfm,incia,inciz,incja,incjz
+integer :: m1,m2,m3,ia,iz,ja,jz,ibcon,ngrid,nstbot,nsttop,jdim  &
+   ,i,j,k,nzfm,nxfm,nyfm,incia,inciz,incja,incjz
 real :: tymeinv
 real, dimension(m1,m2,m3) :: scp,sct
 real, dimension(m1,m3,2) :: bx
@@ -13,6 +16,54 @@ real, dimension(m1,m2,2) :: by
 real, dimension(m2,m3,2) :: bz
 character(len=*) :: vnam
 
+! locally defined variables for sponge code
+integer :: npts_sponge & ! user-defined number of points in the sponge zone
+                         ! ** IMPORTANT ** code not implemented to have this
+                         ! nudging zone distance be greater than the size of 
+                         ! the parallelized subdomain. Addressing this would   
+                         ! require MPI message passing code modifications.
+           ,nxpf,nypf    ! total grid points on entire domain for this variable
+real :: tau_sponge &     ! user-defined sponge zone time scale in seconds
+        ,itau_spg  &     ! inverse sponge zone time scale
+        ,numer,wgttot    ! for calculating weights
+! 2D weights for distance from the boundary edge
+real, dimension(m2,m3) :: wgtW,wgtE,wgtS,wgtN
+
+! ** NOTE ** Would probably be best practice to have b arrays contain more information
+!   through width of sponge zone, instead of nudging entire sponge zone to one boundary
+!   value. This becomes even more important if sponge zone width is increased beyond
+!   5-10 points! However, also note that b arrays only have non-zero values for sub-domains
+!   containing a boundary.
+! ** NOTE ** move tau_sponge and npts_sponge to namelist, make them grid-dependent
+
+
+! set up sponge zone time scale and calculate inverse nudging timescale
+tau_sponge = sponge_tau(ngrid) !30. ! s
+!tau_sponge = 60. ! s ! PJM change for testing
+!tau_sponge = 10. ! s ! PJM change for testing
+itau_spg = 1./tau_sponge
+! set up number of points in the sponge zone. Can vary for different grids
+! Here, use 5 points on grid2 and 8 points on grid3
+npts_sponge = isponge_pts(ngrid) !5
+!if (ngrid .eq. 3) npts_sponge = 8
+! check that subdomain lengths are not smaller than the sponge zone width
+! these are conservative estimates since they use ia/ja and iz/jz
+if ( iand(ibcon,1) .ne. 0 .or. iand(ibcon,2) .ne. 0 ) then ! W or E boundary
+   if ( (iz-ia+1) .lt. npts_sponge ) then
+      stop 'In subroutine nstbtnd: subdomain x-dimension length is smaller than sponge zone'
+   endif
+endif
+if (jdim .eq. 1) then
+   if ( iand(ibcon,4) .ne. 0 .or. iand(ibcon,8) .ne. 0) then ! S or N boundary
+      if ( (jz-ja+1) .lt. npts_sponge ) then
+         stop 'In subroutine nstbtnd: subdomain y-dimension length is smaller than sponge zone'
+      endif
+   endif
+endif
+
+
+! set up subdomain end-grid indices: reduced by one for winds in their respective directions
+! (nxfm, nyfm are no longer used with addition of sponge code)
 nzfm = m1
 nxfm = iz + 1
 nyfm = jz + 1
@@ -20,16 +71,110 @@ if (vnam .eq. 'w') nzfm =nzfm - 1
 if (vnam .eq. 'u') nxfm =nxfm - 1
 if (vnam .eq. 'v') nyfm =nyfm - 1
 if (jdim .eq. 0)  nyfm = 1
+! Do the same for total number of points on the entire grid in x and y, for sponge zone 
+! weight calculations
+nxpf = nnxp(ngrid)
+nypf = nnyp(ngrid)
+if (vnam .eq. 'u') nxpf =nxpf - 1
+if (vnam .eq. 'v') nypf =nypf - 1
+if (jdim .eq. 0)  nypf = 1
 
+! set up counter increments to properly account for subdomain bounds on grid edges
 incia = 0
 inciz = 0
-if (iand(ibcon,1) .ne. 0) incia = 1
-if (iand(ibcon,2) .ne. 0 .and. vnam .ne. 'u') inciz = 1
+if (iand(ibcon,1) .ne. 0) incia = 1 ! W boundary
+if (iand(ibcon,2) .ne. 0 .and. vnam .ne. 'u') inciz = 1 ! E boundary, non-normal wind
 incja = 0
 incjz = 0
-if (iand(ibcon,4) .ne. 0) incja = jdim
-if (iand(ibcon,8) .ne. 0 .and. vnam .ne. 'v') incjz = jdim
+if (iand(ibcon,4) .ne. 0) incja = jdim ! S boundary
+if (iand(ibcon,8) .ne. 0 .and. vnam .ne. 'v') incjz = jdim ! N boundary, non-normal wind
 
+
+! Set up weight array properly accounting for corners. 
+! Make four different weights arrays, one each for N,S,E,W, and check 
+! if their sum is > 1. If so, normalize each weight so they add up to 1. 
+! For a linear weight and 4-point nudging zone, this will look like 
+! the following example for the NW corner:
+
+! NW corner, Contributions from W nudging:
+! .50 .43 .33 .20 0.0 0.0
+! .57 .50 .40 .25 0.0 0.0
+! .63 .60 .50 .25 0.0 0.0
+! .80 .75 .50 .25 0.0 0.0
+! 1.0 .75 .50 .25 0.0 0.0
+! 1.0 .75 .50 .25 0.0 0.0
+
+! NW corner, Contributions from N nudging:
+! .50 .57 .63 .80 1.0 1.0
+! .43 .50 .60 .75 .75 .75
+! .33 .40 .50 .50 .50 .50
+! .20 .25 .25 .25 .25 .25
+! 0.0 0.0 0.0 0.0 0.0 0.0
+! 0.0 0.0 0.0 0.0 0.0 0.0
+
+! Total nudging weight:
+! 1.0 1.0 1.0 1.0 1.0 1.0
+! 1.0 1.0 1.0 1.0 .75 .75
+! 1.0 1.0 1.0 .75 .50 .50
+! 1.0 1.0 .75 .25 .25 .25
+! 1.0 .75 .50 .25 0.0 0.0
+! 1.0 .75 .50 .25 0.0 0.0
+
+! Cannot model weights after varfile nudging code because we don't 
+! have underlying structure in b's, only the boundary values.
+! However, let's set this up with grid-wide indexing in case 
+! b's are given more underlying structure in the future.
+
+!set up 2D weights array - first initialize to zeros
+numer=0.
+wgttot=0.
+do j = 1,m3
+  do i = 1,m2
+    wgtW(i,j) = 0.
+    wgtE(i,j) = 0.
+    wgtS(i,j) = 0.
+    wgtN(i,j) = 0.
+ enddo
+enddo
+! Set up quadratic weight functions
+do j = 1,m3
+  do i = 1,m2
+    ! W boundary weight
+    numer = max( 0., float( npts_sponge + 1-(i+mi0(ngrid)) ) )
+    wgtW(i,j) = numer*numer/float(npts_sponge*npts_sponge)
+    ! E boundary weight - nxpf is the total x-grid length (1-less for u)
+    numer = max( 0., float( npts_sponge + i+mi0(ngrid)-nxpf ) )
+    wgtE(i,j) = numer*numer/float(npts_sponge*npts_sponge)
+    if (jdim .eq. 1) then
+      ! S boundary weight
+      numer = max( 0., float( npts_sponge + 1-(j+mj0(ngrid)) ) )
+      wgtS(i,j) = numer*numer/float(npts_sponge*npts_sponge)
+      ! N boundary weight -  nypf is the total y-grid length (1-less for v)
+      numer = max( 0., float( npts_sponge + j+mj0(ngrid)-nypf ) )
+      wgtN(i,j) = numer*numer/float(npts_sponge*npts_sponge)
+    endif
+    ! take care of corners
+    wgttot = wgtW(i,j)+wgtE(i,j)+wgtS(i,j)+wgtN(i,j)
+    if ( wgttot .gt. 1. ) then
+      wgtW(i,j) = wgtW(i,j) / wgttot
+      wgtE(i,j) = wgtE(i,j) / wgttot
+      wgtS(i,j) = wgtS(i,j) / wgttot
+      wgtN(i,j) = wgtN(i,j) / wgttot
+    endif
+  enddo
+enddo
+! debugging
+!if( ngrid.eq.2 .and. vnam.eq.'w') then
+!  if( (mi0(ngrid).eq.0) .and. (mj0(ngrid).eq.0) ) then
+!    print'(2a,i1,a,2i4,a)',vnam,', grid',ngrid,', (i0,j0) = (',mi0(ngrid),mj0(ngrid),'),wgtW = '
+!    do j=m3,1,-1
+!      write(*,'(a,a,i02,999(2x,f4.2))') vnam,'j',j+mj0(ngrid),wgtW(:,j)
+!    enddo
+!  endif
+!endif
+
+
+! bottom boundary
 if (nstbot .eq. 0) then
   do j = ja,jz
     do i = ia,iz
@@ -37,6 +182,7 @@ if (nstbot .eq. 0) then
     enddo
   enddo
 endif
+! top boundary
 if (nsttop .eq. 0) then
   do j = ja,jz
     do i = ia,iz
@@ -45,34 +191,72 @@ if (nsttop .eq. 0) then
   enddo
 endif
 
-if (iand(ibcon,1) .ne. 0) then
-   do j = ja-incja,jz+incjz
-      do k = 1,m1
-         sct(k,1,j) = (bx(k,j,1) - scp(k,1,j)) * tymeinv
+! west boundary
+if (iand(ibcon,1) .ne. 0) then ! this subdomain is on the boundary
+   do j = ja-incja,jz+incjz ! loop through all j points along this subdomain boundary
+      do k = 1,m1 ! loop through all vertical levels in this j column
+         ! set tendency based on the difference between the west border value
+         ! interpolated from the parent nest (bx(k,j,1)) and the value itself (scp)
+         do i = ia-incia,iz+inciz
+            sct(k,i,j) = sct(k,i,j) &
+                         + wgtW(i,j) * (bx(k,j,1) - scp(k,i,j)) * itau_spg
+         enddo
+         ! below is the old code which sets only the boundary value to bx. tymeinv is a
+         ! fractional timestep based on which integration this is relative to the parent grid.
+         !sct(k,1,j) = (bx(k,j,1) - scp(k,1,j)) * tymeinv
       enddo
    enddo
 endif
 
-if (iand(ibcon,2) .ne. 0) then
-   do j = ja-incja,jz+incjz
-      do k = 1,m1
-         sct(k,nxfm,j) = (bx(k,j,2) - scp(k,nxfm,j)) * tymeinv
+! east boundary
+if (iand(ibcon,2) .ne. 0) then ! this subdomain is on the boundary
+   do j = ja-incja,jz+incjz ! loop through all j points along this subdomain boundary
+      do k = 1,m1 ! loop through all vertical levels in this j column
+         ! set tendency based on the difference between the east border value
+         ! interpolated from the parent nest (bx(k,j,2)) and the value itself (scp)
+         do i = ia-incia,iz+inciz
+            sct(k,i,j) = sct(k,i,j) &
+                         + wgtE(i,j) * (bx(k,j,2) - scp(k,i,j)) * itau_spg
+            ! TEMPORARY - print some stuff
+            !if(ngrid.eq.3 .and. vnam.eq.'u' .and. (k.eq.30) ) then
+            !   print*, 'E boundary,gr3,u,k(30): i,j, wgtE, bx(30,j,2), scp, sct'
+            !   print*, i,j, wgtE(i,j), bx(k,j,2), scp(k,i,j), sct(k,i,j)
+            !endif
+         enddo
+         ! below is the old code which sets only the boundary value to bx
+         !sct(k,nxfm,j) = (bx(k,j,2) - scp(k,nxfm,j)) * tymeinv
       enddo
    enddo
 endif
 
 if (jdim .eq. 1) then
-   if (iand(ibcon,4) .ne. 0) then
-      do i = ia-incia,iz+inciz
-         do k = 1,m1
-            sct(k,i,1) = (by(k,i,1) - scp(k,i,1)) * tymeinv
+   ! south boundary
+   if (iand(ibcon,4) .ne. 0) then ! this subdomain is on the boundary
+      do i = ia-incia,iz+inciz ! loop through all i points along this subdomain boundary
+         do k = 1,m1 ! loop through all vertical levels in this i column
+            ! set tendency based on the difference between the south border value
+            ! interpolated from the parent nest (by(k,j,1)) and the value itself (scp)
+            do j = ja-incja,jz+incjz
+               sct(k,i,j) = sct(k,i,j) &
+                            + wgtS(i,j) * (by(k,i,1) - scp(k,i,j)) * itau_spg
+            enddo
+            ! below is the old code which sets only the boundary value to by
+            !sct(k,i,1) = (by(k,i,1) - scp(k,i,1)) * tymeinv
          enddo
       enddo
    endif
-   if (iand(ibcon,8) .ne. 0) then
-      do i = ia-incia,iz+inciz
-         do k = 1,m1
-            sct(k,i,nyfm) = (by(k,i,2) - scp(k,i,nyfm)) * tymeinv
+   ! north boundary
+   if (iand(ibcon,8) .ne. 0) then ! this subdomain is on the boundary
+      do i = ia-incia,iz+inciz ! loop through all i points along this subdomain boundary
+         do k = 1,m1 ! loop through all vertical levels in this i column
+            ! set tendency based on the difference between the north border value
+            ! interpolated from the parent nest (by(k,j,2)) and the value itself (scp)
+            do j = ja-incja,jz+incjz
+               sct(k,i,j) = sct(k,i,j) &
+                            + wgtN(i,j) * (by(k,i,2) - scp(k,i,j)) * itau_spg
+            enddo
+            ! below is the old code which sets only the boundary value to by
+            !sct(k,i,nyfm) = (by(k,i,2) - scp(k,i,nyfm)) * tymeinv
          enddo
       enddo
    endif
@@ -88,31 +272,31 @@ use mem_grid
 
 implicit none
 
-integer :: nf,nc,nrat,if,jf,kf,kc
+integer :: nf,nc,nrat,ibetter,jf,kf,kc
 real :: alpha,et,ev
 real, dimension(:), allocatable :: vctr1, vctr2, vctr3
 
 do nf = 2,ngrids
    nc = nxtnest(nf)
 
-   allocate(vctr1(nnzp(nc)))
-   allocate(vctr2(nnzp(nc)))
-   allocate(vctr3(nnzp(nc)))
+   allocate(vctr1(nnzp(nf)))
+   allocate(vctr2(nnzp(nf)))
+   allocate(vctr3(nnzp(nf)))
 
    if (nc .eq. 0) go to 50
    nrat = nstratx(nf)
    alpha = ((1. / float(nrat)) ** 2 - 1.) / 24.
-   do if = 1,nnxp(nf)
-      et = -.5 + float(2 * mod(if+nrat-2,nrat) + 1) / (2.0 * float(nrat))
-      ev = -.5 + float(mod(if+nrat-2,nrat) + 1) / float(nrat)
+   do ibetter = 1,nnxp(nf)
+      et = -.5 + float(2 * mod(ibetter+nrat-2,nrat) + 1) / (2.0 * float(nrat))
+      ev = -.5 + float(mod(ibetter+nrat-2,nrat) + 1) / float(nrat)
 
-      ei1(if,nf) = et * (et - 1.) / 2. + alpha
-      ei2(if,nf) = (1. - et * et) - 2. * alpha
-      ei3(if,nf) = et * (et + 1.) / 2. + alpha
-      ei4(if,nf) = (ev * ev - 0.25) * (1.5 - ev) / 6.0
-      ei5(if,nf) = (0.5 - ev) * (2.25 - ev * ev) * 0.5
-      ei6(if,nf) = (0.5 + ev) * (2.25 - ev * ev) * 0.5
-      ei7(if,nf) = (ev * ev - 0.25) * (1.5 + ev) / 6.0
+      ei1(ibetter,nf) = et * (et - 1.) / 2. + alpha
+      ei2(ibetter,nf) = (1. - et * et) - 2. * alpha
+      ei3(ibetter,nf) = et * (et + 1.) / 2. + alpha
+      ei4(ibetter,nf) = (ev * ev - 0.25) * (1.5 - ev) / 6.0
+      ei5(ibetter,nf) = (0.5 - ev) * (2.25 - ev * ev) * 0.5
+      ei6(ibetter,nf) = (0.5 + ev) * (2.25 - ev * ev) * 0.5
+      ei7(ibetter,nf) = (ev * ev - 0.25) * (1.5 + ev) / 6.0
    enddo
 
    if (jdim .eq. 1) then

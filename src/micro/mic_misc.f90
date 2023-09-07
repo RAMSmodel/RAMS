@@ -160,10 +160,10 @@ do k = 2,m1-1
     cifnx(k) = micro%cifnp(k,i,j)
   endif
   if (iaerosol > 0) then
-    aerocon(k,1)   = micro%cccnp(k,i,j)
-    aeromas(k,1)   = micro%cccmp(k,i,j)
-    aerocon(k,2)   = micro%gccnp(k,i,j)
-    aeromas(k,2)   = micro%gccmp(k,i,j)
+    aerocon(k,1)   = micro%cn1np(k,i,j)
+    aeromas(k,1)   = micro%cn1mp(k,i,j)
+    aerocon(k,2)   = micro%cn2np(k,i,j)
+    aeromas(k,2)   = micro%cn2mp(k,i,j)
   endif
   if (idust > 0) then
     aerocon(k,3) = micro%md1np(k,i,j)

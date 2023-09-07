@@ -13,12 +13,14 @@ implicit none
 !     and the recomputation of all boundary tendencies on nested grids
 !     after the first nested grid timestep.
 
-if (nxtnest(ngrid) .eq. 0) then
+! LDG, 11/2022: call boundary conditions on all grids for 1-way nesting
+! Commented out check for grid number
+!if (nxtnest(ngrid) .eq. 0) then
 
 !         Radiative and/or mesoscale compensation region lateral
 !            boundary conditions.
 
-   if (ibnd .eq. 1 .or. jbnd .eq. 1) then
+   if (ibnd .eq. 1 .or. jbnd .eq. 1 .or. ngrid .gt. 1) then
 
       CALL latnormv (mzp,mxp,myp,ibcon                  &
          ,basic_g(ngrid)%up  (1,1,1)  ,tend%ut            (1)   &      
@@ -27,7 +29,7 @@ if (nxtnest(ngrid) .eq. 0) then
 
    endif
 
-endif
+!endif
 
 return
 END SUBROUTINE latbnd
@@ -287,7 +289,9 @@ use node_mod
 
 implicit none
 
-if (nxtnest(ngrid) .eq. 0) then
+! LDG, 11/2022: call boundary conditions on all grids for 1-way nesting
+! Commented out check for grid number
+!if (nxtnest(ngrid) .eq. 0) then
    CALL latset (mzp,mxp,myp,ia,iz,ja,jz,ibcon,'U'              &
       ,basic_g(ngrid)%up (1,1,1)  ,basic_g(ngrid)%up (1,1,1)  &
       ,basic_g(ngrid)%vp (1,1,1)  ,grid_g(ngrid)%dxu (1,1)    &
@@ -308,7 +312,7 @@ if (nxtnest(ngrid) .eq. 0) then
       ,basic_g(ngrid)%vp (1,1,1)  ,grid_g(ngrid)%dxu (1,1)    &
       ,grid_g(ngrid)%dxm (1,1)    ,grid_g(ngrid)%dyv (1,1)    &
       ,grid_g(ngrid)%dym (1,1)    ,'NULL')
-endif
+!endif
 
 if (nsttop .eq. 1) then
    CALL topset (mzp,mxp,myp,basic_g(ngrid)%up(1,1,1),'U')
@@ -328,7 +332,9 @@ CALL dumset (mzp,mxp,myp,ibcon,basic_g(ngrid)%wp(1,1,1),'W')
 CALL dumset (mzp,mxp,myp,ibcon,basic_g(ngrid)%up(1,1,1),'U')
 CALL dumset (mzp,mxp,myp,ibcon,basic_g(ngrid)%vp(1,1,1),'V')
 
-if (nxtnest(ngrid) .eq. 0) then
+! LDG, 11/2022: call boundary conditions on all grids for 1-way nesting
+! Commented out check for grid number
+!if (nxtnest(ngrid) .eq. 0) then
    CALL latset (mzp,mxp,myp,ia,iz,ja,jz,ibcon,'U'  &
       ,basic_g(ngrid)%uc (1,1,1)  ,basic_g(ngrid)%up (1,1,1)  &
       ,basic_g(ngrid)%vp (1,1,1)  ,grid_g(ngrid)%dxu (1,1)    &
@@ -349,7 +355,7 @@ if (nxtnest(ngrid) .eq. 0) then
       ,basic_g(ngrid)%vp (1,1,1)  ,grid_g(ngrid)%dxu (1,1)    &
       ,grid_g(ngrid)%dxm (1,1)    ,grid_g(ngrid)%dyv (1,1)    &
       ,grid_g(ngrid)%dym (1,1)    ,'NULL')
-endif
+!endif
 
 if (nsttop .eq. 1) then
    CALL topset (mzp,mxp,myp,basic_g(ngrid)%uc(1,1,1),'U')
@@ -398,13 +404,15 @@ do n = 1,num_scalar(ngrid)
    scalarp => scalar_tab(n,ngrid)%var_p
    scalart => scalar_tab(n,ngrid)%var_t
 
-   if (nxtnest(ngrid) .eq. 0) then
+   ! LDG, 11/2022: call boundary conditions on all grids for 1-way nesting
+   ! Commented out check for grid number
+   !if (nxtnest(ngrid) .eq. 0) then
       CALL latset (mzp,mxp,myp,ia,iz,ja,jz,ibcon,'TR'           &
         ,scalarp                    ,basic_g(ngrid)%up (1,1,1)  &
         ,basic_g(ngrid)%vp (1,1,1)  ,grid_g(ngrid)%dxu (1,1)    &
         ,grid_g(ngrid)%dxm (1,1)    ,grid_g(ngrid)%dyv (1,1)    &
         ,grid_g(ngrid)%dym (1,1)    ,scalar_tab(n,ngrid)%name)
-   endif
+   !endif
 
    if (nsttop .eq. 1)  &
       CALL topset (mzp,mxp,myp,scalarp,'T')
@@ -430,7 +438,8 @@ use mem_leaf, only:isfcl
 
 implicit none
 
-integer :: m1,m2,m3,ia,iz,ja,jz,ibcon,i,j,k,lbw,lbe,lbs,lbn,setlbcinit
+integer :: m1,m2,m3,ia,iz,ja,jz,ibcon,i,j,k,lbw,lbe,lbs,lbn,setlbcinit &
+           ,lsflg_thisgrid,ibnd_thisgrid
 real :: thresh,dtlx,c1,dxr,dyr,atau
 real, dimension(m1,m2,m3) :: ap,uc,vc
 real, dimension(m2,m3) :: dxu,dxm,dyv,dym
@@ -441,6 +450,20 @@ lbw=0 !Variable initialized
 lbe=0 !Variable initialized
 lbs=0 !Variable initialized
 lbn=0 !Variable initialized
+
+! LDG 11/2022: variable lsflg_thisgrid is used in place of lsflg throughout 
+! this routine. We want to use conditions equivalent of lsflg=2 (constant
+! inflow, radiative outflow) for ngrid>1:  constant inflow leaves the
+! boundary tendencies untouched for inflow conditions since boundary values
+! for nests are handled in nstbtnd, and it allows features to pass smoothly
+! out of the nest for outflow conditions, which is desirable for 1-way
+! nesting setups. Note that this would need modification if 2-way nesting
+! were ever re-introduced.
+lsflg_thisgrid = lsflg
+if (ngrid .gt. 1) lsflg_thisgrid = 2
+! Do the same for ibnd, since this routine can be called for all grids
+ibnd_thisgrid = ibnd
+if (ngrid .gt. 1) ibnd_thisgrid = 1
 
 if (iand(ibcon,1) .gt. 0) lbw = ia - 1
 if (iand(ibcon,2) .gt. 0) lbe = iz + 1
@@ -465,8 +488,8 @@ atau=max(bctau(ngrid),dtlt) !prevent from being less than dtlt
 if(iaerolbc(ngrid)==1)then
  if( ((sname == 'CIFNP') .and. &
        (jnmb(3)>=5 .and. (iifn==1.or.iifn==2))) .or. &
-     ((sname == 'CCCNP' .or. sname == 'CCCMP' .or. &
-       sname == 'GCCNP' .or. sname == 'GCCMP') .and. &
+     ((sname == 'CN1NP' .or. sname == 'CN1MP' .or. &
+       sname == 'CN2NP' .or. sname == 'CN2MP') .and. &
        iaerosol==1) .or. &
      ((sname == 'MD1NP' .or. sname == 'MD1MP' .or. &
        sname == 'MD2NP' .or. sname == 'MD2MP') .and. &
@@ -492,11 +515,11 @@ endif
 allocate(temp_v1(m1))
 allocate(temp_v2(m1))
 
-if (ibnd .ne. 2 .and. vnam .ne. 'U' .and. lsflg .ne. 3) then
+if (ibnd_thisgrid .ne. 2 .and. vnam .ne. 'U' .and. lsflg_thisgrid .ne. 3) then
 
-!     Western and Eastern boundaries for zero gradient option
+!     Western and Eastern boundaries for zero gradient option (grid 1 only)
 
-   if (lsflg .eq. 0) then
+   if (lsflg_thisgrid .eq. 0) then
       if (iand(ibcon,1) .gt. 0) then
          do j = 1,m3
             do k = 1,m1
@@ -519,7 +542,7 @@ if (ibnd .ne. 2 .and. vnam .ne. 'U' .and. lsflg .ne. 3) then
       endif
    else
 
-!     Western boundary for lsflg = 1 or 2
+!     Western boundary for lsflg = 1 or 2, or ngrid > 1
 
       if (iand(ibcon,1) .gt. 0) then
          do j = 1,m3
@@ -563,7 +586,7 @@ if (ibnd .ne. 2 .and. vnam .ne. 'U' .and. lsflg .ne. 3) then
                   else !radiative BC
                    ap(k,lbw,j) = temp_v2(k)
                   endif
-               elseif (lsflg .eq. 1) then
+               elseif (lsflg_thisgrid .eq. 1) then
                   if(setlbcinit==1) then
                    ap(k,ia,j) = ap(k,ia,j)+(ap(k,lbw,j)-ap(k,ia,j))*(dtlt/atau)
                   endif
@@ -573,7 +596,7 @@ if (ibnd .ne. 2 .and. vnam .ne. 'U' .and. lsflg .ne. 3) then
          enddo
       endif
 
-!     Eastern Boundary for LSFLG = 1 or 2
+!     Eastern Boundary for LSFLG = 1 or 2, or ngrid > 1
 
       if (iand(ibcon,2) .gt. 0) then
          do j = 1,m3
@@ -617,7 +640,7 @@ if (ibnd .ne. 2 .and. vnam .ne. 'U' .and. lsflg .ne. 3) then
                   else !radiative BC
                    ap(k,lbe,j) = temp_v2(k)
                   endif
-               elseif (lsflg .eq. 1) then
+               elseif (lsflg_thisgrid .eq. 1) then
                   if(setlbcinit==1) then
                    ap(k,iz,j) = ap(k,iz,j)+(ap(k,lbe,j)-ap(k,iz,j))*(dtlt/atau)
                   endif
@@ -629,11 +652,11 @@ if (ibnd .ne. 2 .and. vnam .ne. 'U' .and. lsflg .ne. 3) then
    endif
 endif
 
-if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg.ne.3)then
+if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg_thisgrid.ne.3)then
 
-!     Southern and Northern boundaries for zero gradient option
+!     Southern and Northern boundaries for zero gradient option (grid 1 only)
 
-  if (lsflg .eq. 0) then
+  if (lsflg_thisgrid .eq. 0) then
      if (iand(ibcon,4) .gt. 0) then
         do i = 1,m2
            do k = 1,m1
@@ -656,7 +679,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg.ne.3)then
      endif
   else
 
-!     Southern boundary for LSFLG = 1 or 2
+!     Southern boundary for LSFLG = 1 or 2, or ngrid > 1
 
      if (iand(ibcon,4) .gt. 0) then
         do i = 1,m2
@@ -700,7 +723,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg.ne.3)then
                  else !radiative BC
                   ap(k,i,lbs) = temp_v2(k)
                  endif
-              elseif (lsflg .eq. 1) then
+              elseif (lsflg_thisgrid .eq. 1) then
                  if(setlbcinit==1) then
                   ap(k,i,ja) = ap(k,i,ja)+(ap(k,i,lbs)-ap(k,i,ja))*(dtlt/atau)
                  endif
@@ -710,7 +733,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg.ne.3)then
         enddo
      endif
 
-!     Northern Boundary for LSFLG = 1 or 2
+!     Northern Boundary for LSFLG = 1 or 2, or ngrid > 1
 
      if (iand(ibcon,8) .gt. 0) then
         do i = 1,m2
@@ -754,7 +777,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg.ne.3)then
                  else !radiative BC
                   ap(k,i,lbn) = temp_v2(k)
                  endif
-              elseif (lsflg .eq. 1) then
+              elseif (lsflg_thisgrid .eq. 1) then
                  if(setlbcinit==1) then
                   ap(k,i,jz) = ap(k,i,jz)+(ap(k,i,lbn)-ap(k,i,jz))*(dtlt/atau)
                  endif
