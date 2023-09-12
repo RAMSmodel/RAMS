@@ -1,6 +1,7 @@
-#Makefile 
+#Makefile
+
 ###############################################################################
-# Include definitions 
+# Include definitions
 ###############################################################################
 include ../include.mk
 ###############################################################################
@@ -52,7 +53,8 @@ wgrib2:
 
 $(EXE): $(ARC) $(MAIN) FORCE
 	@echo ""
-	$(F_COMP) -o $(EXE) $(MAIN_OBJ) $(LOADER_OPTS) $(ARC)
+	$(F_COMP) -o $(EXE) $(MAIN_OBJ) $(LOADER_OPTS) $(ARC) \
+        $(PAR_LIBS)
 	rm -f *.o
 	@echo ""
 	@echo Finished building === $(EXE)

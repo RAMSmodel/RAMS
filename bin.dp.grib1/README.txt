@@ -6,8 +6,8 @@
 3. Not all Grib reanalysis and forecast gridded datasets are accounted for. 
 
    You can view the degribbing code in the files such as:
-     src/6.2.11/dprep/dgrib1_main.f90   and
-     src/6.2.11/lib/griber_grb1.c
+     src/dprep/dgrib1_main.f90   and
+     src/lib/griber_grb1.c
 
    In these routines are the specfications for adding a new dataset. Grib
    names and numbers and labels can vary among datasets and each variation
