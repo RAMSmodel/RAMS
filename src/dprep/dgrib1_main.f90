@@ -16,7 +16,7 @@ integer :: nx,ny,nrec,longdate,mode &
           ,nlev,slev,inproj,miss,startlev,endlev &
           ,iyyyy,imm,idd,ihh,fyyyy,fmm,fdd,fhh,leapyear &
           ,nvar3d,nvar2d,nvarsd,iplevs(1000),islevs(1000),datatype &
-          ,writesoillevs,writesnowlevs
+          ,writesoillevs,writesnowlevs,mx,plev1(1000),plev2(1000)
 real :: alat1,alon1,alat2,alon2,alov,aorient,dx,dy,reflat1,reflat2 &
        ,tinc,amiss,alatscr
 logical :: llisglobal,matched
@@ -415,6 +415,22 @@ if(iplevs(1) < iplevs(nlev))then
    enddo
 endif
 print*,'Number of Pressure Levels= ',nlev
+
+!**************************************************************************
+!Make sure the pressure levels are in descending order for correct output
+!if not ordered properly in grib file - plev1, plev23, and mx added to
+!integer variables declarations (Stephen Noble, SRNL)
+plev1=iplevs
+do i=1,nlev
+   mx=maxval(plev1)
+   plev2(i)=mx
+   do j=1,nlev
+      if (plev1(j)==mx) then
+         plev1(j)=-999
+      endif
+   enddo
+enddo
+iplevs=plev2
 
 !**************************************************************************
 !Determine the number of SOIL levels we are going to use.
