@@ -1,5 +1,4 @@
 #Makefile
-
 ###############################################################################
 # Include definitions
 ###############################################################################
@@ -29,27 +28,23 @@ $(ARC)(%.o): %.c;   $(C_CM)
 ################################################################################
 # Define objects
 ################################################################################
-OBJ = $(ARC)($(MODEL)/lib/griber_grb2.o)  \
+OBJ = $(ARC)($(MODEL)/block/hdf5_f2c.o)  \
+      $(ARC)($(MODEL)/block/hdf5_utils.o) \
       $(ARC)($(MODEL)/lib/rget.o)
 
 ###############################################################################
 # Define archive and executable names
 ###############################################################################
-BASE=dgrib
+BASE=mk-blkfiles
 EXE=$(BASE)-$(RAMS_VERSION)
 ARC=$(BASE)-$(RAMS_VERSION).a
 
 # Define main source.
-MAIN_OBJ = ./dgrib2_main.o
-MAIN = $(MODEL)/dprep/dgrib2_main.f90
+MAIN_OBJ = ./mk_main.o
+MAIN = $(MODEL)/block/mk_main.f90
 
 # Define targets.
-all: wgrib2 $(EXE)
-
-wgrib2:
-	@echo "wgrib2 executable does not exist!"
-	@echo "Precompile wgrib2 and place executable in this directory!"
-	exit 1
+all: $(EXE)
 
 $(EXE): $(ARC) $(MAIN) FORCE
 	@echo ""

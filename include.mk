@@ -20,7 +20,7 @@ MAKE=/usr/bin/make
 #############################################################################
 # Set your RAMS root path and version number.
 #############################################################################
-RAMS_ROOT=/home/smsaleeb/rams_steve_git/RAMS
+RAMS_ROOT=/home/smsaleeb/rams_git_dev
 RAMS_VERSION=6.3.04
 
 #############################################################################
