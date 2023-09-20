@@ -77,8 +77,7 @@ real, dimension(m1) :: dn0,rv
  tot_in = 0.0
  total_in(k) = 0.0
 
- !Loop over CCN-1, CCN-2, SMALL DUST, LARGE DUST, REGEN 1&2 (1,2,3,4,8,9)
- !Not looping over salt species since these cannot act is ice nuclei
+ !Not looping over salt species since these are not allowed to act as ice nuclei
  do acat=1,aerocat
 
    in_thresh = 1

@@ -295,7 +295,7 @@ if(level == 3) then
   if(jnmb(8)>=5) CALL iofil ('immerdp.txt',micro_g(ng)%immerdp(:,i,j),m1,wf,fln)
   if(jnmb(2)>=5) CALL iofil ('immerrp.txt',micro_g(ng)%immerrp(:,i,j),m1,wf,fln)
  endif
- if(imbudget>=1) then !14
+ if(imbudget>=1) then !18
   CALL iofil ('latheatvap.txt' ,micro_g(ng)%latheatvap (:,i,j),m1,wf,fln)
   CALL iofil ('latheatfrz.txt' ,micro_g(ng)%latheatfrz (:,i,j),m1,wf,fln)
   CALL iofil ('nuccldrt.txt'   ,micro_g(ng)%nuccldrt   (:,i,j),m1,wf,fln)
@@ -315,7 +315,7 @@ if(level == 3) then
   CALL iofil ('latheatvapt.txt',micro_g(ng)%latheatvapt(:,i,j),m1,wf,fln)
   CALL iofil ('latheatfrzt.txt',micro_g(ng)%latheatfrzt(:,i,j),m1,wf,fln)
  endif
- if(imbudget>=2) then !29
+ if(imbudget>=2) then !37
   CALL iofil ('inuchomrt.txt'    ,micro_g(ng)%inuchomrt    (:,i,j),m1,wf,fln)
   CALL iofil ('inuccontrt.txt'   ,micro_g(ng)%inuccontrt   (:,i,j),m1,wf,fln)
   CALL iofil ('inucifnrt.txt'    ,micro_g(ng)%inucifnrt    (:,i,j),m1,wf,fln)
