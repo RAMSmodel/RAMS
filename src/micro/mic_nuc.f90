@@ -13,7 +13,7 @@ real, dimension(m1) :: rv,wp,dn0
 real :: tairc_nuc,w_nuc,rg_nuc,tab,sfcareatotal
 real :: rjw,wtw1,wtw2,rjconcen,wtcon1,wtcon2,jrg1,jrg2,eps1,eps2
 real :: total_cld_nucc,total_drz_nucc,total_cld_nucr,total_drz_nucr
-real, dimension(9) :: concen_tab
+real, dimension(aerocat) :: concen_tab
 
 !Re-set cloud layer before nucleation
 k1cnuc = 2
