@@ -564,6 +564,15 @@ implicit none
 integer :: m1,k,ncall7
 integer, dimension(11) :: k1,k2
 data ncall7/0/
+
+integer :: etmp
+real :: wt1,wt2,tagg
+real, dimension(12) :: temps,efftemp
+! Celcius temperature
+data temps   /  0.,  -5., -10., -14., -15., -16., -20., -25., -30., -35., -40., -50./
+! Aggregation efficiency
+data efftemp /0.20, 0.15, 0.20, 0.60, 0.65, 0.60, 0.10, 0.08, 0.06, 0.04, 0.025, 0.020/
+
 save
 
 ! 1 = rp,rs,ra,rg,rh
@@ -604,32 +613,54 @@ endif
 ! 4 = pp,ps,pa
 if (jnmb(5) .ge. 1) then
    do k = k1(3),k2(3)
-      if (abs(tx(k,3)+14.) .le. 2.) then
-         eff(k,4) = 1.4
-      else
-         eff(k,4) = min(0.2,10. ** (0.035 * tx(k,3) - 0.7))
+      tagg = tx(k,3)
+      if (tagg <= -50.0) then
+        tagg = -50.0
+      elseif (tagg >= 0.0) then
+        tagg = 0.0
       endif
+      do etmp=1,11
+        if ( (tagg <= temps(etmp)) .and. (tagg >= temps(etmp+1)) )then 
+          wt1=abs( (tagg-temps(etmp)) / (temps(etmp)-temps(etmp+1)) )
+          wt2=1.0-wt1
+          eff(k,4) = wt2*efftemp(etmp) + wt1*efftemp(etmp+1)
+        endif
+      enddo
    enddo
 
 ! 5 = ss,sa
    do k = k1(4),k2(4)
-      if (abs(tx(k,4)+14.) .le. 2.) then
-         eff(k,5) = 1.4
-      else
-         eff(k,5) = min(0.2,10. ** (0.035 * tx(k,4) - 0.7))
+      tagg = tx(k,4)
+      if (tagg <= -50.0) then
+        tagg = -50.0
+      elseif (tagg >= 0.0) then
+        tagg = 0.0
       endif
+      do etmp=1,11
+        if ( (tagg <= temps(etmp)) .and. (tagg >= temps(etmp+1)) )then
+          wt1=abs( (tagg-temps(etmp)) / (temps(etmp)-temps(etmp+1)) )
+          wt2=1.0-wt1
+          eff(k,5) = wt2*efftemp(etmp) + wt1*efftemp(etmp+1)
+        endif
+      enddo
    enddo
 
 ! 6 = aa
    do k = k1(5),k2(5)
     if (rx(k,5) .ge. rxmin) then
-      if (abs(tx(k,5)+14.) .le. 2.) then
-         eff(k,6) = 1.4
-      elseif (tx(k,5) .ge. -1.) then
-         eff(k,6) = 1.
-      else
-         eff(k,6) = min(0.2,10. ** (0.035 * tx(k,5) - 0.7))
+      tagg = tx(k,5)
+      if (tagg <= -50.0) then
+        tagg = -50.0
+      elseif (tagg >= 0.0) then
+        tagg = 0.0
       endif
+      do etmp=1,11
+        if ( (tagg <= temps(etmp)) .and. (tagg >= temps(etmp+1)) )then
+          wt1=abs( (tagg-temps(etmp)) / (temps(etmp)-temps(etmp+1)) )
+          wt2=1.0-wt1
+          eff(k,6) = wt2*efftemp(etmp) + wt1*efftemp(etmp+1)
+        endif
+      enddo
     endif
    enddo
 endif
@@ -640,7 +671,19 @@ if (jnmb(6) .ge. 1) then
       if (qr(k,6) .gt. 0.) then
          eff(k,7) = 1.0
       else
-         eff(k,7) = min(0.2,10. ** (0.035 * tx(k,6) - 0.7))
+         tagg = tx(k,6)
+         if (tagg <= -50.0) then
+           tagg = -50.0
+         elseif (tagg >= 0.0) then
+           tagg = 0.0
+         endif
+         do etmp=1,11
+           if ( (tagg <= temps(etmp)) .and. (tagg >= temps(etmp+1)) )then
+             wt1=abs( (tagg-temps(etmp)) / (temps(etmp)-temps(etmp+1)) )
+             wt2=1.0-wt1
+             eff(k,7) = wt2*efftemp(etmp) + wt1*efftemp(etmp+1)
+           endif
+         enddo
       endif
    enddo
 endif
@@ -652,7 +695,19 @@ if (jnmb(7) .ge. 1) then
       if (qr(k,7) .gt. 0.) then
          eff(k,8) = 1.0
       else
-         eff(k,8) = min(0.2,10. ** (0.035 * tx(k,7) - 0.7))
+         tagg = tx(k,7)
+         if (tagg <= -50.0) then
+           tagg = -50.0
+         elseif (tagg >= 0.0) then
+           tagg = 0.0
+         endif
+         do etmp=1,11
+           if ( (tagg <= temps(etmp)) .and. (tagg >= temps(etmp+1)) )then
+             wt1=abs( (tagg-temps(etmp)) / (temps(etmp)-temps(etmp+1)) )
+             wt2=1.0-wt1
+             eff(k,8) = wt2*efftemp(etmp) + wt1*efftemp(etmp+1)
+           endif
+         enddo
       endif
     endif
    enddo
