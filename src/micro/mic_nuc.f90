@@ -836,7 +836,7 @@ do k = 2,m1-1
    !(Saleeby10-17-2011) Determine haze nucleation and IN nucleation
    !DeMott(2010) formula already applied for ICLOUD >= 5
    !Allow large DeMott (diagni) particles to preferentially nucleate
-   !over the haze particles (cccnp) for IIFN==3. Perhaps should include
+   !over the haze particles (cn1np) for IIFN==3. Perhaps should include
    !all aerosols into potential haze nucleation?
    if((haznuc.gt.0.0 .or. diagni.gt.0.0) .and. jnmb(3).ge.5) then
 
