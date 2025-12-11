@@ -372,6 +372,8 @@ endif
 
 do k = k1,k2
 if(rx(k,jcat).ge.rxmin .and. rx(k,lcat).ge.rxmin) then
+if(  ((lcat==4 .or. lcat==5) .and. emb(k,jcat) .gt. 9.0e-13) .or. &
+     ((lcat==6 .or. lcat==7) .and. emb(k,jcat) .gt. 3.4e-14) ) then
 
 ! This routine works in cgs units, so convert inputs from mks
 !mean diameter cloud,cloud2,rain - convert (meters) to (cm)
@@ -563,6 +565,7 @@ endif
  if(lcat.ne.ccat) enxfer(k,lcat,ccat) = enxfer(k,lcat,ccat) &
    + ytoz * min(uncld,cx(k,lcat)) / max(1.0e-20,rx(k,lcat))
 
+endif !if cloud mean mass is greater than min threshold
 endif !if cloud mixing ratio greater than min threshold
 enddo !loop of vertical levels
 

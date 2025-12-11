@@ -27,7 +27,8 @@ Subroutine adj1 (m1,m2,m3,rtp,micro,ngr)
 
 use mem_micro
 use micphys
-use node_mod, only:mi0,mj0
+use node_mod, only:mi0,mj0,my_rams_num
+use mem_grid, only:ibnd,jbnd,nnxp,nnyp
 
 implicit none
 
@@ -136,6 +137,22 @@ do j = 1,m3
    do lcat = 1,ncat
      do k = 1,m1
 
+       !Do not allow stored aerosol mass in hydrometeors along the lateral
+       !boundary (LB) zone of Grid-1 due to issues with advection/diffusion
+       !and LB conditions (LBCs). The hydrometeor masses themselves have more
+       !built in constraints and thus less of a potential problem along LBs.
+       !Only do this for open boundaries since periodic boundaries do not suffer
+       !from the same advection and diffusion issues that open boundaries do.
+       if (ngr==1 .and. iccnlev>=2 .and. jnmb(lcat)>=5) then
+        if( ibnd == 1 .and. (i+mi0(ngr) <= 2 .or. i+mi0(ngr) >= (nnxp(ngr)-1)) ) then
+            cnmhx(k,lcat) = 0.0
+        endif
+        if( jbnd == 1 .and. (j+mj0(ngr) <= 2 .or. j+mj0(ngr) >= (nnyp(ngr)-1)) ) then
+            cnmhx(k,lcat) = 0.0
+        endif
+       endif
+
+       !Zero out initial checking flags for minimum 
        zerocheck=0
        cxloss=0
        rxloss=0

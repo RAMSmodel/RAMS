@@ -6,16 +6,17 @@ implicit none
 character(len=32) :: varn
 integer :: nzp,nxp,nyp
 real :: a(nxp,nyp,nzp)
-real :: t_mbudr,t_mbudc,t_mixr,t_numc,t_aeroc,t_pcpr
+real :: t_mbudr,t_mbudc,t_mixr,t_numc,t_aeroc,t_pcpr,t_cnmhx
 
 !Common rounding thresholds for reducing precision and 
 !enabling better data compression in LITE files
-t_mbudr = 1e9 ! kg/kg/timefreq
-t_mbudc = 1e6 ! #/g/timefreq
-t_mixr  = 1e6 ! kg/kg
-t_numc  = 1e2 ! #/kg
-t_aeroc = 1e2 ! #/kg
-t_pcpr  = 1e7 ! mm/sec
+t_mbudr = 1e9  ! kg/kg/timefreq
+t_mbudc = 1e6  ! #/g/timefreq
+t_cnmhx = 1e11 ! kg/kg
+t_mixr  = 1e6  ! kg/kg
+t_numc  = 1e2  ! #/kg
+t_aeroc = 1e2  ! #/kg
+t_pcpr  = 1e7  ! mm/sec
 
 !Application of rounding based on native units of variables within
 !model runtime (e.g. m/s, kg/kg, #/kg, K, etc)
@@ -75,6 +76,24 @@ elseif(trim(varn)=='RHP')then
 a = anint(a*t_mixr)/t_mixr
 elseif(trim(varn)=='RDP')then
 a = anint(a*t_mixr)/t_mixr
+!
+!Aerosol mass inside hydrometeors (kg/kg)
+elseif(trim(varn)=='CNMCP')then
+a = anint(a*t_cnmhx)/t_cnmhx
+elseif(trim(varn)=='CNMRP')then
+a = anint(a*t_cnmhx)/t_cnmhx
+elseif(trim(varn)=='CNMPP')then
+a = anint(a*t_cnmhx)/t_cnmhx
+elseif(trim(varn)=='CNMSP')then
+a = anint(a*t_cnmhx)/t_cnmhx
+elseif(trim(varn)=='CNMAP')then
+a = anint(a*t_cnmhx)/t_cnmhx
+elseif(trim(varn)=='CNMGP')then
+a = anint(a*t_cnmhx)/t_cnmhx
+elseif(trim(varn)=='CNMHP')then
+a = anint(a*t_cnmhx)/t_cnmhx
+elseif(trim(varn)=='CNMDP')then
+a = anint(a*t_cnmhx)/t_cnmhx
 !
 !Hydrometeor number concentrations (#/kg)
 elseif(trim(varn)=='CCP')then
