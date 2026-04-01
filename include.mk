@@ -29,21 +29,13 @@ RAMS_VERSION=6.3.04
 # Typically can use "parallel" for either, but some supercomputers require
 # use of the serial executable.
 #############################################################################
-HDF5_ROOT=
-#/share/apps/hdf5-1.10.1/intel
+HDF5_ROOT=/home/smsaleeb/software/hdf5-1.10.7
 
 #############################################################################
 # Set root locations for parallel processing MPI software.
 # You can comment out MPI_ROOT for serial processing compile.
 #############################################################################
-#MPI_ROOT=/share/apps/openmpi-3.1.2/intel-2019
-MPI_ROOT=/share/apps/22.04/openmpi/4.1.5
-
-#############################################################################
-# RTE+RRTMGP requires netcdf
-#############################################################################
-#NETCDF_FORTRAN_ROOT=
-#NETCDF_C_ROOT=
+MPI_ROOT=/home/smsaleeb/software/mpich-3.3.2
 
 #############################################################################
 # Do not change these 2. They point from RAMS_ROOT to the source code.
@@ -62,11 +54,8 @@ UTILS_INCS=-I$(MODEL)/include
 #HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5 \
 #  -Wl,-rpath,/home/smsaleeb/software/szip-2.1/lib \
 #  -Wl,-rpath,/home/smsaleeb/software/zlib-1.2.5/lib
-#HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5
-#HDF5_INCS=-I$(HDF5_ROOT)/include
-#HDF5_DEFS=
-HDF5_LIBS= -lhdf5_hl -lhdf5
-HDF5_INCS=
+HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5
+HDF5_INCS=-I$(HDF5_ROOT)/include
 HDF5_DEFS=
 
 #############################################################################
@@ -141,16 +130,11 @@ LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
 # (-fno-sign-zero) for not making zeros negative values
 # (-fcheck=bounds) check for array bounds issues
 # (-fcheck=all) all runtime checking
-F_COMP=gfortran
-F_OPTS1=-fallow-argument-mismatch -ffree-form -O1 
-F_OPTS2=-fallow-argument-mismatch -ffree-form -O2
-F_OPTS3=-fallow-argument-mismatch -ffree-form -O3
-#F_OPTS1=-fallow-argument-mismatch -ffree-form -O1 -fbacktrace
-#F_OPTS2=-fallow-argument-mismatch -ffree-form -O2 -fbacktrace
-#F_OPTS3=-fallow-argument-mismatch -ffree-form -O3 -fbacktrace
-#Use F_OPTS3 for RTE+RRTMGP. See Makefiles in src/version/radiate/rte-rrtmgp
-LOADER_OPTS=-ffree-form -O2
-LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lz -lsz
+#F_COMP=/usr/bin/gfortran
+#F_OPTS1=-ffree-form -O1
+#F_OPTS2=-ffree-form -O2
+#LOADER_OPTS=-ffree-form -O2
+#LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lz -lsz
 
 #############################################################################
 # C compiler choice and flags (gcc) and (mpicc) are most common

@@ -231,12 +231,10 @@ endif
     print*,'FATAL - IAERORAD OUT OF RANGE: MUST BE 0-1'
     IFATERR = IFATERR + 1
  endif
- if (iaerorad .eq. 1 .and. (iswrtyp.eq.1 .or. ilwrtyp.eq.1 .or. &
-                            iswrtyp.eq.2 .or. ilwrtyp.eq.2 .or. &
-                            iswrtyp.eq.4 .or. ilwrtyp.eq.4)) THEN
+ if (iaerorad .eq. 1 .and. (iswrtyp.ne.3 .or. ilwrtyp.ne.3)) THEN
     print*,'FATAL - Aerosol radiation turned on but will'
     print*,'        only impact shortwave and/or longwave'  
-    print*,'        radiation if type is set to 3(Harrington) or 5(RTE-RRTMGP)'
+    print*,'        radiation if type is set to 3 (Harrington)'
     IFATERR = IFATERR + 1
  endif
 
@@ -295,10 +293,6 @@ elseif (level .eq. 3) then
   print*,'FATAL - ISNOW OUT OF RANGE'
   IFATERR = IFATERR + 1
  endif
- if (iifn .eq. 4 .and. itrkdustifn .eq. 1) then
-  print*, 'FATAL - ITRKDUSTIFN must be 0 when using simple icenuc (iifn=4)'
-  IFATERR = IFATERR + 1
- endif 
  if (iaggr .lt. 0 .or. iaggr .gt. 5) THEN
   print*,'FATAL - IAGGR OUT OF RANGE'
   IFATERR = IFATERR + 1
@@ -323,8 +317,8 @@ elseif (level .eq. 3) then
   print*,'FATAL - IMBUDGET OUT OF RANGE'
   IFATERR = IFATERR + 1
  endif
- if (iifn .lt. 0 .or. iifn .gt. 4) THEN
-  print*,'FATAL - IIFN OUT OF RANGE: MUST BE 0-4'
+ if (iifn .lt. 0 .or. iifn .gt. 3) THEN
+  print*,'FATAL - IIFN OUT OF RANGE: MUST BE 0-3'
   IFATERR = IFATERR + 1
  endif
  if (isedim .lt. 0 .or. isedim .gt. 1) THEN
@@ -386,10 +380,6 @@ elseif (level .eq. 3) then
    print*,'FATAL - Dust tracking = 0 since IDUST=0.'
    print*,'Either set IDUST>0 or set ITRKDUST=ITRKDUSTIFN=0'
    IFATERR = IFATERR + 1
- endif
- if ((iaerodep.eq.1 .and. isfcl.eq.3)) THEN
-    print*,'FATAL - The surface scheme must be turned on to run aerosol deposition'
-    IFATERR = IFATERR + 1
  endif
 elseif (level .eq. 4) then
    idriz=0
@@ -848,7 +838,7 @@ if (isfcl == 0 .and. npatch /= 2) then
   ifaterr = ifaterr + 1
 endif
 
-IF(ISFCL.GT.0.AND.ISFCL.LT.3.AND.NZG.LE.2)THEN
+IF(ISFCL.GT.0.AND.NZG.LE.2)THEN
   PRINT*,  &
     ' FATAL  - at least 3 soil levels are needed for soil'  &
    ,' model.'

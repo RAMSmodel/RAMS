@@ -8,8 +8,7 @@ implicit none
 integer ::       &
     niter_leaf   & ! number of leaf timesteps in model long timestep
    ,niter_can    & ! number of canopy timesteps in leaf timestep
-   ,ifreeslip    & ! flag for freeslip surface BC (set sflux to zero)
-   ,icharnock      ! flag to use Charnock ocean roughness parameterization
+   ,ifreeslip      ! flag for freeslip surface BC (set sflux to zero)
 
 real ::          &
     dtll         & ! leaf timestep

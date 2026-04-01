@@ -9,8 +9,6 @@ use mem_basic
 use node_mod
 use micro_prm, only:nkr
 use kpp_parameters, only:nkppz
-use ref_sounding, only:iugforce
-
 
 implicit none
 
@@ -34,12 +32,6 @@ enddo
 CALL hist_read (maxarr,trim(hfilin))
 
 if(print_msg) print*,'back from read'
-
-if (iugforce==2 .or. iupdsst==2) CALL readforcing ()
-
-CALL calc_refs()
-
-CALL calc_wsub()
 
 do ifm = 1,ngrids
    icm = nxtnest(ifm)
@@ -122,10 +114,8 @@ implicit none
     ie=cio_f(iunhd,1,'vs',vs,nsndg)
     ie=cio_f(iunhd,1,'ts',ts,nsndg)
     ie=cio_f(iunhd,1,'thds',thds,nsndg)
-    ie=cio_f(iunhd,1,'rts',rts,nsndg)
     ie=cio_f(iunhd,1,'ps',ps,nsndg)
     ie=cio_f(iunhd,1,'hs',hs,nsndg)
-    if(io3flg==1)ie=cio_f(iunhd,1,'o3s',o3s,nsndg)
 
     !Get original simulation type
     ie=cio_i(iunhd,1,'initorig',initorig,1)

@@ -17,7 +17,7 @@ if(ilwrtyp+iswrtyp > 0) then
  CALL trsetns (mzp,mxp,myp,radiate_g(ngrid)%fthrd,1)
 endif
 
-if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
+if(ilwrtyp == 3 .or. iswrtyp == 3) then
  CALL trsetns (mzp,mxp,myp,radiate_g(ngrid)%bext,2)
 endif
 

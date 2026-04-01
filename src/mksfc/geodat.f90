@@ -498,11 +498,11 @@ integer :: iq,jq
 do jq=1,njq
    do iq=1,niq
       if(ITOPSFLG(ngr).lt.0) then  ! No orography
-         datq(iq,jq)=ztrough
+         datq(iq,jq)=zrough
       elseif(iz0flg(ngr).eq.1) then
          datq(iq,jq)=min(z0fact*sdq(iq,jq),z0max(NGR))
       else
-         datq(iq,jq)=ztrough
+         datq(iq,jq)=zrough
       endif
    enddo
 enddo

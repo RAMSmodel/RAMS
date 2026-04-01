@@ -199,8 +199,7 @@ Subroutine sfcinit_nofile_user (n1,n2,n3,mzg,mzs,npat,ifm  &
    ,sfcwater_mass  ,sfcwater_energy  ,sfcwater_depth  &
    ,veg_fracarea   ,veg_lai          ,veg_tai         &
    ,veg_rough      ,veg_height       ,veg_albedo      &
-   ,patch_area     ,patch_rought     ,patch_roughm    &
-   ,leaf_class      &
+   ,patch_area     ,patch_rough      ,leaf_class      &
    ,soil_rough     ,sfcwater_nlev    ,stom_resist     &
    ,ground_rsat    ,ground_rvap      ,veg_water       &
    ,veg_temp       ,can_rvap         ,can_temp        & 
@@ -239,7 +238,7 @@ real, dimension(mzs,n2,n3,npat) :: sfcwater_mass,sfcwater_energy  &
 real, dimension(n2,n3,npat) :: veg_fracarea ,veg_lai       ,veg_tai      &
                               ,veg_rough                                 &
                               ,veg_height   ,veg_albedo    ,patch_area   &
-                              ,patch_rought ,patch_roughm  ,leaf_class   &
+                              ,patch_rough  ,leaf_class   &
                               ,soil_rough   ,sfcwater_nlev ,stom_resist  &
                               ,ground_rsat  ,ground_rvap   ,veg_water    &
                               ,veg_temp     ,can_rvap      ,can_temp     &
@@ -308,8 +307,7 @@ do j = 1,n3
       airtemp = theta(2,i,j) * piv
       prsv = piv ** cpor * p00
 
-      patch_rought(i,j,1) = 0.001
-      patch_roughm(i,j,1) = 0.001
+      patch_rough(i,j,1) = 0.001
       can_temp(i,j,1) = airtemp
       can_rvap(i,j,1) = rv(2,i,j)
 
@@ -322,9 +320,8 @@ do j = 1,n3
 
          nveg = nint(leaf_class(i,j,ipat))
 
-         soil_rough(i,j,ipat) = ztrough
-         patch_rought(i,j,ipat) = max(ztrough,zot(i,j))
-         patch_roughm(i,j,ipat) = max(zmrough,zot(i,j))
+         soil_rough(i,j,ipat) = zrough
+         patch_rough(i,j,ipat) = max(zrough,zot(i,j))
          veg_rough(i,j,ipat) = .13 * veg_ht(nveg)
 
          veg_height(i,j,ipat) = veg_ht(nveg)

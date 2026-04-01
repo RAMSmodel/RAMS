@@ -7,7 +7,6 @@ use mem_mksfc
 use mem_grid
 use io_params
 use node_mod
-use mem_leaf, only:isfcl
 
 implicit none
 
@@ -52,16 +51,11 @@ ng1s=1 ; ng2s=ngrids !Variable initialized
 
 if (trim(runtype) == 'MAKESFC') then
 
-   if (isfcl .ne. 3) then
-     print*, 'MAKESFC run: Making all surface, topo, sst, and ndvi files.'
-     itoperr = 1
-     isfcerr = 1
-     issterr = 1
-     indvierr = 1
-   else
-     print*,'MAKESFC run: Making topo file.'
-     itoperr = 1
-   endif
+   print*, 'MAKESFC run: Making all surface, topo, sst, and ndvi files.'
+   itoperr = 1
+   isfcerr = 1
+   issterr = 1
+   indvierr = 1
    
    ng1=1  ; ng2 =ngrids    ! sst,ndvi grid bounds
    ng1t=1 ; ng2t=ngrids    ! topo grid bounds
@@ -72,30 +66,28 @@ elseif (trim(runtype) == 'INITIAL' .or. trim(runtype) == 'MAKEVFILE'  &
                                    .or. trim(runtype) == 'HISTORY'    &
                                    .or. trim(runtype) == 'ERROR') then
    
+   ! Check sfc files 
+   do ifm = 1,ngrids
+      CALL sfc_check (ifm,isfcerr)
+      if(isfcerr == 1) exit
+   enddo
+   
    ! Check topo files 
    do ifm = 1,ngrids
       CALL top_check (ifm,itoperr)
       if(itoperr == 1) exit
    enddo
    
-   if (isfcl .ne. 3) then
-     ! Check sfc files 
-     do ifm = 1,ngrids
-        CALL sfc_check (ifm,isfcerr)
-        if(isfcerr == 1) exit
-     enddo
-   
-     ! Check sst files
-     CALL sst_read (2,ifm,issterr)
+   ! Check sst files
+   CALL sst_read (2,ifm,issterr)
 
-     ! Check ndvi files
-     CALL ndvi_read (2,ifm,indvierr)
+   ! Check ndvi files
+   CALL ndvi_read (2,ifm,indvierr)
    
-     ! If we are making ndvi files, we must also make the sfc files (and vice versa)
-     if(indvierr == 1) isfcerr = 1
-     if(isfcerr == 1) indvierr = 1
+   ! If we are making ndvi files, we must also make the sfc files (and vice versa)
+   if(indvierr == 1) isfcerr = 1
+   if(isfcerr == 1) indvierr = 1
    
-   endif
    if (isfcerr==0 .and. issterr==0 .and.  &
        itoperr==0 .and.indvierr==0) then
       print*, 'Surface, topo, sst, and ndvi files all ok for'

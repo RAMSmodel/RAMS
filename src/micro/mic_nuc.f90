@@ -491,47 +491,6 @@ return
 END SUBROUTINE cldnuc
 
 !##############################################################################
-Subroutine snownuc (m1,kp1,kp2,ngr,rv,dn0,dtlt,i,j)
-
-use rconstants
-use micphys
-
-implicit none
-
-integer :: m1, kp1, kp2, ngr, i, j, k
-real :: rnuc,nnuc,sati,satw,excessrv,rsnew,dtlt
-real,dimension(m1) :: rv, dn0
-
-kp1 = m1
-kp2 = 0
-do k = 2,m1-1
-   excessrv = rv(k) - rvisair(k)
-   satw = rv(k)/rvlsair(k) - 1.
-   sati = rv(k)/rvisair(k) - 1.
-   rsnew = 0.
-   !rvisair<rvlsair is easy check that T<0C
-   if (sati > 0.05 .and. rvisair(k) < rvlsair(k) &
-      .and. (satw<0. .or. rx(k,1)>=2.e-6)) then
-      !Adele - assuming that cin_max is in 1/L!!!
-      nnuc = max(0.,cin_max/dn0(k)*1.e3-cx(k,3)-cx(k,4))
-      if (nnuc > 0) then
-         rnuc = nnuc * emb0(4)
-         rsnew = min(rnuc,.5*excessrv)
-         rx(k,3) = rx(k,3) + rsnew
-         rv(k) = rv(k) - rsnew
-         !Set sum of pristine ice and snow concentration
-         cx(k,3) = cx(k,3) + nnuc
-         if (k<kp1) kp1=k
-         if (k>kp2) kp2=k
-         if (imbudget >= 1) then
-            xnucicert(k) = xnucicert(k) + rsnew * budget_scalet
-         endif
-      endif
-   endif
-enddo
-return
-END SUBROUTINE snownuc
-!##############################################################################
 Subroutine icenuc (m1,kc1,kc2,kd1,kd2,k1pnuc,k2pnuc,ngr,rv,dn0,dtlt,i,j)
 
 use rconstants

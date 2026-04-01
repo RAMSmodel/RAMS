@@ -108,8 +108,6 @@ enddo
 
 if (initial == 2 .or. (initial == 3 .and. initorig == 2)) return
 
-!Now do geostrophic wind forcing if we initialized horizontally homogeneously
-if (iugforce>=1) then
 if (itopo == 1) then
 
    do j = ja,jz
@@ -135,11 +133,6 @@ else
    enddo
 
 endif
-else
-   print*, 'geostrophic wind forcing is strongly recommended for INITIAL = 1 and ICORFLG = 1'
-   print*, 'stop statement can be removed from core/coriolis.f90'
-   stop
-endif 
 
 return
 END SUBROUTINE corlsu
@@ -185,7 +178,6 @@ enddo
 
 if (initial == 2 .or. (initial == 3 .and. initorig == 2)) return
 
-if (iugforce >= 1) then
 if (itopo == 1) then
 
    do j = ja,jz
@@ -210,7 +202,6 @@ else
       enddo
    enddo
 
-endif
 endif
 
 return

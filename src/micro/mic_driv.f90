@@ -98,7 +98,7 @@ ngr = ngrid
 
 !Zero out the radiative heating rate "fthrd" if this this a radiation timestep
 !and if running Harrington Radiation as called below with microphysics loop.
-if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3 .or. iswrtyp .eq. 4 .or. ilwrtyp .eq. 4) then
+if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3) then
   if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. .001) then
     CALL azero (mzp*mxp*myp,radiate_g(ngrid)%fthrd(1,1,1))
   endif
@@ -138,7 +138,7 @@ do j = ja,jz
          ,npatch                                 &
          !LEAF Variables needed for aerosol deposition
          ,leaf_g(ngr)%ustar(i,j,1:npatch)        &
-         ,leaf_g(ngr)%patch_rought(i,j,1:npatch)  &
+         ,leaf_g(ngr)%patch_rough(i,j,1:npatch)  &
          ,imonth1                                &
          )
       !Copy local variables back to global variables
@@ -197,7 +197,7 @@ type (radiate_vars) :: radiate
 integer :: i,j,k,lcat,jcat,icv,icx,mc1,mc2,mc3,mc4,m1  &
           ,ngr  &
           ,maxnzp,mcat  &
-          ,k1cnuc,k2cnuc,k1dnuc,k2dnuc,k1pnuc,k2pnuc,lhcat,lcatact
+          ,k1cnuc,k2cnuc,k1dnuc,k2dnuc,k1pnuc,k2pnuc,lhcat
 
 real,    dimension(8)   :: dpcp0
 integer, dimension(8)   :: mcats,mivap,mix02
@@ -274,8 +274,8 @@ do lcat = 1,8
 enddo
 
 ! Evaluate radiative heating rates if using Harrington radiation scheme
-if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. .001) then
-   if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3) then
+if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3) then
+   if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. .001) then
       !Saleeby(2008): Change passing of 7 to 8 if adding drizzle mode
       ! and modify locations in radcalc3 and radcomp3 to match
       CALL radcalc3 (m1,i,j,ngr,maxnzp,7,iswrtyp,ilwrtyp,zm,zt &
@@ -294,24 +294,6 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. .001) then
          ,radiate%lwdn (1,i,j)    &
          ,dn0(1)                  &
          )
-   elseif (iswrtyp .eq. 4 .or. ilwrtyp .eq. 4) then
-      CALL radcalc4 (m1,maxnzp,7,iswrtyp,ilwrtyp  &
-         ,glat,rtgt,topt  &
-         ,radiate%albedt  (i,j) ,radiate%cosz  (i,j)  &
-         ,radiate%rlongup (i,j) ,radiate%rshort(i,j)  &
-         ,radiate%rlong   (i,j)  &
-         ,zm,zt,rv(1),dn0(1),pi0(1),pp(1),radiate%fthrd(1,i,j),i,j,ngr &
-         ,radiate%bext(1,i,j),radiate%swup(1,i,j),radiate%swdn(1,i,j) &
-         ,radiate%lwup(1,i,j),radiate%lwdn(1,i,j))
-   elseif (iswrtyp .eq. 5 .or. ilwrtyp .eq. 5) then
-      CALL radcalc5 (m1,maxnzp,iswrtyp,ilwrtyp  &
-         ,glat,rtgt,topt  &
-         ,radiate%albedt  (i,j) ,radiate%cosz  (i,j)  &
-         ,radiate%rlongup (i,j) ,radiate%rshort(i,j)  &
-         ,radiate%rlong   (i,j) ,radiate%aodt  (i,j)  &
-         ,zm,zt,rv(1),dn0(1),pi0(1),pp(1),radiate%fthrd(1,i,j),i,j,ngr &
-         ,radiate%bext(1,i,j),radiate%swup(1,i,j),radiate%swdn(1,i,j) &
-         ,radiate%lwup(1,i,j),radiate%lwdn(1,i,j))
    endif
 endif
 
@@ -338,7 +320,7 @@ do icv = 1,8
 enddo
 
 ! Pristine ice to snow transfer
-if (jnmb(3).ge.1) then
+if (jnmb(4) .ge. 1) then
    CALL psxfer (k1(3),k2(3),k1(4),k2(4),i,j)
 endif
 
@@ -442,13 +424,12 @@ enddo
 rx_lhr = rx
 qx_lhr = qx
 
-
 ! Make hydrometeor transfers due to collision-coalescence
  CALL colxfers (m1,k1,k2,scrmic1,scrmic2)
 
 ! Pristine ice to snow transfer done after collision-coalescence to
 ! avoid any mass/number adjustments that impact cloud-ice number
-if (jnmb(3) .ge. 1) then
+if (jnmb(4) .ge. 1) then
    CALL psxfer (k1(3),k2(3),k1(4),k2(4),i,j)
 endif
 
@@ -500,11 +481,9 @@ rx_lhr = rx
 qx_lhr = qx
 
 ! Ice nucleation
-if (jnmb(3) .ge. 1 .and. iifn .lt. 4) then
+if (jnmb(3) .ge. 1) then
    CALL icenuc (m1,k1(1),k2(1),k1(8),k2(8),k1pnuc,k2pnuc,ngr,rv(1)  &
    ,dn0(1),dtlt,i,j)
-elseif (iifn .eq. 4) then
-   CALL snownuc(m1,k1pnuc,k2pnuc,ngr,rv(1),dn0(1),dtlt,i,j)
 endif
 
 !Output some data for diagnostic purposes
@@ -533,7 +512,6 @@ if (jnmb(8) .ge. 3) CALL enemb (m1,k1,k2,8,dn0(1))
 !   ,rx(k,3)+rx(k,4),(cx(k,3)+cx(k,4))*dn0(k)/1000.
 ! enddo
 !endif
-
 
 ! Update latent heating budgets after ice nucleation
  CALL calc_lhr_icenuc (k1,k2)

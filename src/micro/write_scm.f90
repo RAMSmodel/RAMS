@@ -128,7 +128,7 @@ CALL iofil ('rv.txt'   ,basic_g(ng)%rv   (:,i,j),m1,wf,fln)
 CALL iofil ('dn0.txt'  ,basic_g(ng)%dn0  (:,i,j),m1,wf,fln)
 CALL iofil ('pi0.txt'  ,basic_g(ng)%pi0  (:,i,j),m1,wf,fln)
 
-if(iswrtyp >= 3 .or. ilwrtyp >= 3) then
+if(iswrtyp == 3 .or. ilwrtyp == 3) then
  CALL iofil ('fthrd.txt'  ,radiate_g(ng)%fthrd  (:,i,j),m1,wf,fln)
  CALL iofil ('fthrdp.txt' ,radiate_g(ng)%fthrdp (:,i,j),m1,wf,fln)
  CALL iofil ('bext.txt'   ,radiate_g(ng)%bext   (:,i,j),m1,wf,fln)
