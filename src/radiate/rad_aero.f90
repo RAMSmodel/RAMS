@@ -55,8 +55,8 @@ do acat=1,aerocat
 enddo
 
 if(iaerosol>0) then
-   aerotype(1) = 1   ! CCN
-   aerotype(2) = 1   ! GCCN
+   aerotype(1) = 1   ! CCN-mode-1
+   aerotype(2) = 1   ! CCN-mode-2
 endif
 if(idust>0) then
    aerotype(3) = 3   ! Small dust mode

@@ -91,8 +91,8 @@ do acat=1,aerocat
  rundep=0
 
  !Set up profile of aerosol properties if they exist
- if((acat==1 .and. iaerosol>0)  .or. &  ! CCN
-    (acat==2 .and. iaerosol>0)  .or. &  ! GCCN
+ if((acat==1 .and. iaerosol>0)  .or. &  ! CCN mode 1
+    (acat==2 .and. iaerosol>0)  .or. &  ! CCN mode 2
     (acat==3 .and. idust>0)    .or. &  ! Small dust mode
     (acat==4 .and. idust>0)    .or. &  ! Large dust mode
     (acat==5 .and. isalt>0)    .or. &  ! Salt film mode

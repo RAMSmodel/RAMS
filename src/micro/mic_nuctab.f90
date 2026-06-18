@@ -13,12 +13,12 @@ real :: supsatpcnt,ssvalue11,ssvalue12,ssvalue21,ssvalue22
 real :: mult1,mult2,nucss1,nucss2,nucss,rrv,rrvlsair
 
 !Saleeby (6/3/02)
-!The following tables are percent of prescibed CCN to activate.
+!The following tables are percent of prescibed aerosols to activate.
 !Table dimensions are:
 ! (median radius,updraft,concentration,temperature,solubility).
-!Large aerosols or GCCN number are prescibed by the user and these
+!Large aerosols (rg>0.96microns) are prescibed by the user and these
 !automatically nucleate and they have no lookup tables.
-!Small aerosols or CCN with median radius from 0.01 - 0.96 microns
+!Small aerosols with median radius from 0.01 - 0.96 microns
 !are user prescribed in concentration from 1 - 10,000 /mg.
 !Median radius is in centimeters as is the parcel model.
 
@@ -7193,12 +7193,12 @@ real :: supsatpcnt,ssvalue11,ssvalue12,ssvalue21,ssvalue22
 real :: mult1,mult2,nucss1,nucss2,nucss,rrv,rrvlsair
 
 !Saleeby (6/3/02)
-!The following tables are percent of prescibed CCN to activate.
+!The following tables are percent of prescibed aerosols to activate.
 !Table dimensions are:
 ! (median radius,updraft,concentration,temperature,solubility).
-!Large aerosols or GCCN number are prescibed by the user and these
+!Large aerosols are prescibed by the user and these
 !automatically nucleate and they have no lookup tables.
-!Small aerosols or CCN with median radius from 0.01 - 0.96 microns
+!Small aerosols with median radius from 0.01 - 0.96 microns
 !are user prescribed in concentration from 1 - 10,000 /mg.
 !Median radius is in centimeters as is the parcel model.
 

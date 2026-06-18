@@ -25,7 +25,7 @@ character(len=*) :: group,vr,cc
 real :: ff
 integer :: ii,nv
 integer :: inrflg
-integer, parameter ::nvgrid=37,nvstrt=77,nvindat=145,nvsound=10
+integer, parameter ::nvgrid=37,nvstrt=77,nvindat=147,nvsound=10
 integer ::  igrids(nvgrid),istart(nvstrt),iindat(nvindat),isound(nvsound)
 character(len=16) :: grids(nvgrid),start(nvstrt),indat(nvindat),sound(nvsound)
 data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
@@ -54,7 +54,8 @@ DATA START/  &
      ,'ISSTFN','IVEGTFN','ISOILFN','NDVIFN','ITOPSFLG','TOPTENH'         &
      ,'TOPTWVL','IZ0FLG','Z0MAX','Z0FACT'/
 DATA INDAT/  &
-      'ICORFLG','IBND','JBND','CPHAS','LSFLG','NFPT','DISTIM','ISWRTYP'  &
+      'ICORFLG','IBND','JBND','ISPONGE_PTS','SPONGE_TAU','CPHAS','LSFLG' &
+     ,'NFPT','DISTIM','ISWRTYP'  &
      ,'ILWRTYP','RADFRQ','LONRAD','NNQPARM','CONFRQ','WCLDBS','IKPP'     &
      ,'NKPPZ','FRQKPP','RELAX_SST','RELAX_OCNT','RELAX_SAL','DMAXKPP'    &
      ,'DSCALEKPP','KPPITERMAX','KPPRNT','UBMN_KPP','NPATCH','NVEGPAT'    &
@@ -71,8 +72,8 @@ DATA INDAT/  &
      ,'IGRAUP','IHAIL','CPARM','DPARM','RPARM','PPARM','SPARM','APARM'   &
      ,'GPARM','HPARM','GNU','HUCMFILE','NDTCOLL','IAEROSOL','ISALT'      &
      ,'IDUST','IDUSTLOFT','DUSTFILE','ICCNLEV','IIFN','IIFN_FORMULA'     &
-     ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','CCN_MAX'  &
-     ,'GCCN_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'         &
+     ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','CCN1_MAX' &
+     ,'CCN2_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'         &
      ,'SALTS_MAX','IAEROLBC','ICO2LBC','BCTAU','IAERO_CHEM'              &
      ,'AERO_EPSILON','AERO_MEDRAD','ITRKEPSILON','ITRKDUST'              &
      ,'ITRKDUSTIFN','SCMTIME','ISCMX','ISCMY','FRACSAT','IABCARB'        &
@@ -237,6 +238,8 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'ICORFLG')      CALL varseti (VR,ICORFLG,NV,1,II,0,1)
  IF(VR.EQ.'IBND')         CALL varseti (VR,IBND,NV,1,II,1,2)
  IF(VR.EQ.'JBND')         CALL varseti (VR,JBND,NV,1,II,1,2)
+ IF(VR.EQ.'ISPONGE_PTS')  CALL varseti (VR,ISPONGE_PTS(NV),NV,MAXGRDS,II,0,100)
+ IF(VR.EQ.'SPONGE_TAU')   CALL varsetf (VR,SPONGE_TAU(NV),NV,MAXGRDS,FF,0.,43200.)
  IF(VR.EQ.'CPHAS')        CALL varsetf (VR,CPHAS,NV,1,FF,.001,1.E8)
  IF(VR.EQ.'LSFLG')        CALL varseti (VR,LSFLG,NV,1,II,0,3)
  IF(VR.EQ.'NFPT')         CALL varseti (VR,NFPT,NV,1,II,0,10000)
@@ -360,9 +363,9 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'IAERODEP')     CALL varseti (VR,IAERODEP,NV,1,II,0,1)
  IF(VR.EQ.'IAEROPRNT')    CALL varseti (VR,IAEROPRNT,NV,1,II,0,1)
  IF(VR.EQ.'IAEROHIST')    CALL varseti (VR,IAEROHIST,NV,1,II,0,1)
- IF(VR.EQ.'CIN_MAX')      CALL varsetf (VR,CIN_MAX,NV,1,FF,0.,1.E4)
- IF(VR.EQ.'CCN_MAX')      CALL varsetf (VR,CCN_MAX,NV,1,FF,0.,1.E4)
- IF(VR.EQ.'GCCN_MAX')     CALL varsetf (VR,GCCN_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'CIN_MAX')      CALL varsetf (VR,CIN_MAX,NV,1,FF,-2.,1.E3)
+ IF(VR.EQ.'CCN1_MAX')     CALL varsetf (VR,CCN1_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'CCN2_MAX')     CALL varsetf (VR,CCN2_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST1_MAX')    CALL varsetf (VR,DUST1_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST2_MAX')    CALL varsetf (VR,DUST2_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'ABC1_MAX')     CALL varsetf (VR,ABC1_MAX,NV,1,FF,0.,1.E4)
@@ -426,7 +429,7 @@ WRITE(6,103)(' ',NNSTTOP(NG),NNSTBOT(NG),ITOPTFLG(NG) &
             ,ISSTFLG(NG),IVEGTFLG(NG),NG=1,NGRIDS)
 WRITE(6,104)(' ',ISOILFLG(NG),NDVIFLG(NG)  &
             ,NNQPARM(NG),IDIFFK(NG),NG=1,NGRIDS)
-WRITE(6,105)(' ',IAEROLBC(NG),ICO2LBC(NG)  &
+WRITE(6,105)(' ',IAEROLBC(NG),ICO2LBC(NG),ISPONGE_PTS(NG)  &
             ,NG=1,NGRIDS)
 
 101  FORMAT(A1,'    NNXP=',I4,'       NNYP=',I4,'       NNZP=',I4  &
@@ -438,7 +441,7 @@ WRITE(6,105)(' ',IAEROLBC(NG),ICO2LBC(NG)  &
 104  FORMAT(A1,'ISOILFLG=',I4,'    NDVIFLG=',I4  &
      ,'    NNQPARM=',I4,'     IDIFFK=',I4,999(A1,/,I14,3I16))
 105  FORMAT(A1,'IAEROLBC=',I4,'    ICO2LBC=',I4  &
-     ,999(A1,/,I14,1I16))
+                       ,' ISPONGE_PT=',I4,999(A1,/,I14,2I16))
 
 PRINT*, ' '
 
@@ -604,8 +607,8 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'GPARM=',GPARM                     &
  ,'HPARM=',HPARM                     &
  ,'CIN_MAX=',CIN_MAX                 &
- ,'CCN_MAX=',CCN_MAX                 &
- ,'GCCN_MAX=',GCCN_MAX               &
+ ,'CCN1_MAX=',CCN1_MAX               &
+ ,'CCN2_MAX=',CCN2_MAX               &
  ,'DUST1_MAX=',DUST1_MAX             &
  ,'DUST2_MAX=',DUST2_MAX             &
  ,'ABC1_MAX=',ABC1_MAX               &
@@ -620,14 +623,14 @@ WRITE(6,*)'Grid-dependent Floats:'
 WRITE(6,301)(' ',TOPTENH(NG),TOPTWVL(NG),CENTLAT(NG),NG=1,NGRIDS)
 WRITE(6,302)(' ',CENTLON(NG),CSX(NG),CSZ(NG),NG=1,NGRIDS)
 WRITE(6,303)(' ',XKHKM(NG),ZKHKM(NG),AKMIN(NG),NG=1,NGRIDS)
-WRITE(6,304)(' ',BCTAU(NG),NG=1,NGRIDS)
+WRITE(6,304)(' ',BCTAU(NG),SPONGE_TAU(NG),NG=1,NGRIDS)
 301  FORMAT(A1,'TOPTENH=',E12.5,'        TOPTWVL=',E12.5  &
    ,'        CENTLAT=',E12.5,999(A1,/,E21.5,2E28.5))
 302  FORMAT(A1,'CENTLON=',E12.5,'            CSX=',E12.5  &
    ,'            CSZ=',E12.5,999(A1,/,E21.5,2E28.5))
 303  FORMAT(A1,'  XKHKM=',E12.5,'          ZKHKM=',E12.5  &
    ,'          AKMIN=',E12.5,999(A1,/,E21.5,2E28.5))
-304  FORMAT(A1,'  BCTAU=',E12.5,999(A1,/,E21.5))
+304  FORMAT(A1,'  BCTAU=',E12.5'     SPONGE_TAU=',E12.5,999(A1,/,E21.5,E28.5))
 
 PRINT*, ' '
 

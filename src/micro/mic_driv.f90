@@ -250,6 +250,14 @@ data mix02 /3,1,8,4,5,6,7,2/
 data dpcp0 /.001,.001,.010,.010,.010,.003,.001,.001/
 save
 
+!Output some data for diagnostic purposes
+!if(i==4)then
+! do k=2,38
+! print*,'ice_start',k,(theta(k) * (pi0(k)+pp(k)) / 1004.) - 273.16 &
+!   ,rx(k,3)+rx(k,4),(cx(k,3)+cx(k,4))*dn0(k)/1000.
+! enddo
+!endif
+
 ! Compute pressure, temperature, and moisture for vapor diffusion
  CALL thrmstr (m1,k1,k2,thp(1),theta(1),rtp(1),rv(1) &
               ,pp(1),pi0(1)                          &
@@ -419,6 +427,12 @@ qx_lhr = qx
 ! Make hydrometeor transfers due to collision-coalescence
  CALL colxfers (m1,k1,k2,scrmic1,scrmic2)
 
+! Pristine ice to snow transfer done after collision-coalescence to
+! avoid any mass/number adjustments that impact cloud-ice number
+if (jnmb(4) .ge. 1) then
+   CALL psxfer (k1(3),k2(3),k1(4),k2(4),i,j)
+endif
+
 ! Calcs r,q,c for each category considering melting processes
 ! in the order of pristine,cloud,drizzle,snow,agg,graupel,hail,rain
 ! though nothing done for cloud or drizzle in (x02) routine
@@ -472,6 +486,14 @@ if (jnmb(3) .ge. 1) then
    ,dn0(1),dtlt,i,j)
 endif
 
+!Output some data for diagnostic purposes
+!if(i==4)then
+! do k=2,38
+! print*,'ice_nuc',k,(theta(k) * (pi0(k)+pp(k)) / 1004.) - 273.16 &
+!   ,rx(k,3)+rx(k,4),(cx(k,3)+cx(k,4))*dn0(k)/1000.
+! enddo
+!endif
+
 ! Finds bottom and top later of pristine ice
 if (jnmb(3) .ge. 1) then
  k1(3) = min(k1(3),k1pnuc)
@@ -483,6 +505,13 @@ endif
 if (jnmb(3) .ge. 3) CALL enemb (m1,k1,k2,3,dn0(1))
 if (jnmb(1) .ge. 3) CALL enemb (m1,k1,k2,1,dn0(1))
 if (jnmb(8) .ge. 3) CALL enemb (m1,k1,k2,8,dn0(1))
+
+!if(i==4)then
+! do k=2,38
+! print*,'ice_presed',k,(theta(k) * (pi0(k)+pp(k)) / 1004.) - 273.16 &
+!   ,rx(k,3)+rx(k,4),(cx(k,3)+cx(k,4))*dn0(k)/1000.
+! enddo
+!endif
 
 ! Update latent heating budgets after ice nucleation
  CALL calc_lhr_icenuc (k1,k2)
@@ -536,6 +565,14 @@ if(iaerodep==1) &
     ,ustar(1),prough(1),imonthx                       &
     )
 
+!Output some data for diagnostic purposes
+!if(i==4)then
+! do k=2,38
+! print*,'ice_last',k,(theta(k) * (pi0(k)+pp(k)) / 1004.) - 273.16 &
+!   ,rx(k,3)+rx(k,4),(cx(k,3)+cx(k,4))*dn0(k)/1000.
+! enddo
+!endif
+
 return
 END SUBROUTINE mcphys
 
@@ -566,10 +603,10 @@ endif
 
 !Copyback AEROSOLS
 if (iaerosol > 0) then
-   CALL ae1kmic (2,m1-1,micro%cccnp(1,i,j),aerocon(1,1))
-   CALL ae1kmic (2,m1-1,micro%cccmp(1,i,j),aeromas(1,1))
-   CALL ae1kmic (2,m1-1,micro%gccnp(1,i,j),aerocon(1,2))
-   CALL ae1kmic (2,m1-1,micro%gccmp(1,i,j),aeromas(1,2))
+   CALL ae1kmic (2,m1-1,micro%cn1np(1,i,j),aerocon(1,1))
+   CALL ae1kmic (2,m1-1,micro%cn1mp(1,i,j),aeromas(1,1))
+   CALL ae1kmic (2,m1-1,micro%cn2np(1,i,j),aerocon(1,2))
+   CALL ae1kmic (2,m1-1,micro%cn2mp(1,i,j),aeromas(1,2))
 endif
 if (idust > 0) then
    CALL ae1kmic (2,m1-1,micro%md1np(1,i,j),aerocon(1,3))

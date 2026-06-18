@@ -13,13 +13,27 @@
 *.grb1
 *.grb2
 dp-p[0-9]*
+
 bin.block/example_modis_sst/*
 bin.block/example_reynolds_sst/*
+bin.block/mk-blkfiles*
+bin.block/CreateSSTblockfiles.sc
+bin.block/run_test_sstfiles.sc
+
 bin.dp.grib1/example_data/*
+bin.dp.grib1/dgrib*
+bin.dp.grib1/rams_wgrib
+
 bin.dp.grib2/example_data/*
-bin.revu/example_data/*
 bin.dp.grib2/wgrib*
+bin.dp.grib2/dgrib*
+
+bin.revu/example_data/*
+bin.revu/revu*
+
 bin.rams/dprep.test/*
+bin.rams/rams*
+bin.rams/cleanup.sc
 
 # Ignore external libraries
 misc/*

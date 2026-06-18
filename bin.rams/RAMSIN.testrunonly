@@ -184,7 +184,7 @@
 
 ! History start (if RUNTYPE='HISTORY')
 
-   HFILIN   = './test.supercell/a-A-1991-04-26-213000-head.txt',
+   HFILIN   = './testrun.output/a-A-1991-04-26-213000-head.txt',
                              ! Input state file name
 
 ! Analysis file input for assimilation: 1=yes, 0=no
@@ -198,7 +198,7 @@
 !  Analysis file output
  
    IOUTPUT  =  1,             ! 0-no files, 1-write files
-   AFILEPREF  = './test.supercell/a',  
+   AFILEPREF  = './testrun.output/a',  
                               ! File prefix for all analysis files
                               !   state,mean,lite,both
                               
@@ -229,10 +229,10 @@
 
 ! Input topography variables
 
-   TOPFILES = './test.supercell/toph', ! Path and prefix for topo files. 
-   SFCFILES = './test.supercell/sfch', ! Path and prefix for surface files. 
-   SSTFPFX  = './test.supercell/ssth', ! Path and prefix for sst files
-   NDVIFPFX = './test.supercell/ndh',  ! Path and prefix for ndni files
+   TOPFILES = './testrun.output/toph', ! Path and prefix for topo files. 
+   SFCFILES = './testrun.output/sfch', ! Path and prefix for surface files. 
+   SSTFPFX  = './testrun.output/ssth', ! Path and prefix for sst files
+   NDVIFPFX = './testrun.output/ndh',  ! Path and prefix for ndni files
 
    ITOPTFLG = 2,0,0,0,           ! 2 - Fill data in "leaf3_init"
    ISSTFLG  = 2,2,0,0,           ! 0 - Interpolate from coarser grid
@@ -245,8 +245,8 @@
                               ! 1 - Update values during run
  
                              ! The following only apply for IxxxxFLG=1
-   ITOPTFN  = '../../sfctypehdf5/DEM30s-h5/EL',
-              '../../sfctypehdf5/DEM30s-h5/EL',
+   ITOPTFN  = '../../sfctypehdf5/gmted2010-h5/TM',
+              '../../sfctypehdf5/gmted2010-h5/TM',
    ISSTFN   = '../../sfctypehdf5/sst-h5/S',
               '../../sfctypehdf5/sst-h5/S',
    IVEGTFN  = '../../sfctypehdf5/ogedata-h5/GE',
@@ -288,6 +288,9 @@
    IBND     = 1,             ! Lateral boundary condition flags
    JBND     = 1,             ! 1-Klemp/Wilhelmson, 2-cyclic
 
+   ISPONGE_PTS = 0,5,5,       ! Number of nested grid boundary sponge points
+   SPONGE_TAU  = 0.,30.,30.,  ! Nested grid sponge zone time scale (seconds)
+
    CPHAS    = 30.,           ! Phase speed if IBND or JBND = 1
    LSFLG    = 1,             ! Large-scale gradient flag for variables other than
                              !  normal velocity:
@@ -316,7 +319,7 @@
 
 ! KPP mixed-layer single-column ocean model
 
-   IKPP       = 1,          ! Ocean model (0-off, 1-on, 2-more diagnostics)
+   IKPP       = 0,          ! Ocean model (0-off, 1-on, 2-more diagnostics)
    DMAXKPP    = 500.,       ! Maximum ocean depth (meters)
    NKPPZ      = 48,         ! Number of ocean layers (levels = layers+1)
    DSCALEKPP  = 3.,         ! Set exponential for stretched grid
@@ -369,7 +372,7 @@
    !  9  Tall grass                  ! 20  Wetland evergreen broadleaf tree
    ! 10  Semi-desert                 ! 21  Very urban
  
-   PCTLCON  = 0.7,            ! Constant land % if for all domain
+   PCTLCON  = 1.0,            ! Constant land % if for all domain
    NSLCON   = 6,              ! Constant soil type if for all domain
 
    !   1 -- sand             2 -- loamy sand      3 -- sandy loam
@@ -536,7 +539,7 @@
 
 ! Aerosol parameters         ! See mic_init.f90 for setting profiles
                              ! ------------------------------------------
-   IAEROSOL = 1,             ! CCN,GCCN: 0=off, 1=userset
+   IAEROSOL = 1,             ! CCN-1,CCN-2: 0=off, 1=userset
    ISALT    = 1,             ! Sea Salt: 0=off, 1=userset, 2=saltmodel
    IDUST    = 1,             ! Dust: 0=off, 1=userset 2=dustmodel
    IABCARB = 0,              ! Absorbing carbon: 0=off, 1=userset
@@ -576,8 +579,8 @@
    IAEROPRNT  = 1,           ! Print aerosol init profiles (0=no,1=yes)
    IAEROHIST  = 0,           ! Re-initialize aerosols on hist restart:0,1 
    CIN_MAX    = 0.01,        ! Ice Nuclei (#/mg)
-   CCN_MAX    = 1000.,       ! CCN (#/mg)
-   GCCN_MAX   = 0.01,        ! Giant-CCN (#/mg)
+   CCN1_MAX   = 1000.,       ! CCN-mode-1 (#/mg)
+   CCN2_MAX   = 0.01,        ! CCN-mode-2 (#/mg)
    DUST1_MAX  = 100.,        ! Small Dust Mode (#/mg)
    DUST2_MAX  = 10.,         ! Large Dust Mode (#/mg)
    SALTF_MAX  = 100.,        ! Film Sea Salt (#/mg)
@@ -593,7 +596,7 @@
    AERO_EPSILON = 0.90,0.90,0.05,0.05,1.00,1.00,1.00,0.05,0.05,0.20,0.20, 
 
    ! Aerosol 9 categories initial median radius (meters)
-   AERO_MEDRAD  = 0.04e-6,3.00e-6,          !CCN,GCCN
+   AERO_MEDRAD  = 0.04e-6,3.00e-6,          !CCN-1,CCN-2
                   0.05e-6,0.50e-6,          !Dust1,Dust2
                   0.10e-6,1.00e-6,6.00e-6,  !SeaSalt: film,jet,spume
                   0.05e-6,0.05e-6,          !Absorbing carbon

@@ -14,7 +14,7 @@ implicit none
                          !Bin precip vars
                          ,pcpvic,pcpvip,pcpvid                      &
                          !Aerosol categories mass and number
-                         ,cccnp,gccnp,cccmp,gccmp                   &
+                         ,cn1np,cn2np,cn1mp,cn2mp                   &
                          ,md1np,md2np,md1mp,md2mp                   &
                          ,salt_film_np,salt_jet_np,salt_spum_np     &
                          ,salt_film_mp,salt_jet_mp,salt_spum_mp     &
@@ -132,10 +132,10 @@ implicit none
 ! Allocate arrays based on options (if necessary)
       if (level >= 0 .and. level .ne. 4) then
          if(iaerosol > 0) then
-            allocate (micro%cccnp(n1,n2,n3))
-            allocate (micro%cccmp(n1,n2,n3))
-            allocate (micro%gccnp(n1,n2,n3))
-            allocate (micro%gccmp(n1,n2,n3))
+            allocate (micro%cn1np(n1,n2,n3))
+            allocate (micro%cn1mp(n1,n2,n3))
+            allocate (micro%cn2np(n1,n2,n3))
+            allocate (micro%cn2mp(n1,n2,n3))
          endif
          if(idust > 0) then
             allocate (micro%md1np(n1,n2,n3))
@@ -509,10 +509,10 @@ implicit none
    if (allocated(micro%q6))      deallocate (micro%q6)
    if (allocated(micro%q7))      deallocate (micro%q7)
 
-   if (allocated(micro%cccnp))   deallocate (micro%cccnp)
-   if (allocated(micro%gccnp))   deallocate (micro%gccnp)
-   if (allocated(micro%cccmp))   deallocate (micro%cccmp)
-   if (allocated(micro%gccmp))   deallocate (micro%gccmp)
+   if (allocated(micro%cn1np))   deallocate (micro%cn1np)
+   if (allocated(micro%cn2np))   deallocate (micro%cn2np)
+   if (allocated(micro%cn1mp))   deallocate (micro%cn1mp)
+   if (allocated(micro%cn2mp))   deallocate (micro%cn2mp)
    if (allocated(micro%md1np))   deallocate (micro%md1np)
    if (allocated(micro%md2np))   deallocate (micro%md2np)
    if (allocated(micro%md1mp))   deallocate (micro%md1mp)
@@ -796,22 +796,22 @@ implicit none
                  'Q7 :3:anal:mpti:mpt1')
 
 !Aerosol categories mass and number
-   if (allocated(micro%cccnp)) &
-      CALL vtables2 (micro%cccnp(1,1,1),microm%cccnp(1,1,1)  &
+   if (allocated(micro%cn1np)) &
+      CALL vtables2 (micro%cn1np(1,1,1),microm%cn1np(1,1,1)  &
                  ,ng, npts, imean,  &
-                 'CCCNP :3:anal:mpti:mpt1')
-   if (allocated(micro%gccnp)) &
-      CALL vtables2 (micro%gccnp(1,1,1),microm%gccnp(1,1,1)  &
+                 'CN1NP :3:anal:mpti:mpt1')
+   if (allocated(micro%cn2np)) &
+      CALL vtables2 (micro%cn2np(1,1,1),microm%cn2np(1,1,1)  &
                  ,ng, npts, imean,  &
-                 'GCCNP :3:anal:mpti:mpt1')
-   if (allocated(micro%cccmp)) &
-      CALL vtables2 (micro%cccmp(1,1,1),microm%cccmp(1,1,1)  &
+                 'CN2NP :3:anal:mpti:mpt1')
+   if (allocated(micro%cn1mp)) &
+      CALL vtables2 (micro%cn1mp(1,1,1),microm%cn1mp(1,1,1)  &
                  ,ng, npts, imean,  &
-                 'CCCMP :3:anal:mpti:mpt1')
-   if (allocated(micro%gccmp)) &
-      CALL vtables2 (micro%gccmp(1,1,1),microm%gccmp(1,1,1)  &
+                 'CN1MP :3:anal:mpti:mpt1')
+   if (allocated(micro%cn2mp)) &
+      CALL vtables2 (micro%cn2mp(1,1,1),microm%cn2mp(1,1,1)  &
                  ,ng, npts, imean,  &
-                 'GCCMP :3:anal:mpti:mpt1')
+                 'CN2MP :3:anal:mpti:mpt1')
    if (allocated(micro%md1np)) &
       CALL vtables2 (micro%md1np(1,1,1),microm%md1np(1,1,1)  &
                  ,ng, npts, imean,  &

@@ -151,8 +151,16 @@ use mem_grid
 implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm
+real :: e_a,e_b,e_t,e_k,e_c
 real, dimension(n1,n2,n3) :: cifnp,dn0
 real :: cin_maxt
+
+!CREATE YOUR OWN CUSTOM POTENTIAL IFN/INP PROFILE BELOW. OUR SORT OF
+!DEFAULT IS THE EXPONENTIALLY DECREASING PROFILE, BUT THIS IS BY ALL
+!MEANS NOT A DEFINITIVE PROFILE, JUST A NECESSARY PLACEHOLDER SO THAT
+!SOME HETEROGENEOUS ICE NUCLEATION CAN OCCUR IF IIFN==1or2. IIFN==3
+!USES ONE OF THE DEMOTT FORMULAS AND IS BASED ON LARGE AEROSOLS DETERMINED 
+!FROM THE CLOUD DROPLET NUCLEATING AEROSOL DISTRIBUTIONS.
 
 ! Initialize IFN
 if(iaeroprnt==1 .and. print_msg) then
@@ -167,17 +175,64 @@ do j = 1,n3
    cin_maxt = cin_max * 1.e6
 
    !Set up Vertical profile 
-   if(k<=2) cifnp(k,i,j)=cin_maxt
-   ! Exponential decrease that scales with pressure decrease
-   if(k>2)  cifnp(k,i,j)=cin_maxt*exp(-zt(k)/7000.)
 
-   !Output initial sample profile
-   if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' Ice Nuclei - init (k,zt,ifn/kg,ifn/L) on Grid:',ifm
+   !*************************************************************************** 
+   !Exponential decrease that scales with pressure decrease.
+   if (cin_max >= 0.0) then
+    if(k<=2) cifnp(k,i,j)=cin_maxt
+    if(k >2) cifnp(k,i,j)=cin_maxt*exp(-zt(k)/7000.)
+    !Output initial sample profile
+    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+     if(k==1) print*,' Ice Nuclei - init (k,zt,ifn/mg,ifn/L) on Grid:',ifm
      print'(a9,i5,f11.1,2f17.7)',' IFN-init' &
-        ,k,zt(k),cifnp(k,i,j),cifnp(k,i,j)/1.e3*dn0(k,i,j)
+        ,k,zt(k),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
+    endif
+   !*************************************************************************** 
+   !Use SPICULE INP profile if cin_maxt ~ -1.0
+   !Profile from aircraft obs during the SPICULE field campaign.
+   !To mimic the SPICULE profile in magnitude, need to set the following parameters.
+   !and use IIFN=2 for DeMott scheme, and IFN_FORMULA=2 for DeMott(2015) dust formula.
+   !Perhaps using this profile is more realistic given that is has basis
+   !in reality from observations of the central-western continental U.S. 
+   elseif (cin_max > -1.01 .and. cin_max < -0.99) then
+    e_t = 0.10 ! Controls the shape of the profile
+    e_a = 2.50 ! approximately cin_maxt
+    e_k = 3.80 
+    e_b = 5.80 ! Level where you want profile to start decreasing
+    e_c = 1.32 ! Necessary so you do not get negative numbers (changes with "a")
+    cifnp(k,i,j)=(-1.0*(e_a/2.0)*(erf(((zt(k)/1000)-e_b)/sqrt(4.0*e_k*e_t)))+e_c)
+    !NOTE THAT THIS CURVE FIT TO DATA IS BASED ON #/CM3 UNITS, SO CONVERT BELOW
+    cifnp(k,i,j) = cifnp(k,i,j) * 1.e6 / dn0(k,i,j) ! convert #/cm3 to #/kg
+    !Output initial sample profile
+    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+     if(k==1) print*,' Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
+     print'(a9,i5,f11.1,3f12.3)',' IFN-init',k,zt(k) &
+       ,cifnp(k,i,j)/1.e6*dn0(k,i,j),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
+    endif
+   !*************************************************************************** 
+   !Use MC3E INP profile if cin_maxt ~ 2.0
+   !Profile from aircraft obs during the MC3E field project. (Marinescu et al. 2016)
+   !To mimic the MC3E profile in magnitude, need to set the following parameters.
+   !and use IIFN=2 for DeMott scheme, and IFN_FORMULA=1 for DeMott(2010) general formula.
+   !Perhaps using this profile is more realistic given that is has basis
+   !in reality from observations in the southern great plains of the continental U.S. 
+   elseif (cin_max > -2.01 .and. cin_max < -1.99) then
+    e_t = 0.35 ! Controls the shape of the profile
+    e_a = 3.28 ! approximately cin_maxt
+    e_k = 3.00
+    e_b = 2.27 ! Level where you want profile to start decreasing
+    e_c = 1.96 ! Necessary so you do not get negative numbers (changes with "a")
+    cifnp(k,i,j)=(-1.0*(e_a/2.0)*(erf(((zt(k)/1000)-e_b)/sqrt(4.0*e_k*e_t)))+e_c)
+    !NOTE THAT THIS CURVE FIT TO DATA IS BASED ON #/MG UNITS, SO CONVERT BELOW
+    cifnp(k,i,j) = cifnp(k,i,j) * 1.e6 ! convert #/mg to #/kg
+    !Output initial sample profile
+    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+     if(k==1) print*,' Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
+     print'(a9,i5,f11.1,3f12.3)',' IFN-init',k,zt(k) &
+       ,cifnp(k,i,j)/1.e6*dn0(k,i,j),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
+    endif
+   !***************************************************************************
    endif
-
 
   enddo
  enddo
@@ -189,7 +244,7 @@ return
 END SUBROUTINE init_ifn
 
 !##############################################################################
-Subroutine init_ccn (n1,n2,n3,cccnp,cccmp,dn0,ifm)
+Subroutine init_ccn1 (n1,n2,n3,cn1np,cn1mp,dn0,ifm)
 
 use micphys
 use rconstants
@@ -198,34 +253,34 @@ use mem_grid
 implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm
-real, dimension(n1,n2,n3) :: cccnp,cccmp,dn0
-real :: ccn_maxt
+real, dimension(n1,n2,n3) :: cn1np,cn1mp,dn0
+real :: ccn1_maxt
 
-! Initialize CCN
-if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN concentration'
+! Initialize CCN mode 1
+if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN mode 1 concen'
 
 !Convert RAMSIN #/mg to #/kg
- ccn_maxt = ccn_max * 1.e6 
+ ccn1_maxt = ccn1_max * 1.e6 
 
 do j = 1,n3
  do i = 1,n2
   do k = 1,n1
 
    !Set up Vertical profile
-   if(k<=2) cccnp(k,i,j)=ccn_maxt
+   if(k<=2) cn1np(k,i,j)=ccn1_maxt
    !Exponential decrease that scales with pressure decrease
-   if(k>2)  cccnp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+   if(k>2)  cn1np(k,i,j)=ccn1_maxt*exp(-zt(k)/7000.)
 
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' CCN-init (k,zt,ccn/mg,ccn/cc) on Grid:',ifm
-     print'(a9,i5,f11.1,2f17.7)',' CCN-init' &
-        ,k,zt(k),cccnp(k,i,j)/1.e6,cccnp(k,i,j)/1.e6*dn0(k,i,j)
+     if(k==1) print*,' CCN-1-init (k,zt,ccn1/mg,ccn1/cc) on Grid:',ifm
+     print'(a11,i5,f11.1,2f17.7)',' CCN-1-init' &
+        ,k,zt(k),cn1np(k,i,j)/1.e6,cn1np(k,i,j)/1.e6*dn0(k,i,j)
    endif
 
-   !Set up Field of CCN mass mixing ratio (kg/kg)
-   cccmp(k,i,j) = ((aero_medrad(1)*aero_rg2rm(1))**3.) &
-                *cccnp(k,i,j)/(0.23873/aero_rhosol(1))
+   !Set up Field of CCN-mode-1 mass mixing ratio (kg/kg)
+   cn1mp(k,i,j) = ((aero_medrad(1)*aero_rg2rm(1))**3.) &
+                *cn1np(k,i,j)/(0.23873/aero_rhosol(1))
 
   enddo
  enddo
@@ -234,10 +289,10 @@ enddo
 if(iaeroprnt==1 .and. print_msg) print*,' '
 
 return
-END SUBROUTINE init_ccn
+END SUBROUTINE init_ccn1
 
 !##############################################################################
-Subroutine init_gccn (n1,n2,n3,gccnp,gccmp,dn0,ifm)
+Subroutine init_ccn2 (n1,n2,n3,cn2np,cn2mp,dn0,ifm)
 
 use micphys
 use rconstants
@@ -246,34 +301,34 @@ use mem_grid
 implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm
-real, dimension(n1,n2,n3) :: gccnp,gccmp,dn0
-real :: gccn_maxt
+real, dimension(n1,n2,n3) :: cn2np,cn2mp,dn0
+real :: ccn2_maxt
 
-! Initialize Giant-CCN
-if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing GCCN concentration'
+! Initialize CCN mode 2
+if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN mode 2 concen'
 
 !Convert RAMSIN #/mg to #/kg
- gccn_maxt = gccn_max * 1.e6 
+ ccn2_maxt = ccn2_max * 1.e6 
 
 do j = 1,n3
  do i = 1,n2
   do k = 1,n1
 
    !Set up Vertical profile
-   if(k<=2) gccnp(k,i,j)=gccn_maxt
+   if(k<=2) cn2np(k,i,j)=ccn2_maxt
    ! Exponential decrease that scales with pressure decrease
-   if(k>2)  gccnp(k,i,j)=gccn_maxt*exp(-zt(k)/7000.)
+   if(k>2)  cn2np(k,i,j)=ccn2_maxt*exp(-zt(k)/7000.)
 
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' GCCN-init (k,zt,gccn/mg,gccn/cc) on Grid:',ifm
-     print'(a10,i5,f11.1,2f17.7)',' GCCN-init' &
-        ,k,zt(k),gccnp(k,i,j)/1.e6,gccnp(k,i,j)/1.e6*dn0(k,i,j)
+     if(k==1) print*,' CCN-2-init (k,zt,ccn2/mg,ccn2/cc) on Grid:',ifm
+     print'(a11,i5,f11.1,2f17.7)',' CCN-2-init' &
+        ,k,zt(k),cn2np(k,i,j)/1.e6,cn2np(k,i,j)/1.e6*dn0(k,i,j)
    endif
 
-   !Set up Field of GCCN mass mixing ratio (kg/kg)
-   gccmp(k,i,j) = ((aero_medrad(2)*aero_rg2rm(2))**3.) &
-                *gccnp(k,i,j)/(0.23873/aero_rhosol(2))
+   !Set up Field of CCN-mode-2 mass mixing ratio (kg/kg)
+   cn2mp(k,i,j) = ((aero_medrad(2)*aero_rg2rm(2))**3.) &
+                *cn2np(k,i,j)/(0.23873/aero_rhosol(2))
 
   enddo
  enddo
@@ -282,7 +337,7 @@ enddo
 if(iaeroprnt==1 .and. print_msg) print*,' '
 
 return
-END SUBROUTINE init_gccn
+END SUBROUTINE init_ccn2
 
 !##############################################################################
 Subroutine init_dust (n1,n2,n3,md1np,md2np,md1mp,md2mp,dn0,ifm)
@@ -510,13 +565,13 @@ implicit none
 
 integer :: n1,n2,n3,i,j,k,ifm,nsc,ii,jj
 real, dimension(n1,n2,n3) :: tracerp,dn0
-real :: ccn_maxt
+real :: ccn1_maxt
 
 ! Initialize Tracers
 if(print_msg) print*,'Start Initializing Tracers, Grid:',ifm,' Tracer:',nsc
 
 !Convert RAMSIN #/mg to #/kg
- ccn_maxt = ccn_max * 1.e6 
+ ccn1_maxt = ccn1_max * 1.e6 
 
 do j = 1,n3
  do i = 1,n2
@@ -528,8 +583,8 @@ do j = 1,n3
 
    !Set up Vertical profile, Exponential decrease that scales with pressure
    if(nsc==1) then
-    if(k<=2) tracerp(k,i,j)=ccn_maxt
-    if(k>2)  tracerp(k,i,j)=ccn_maxt*exp(-zt(k)/7000.)
+    if(k<=2) tracerp(k,i,j)=ccn1_maxt
+    if(k>2)  tracerp(k,i,j)=ccn1_maxt*exp(-zt(k)/7000.)
    endif
    !Set up Field of CCN mass mixing ratio (kg/kg)
    if(nsc==2) then
@@ -720,8 +775,11 @@ if(print_msg) then
  print*,''
 endif
 
+! 125 micron max diameter ice crystal size for participating
+! in Hallet-Mossop 2ndary ice splintering process.
 dps = 125.e-6
 dps2 = dps ** 2
+
 rictmin = 1.0001
 rictmax = 0.9999 * float(nembc)
 

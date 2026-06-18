@@ -1932,17 +1932,17 @@ elseif(cvar(1:lv).eq.'ifn_concen_cm3') then
    cdname='ice-nuclei-concentration;'
    cdunits='#/cm3;'
 
-elseif(cvar(1:lv).eq.'ccn_concen_mg') then
+elseif(cvar(1:lv).eq.'ccn1_concen_mg') then
    ivar_type=3
-   ierr=rams_getvar('CCCNP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CN1NP',idim_type,ngrd,a,flnm)
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
-   cdname='ccn-concentration;'
+   cdname='ccn-mode-1-concentration;'
    cdunits='#/mg;'
 
-elseif(cvar(1:lv).eq.'ccn_concen_cm3') then
+elseif(cvar(1:lv).eq.'ccn1_concen_cm3') then
    ivar_type=3
-   ierr=rams_getvar('CCCNP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CN1NP',idim_type,ngrd,a,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    if(ierr.eq.0) then
     CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
@@ -1950,20 +1950,20 @@ elseif(cvar(1:lv).eq.'ccn_concen_cm3') then
     CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
     CALL rams_comp_noneg (n1,n2,n3,a)
    endif
-   cdname='ccn-concentration;'
+   cdname='ccn-mode-1-concentration;'
    cdunits='#/cm3;'
 
-elseif(cvar(1:lv).eq.'gccn_concen_mg') then
+elseif(cvar(1:lv).eq.'ccn2_concen_mg') then
    ivar_type=3
-   ierr=rams_getvar('GCCNP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CN2NP',idim_type,ngrd,a,flnm)
    CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
    CALL rams_comp_noneg (n1,n2,n3,a)
-   cdname='gccn-concentration;'
+   cdname='ccn-mode-2-concentration;'
    cdunits='#/mg;'
 
-elseif(cvar(1:lv).eq.'gccn_concen_cm3') then
+elseif(cvar(1:lv).eq.'ccn2_concen_cm3') then
    ivar_type=3
-   ierr=rams_getvar('GCCNP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CN2NP',idim_type,ngrd,a,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    if(ierr.eq.0) then
     CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
@@ -1971,7 +1971,7 @@ elseif(cvar(1:lv).eq.'gccn_concen_cm3') then
     CALL rams_comp_mults (n1,n2,n3,a,1.e-6)
     CALL rams_comp_noneg (n1,n2,n3,a)
    endif
-   cdname='gccn-concentration;'
+   cdname='ccn-mode-2-concentration;'
    cdunits='#/cm3;'
 
 elseif(cvar(1:lv).eq.'dust1_concen') then
@@ -2091,9 +2091,9 @@ elseif(cvar(1:lv).eq.'regen_aero2_concen') then
    cdname='regenerated-aero2-concentration;'
    cdunits='#/cm3;'
 
-elseif(cvar(1:lv).eq.'ccn_mass') then
+elseif(cvar(1:lv).eq.'ccn1_mass') then
    ivar_type=3
-   ierr=rams_getvar('CCCMP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CN1MP',idim_type,ngrd,a,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    if(ierr.eq.0) then
     CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
@@ -2101,12 +2101,12 @@ elseif(cvar(1:lv).eq.'ccn_mass') then
     CALL rams_comp_mults (n1,n2,n3,a,1.e9)
     CALL rams_comp_noneg (n1,n2,n3,a)
    endif
-   cdname='ccn-mass;'
+   cdname='ccn-mode-1-mass;'
    cdunits='micro-grams/m3;'
 
-elseif(cvar(1:lv).eq.'gccn_mass') then
+elseif(cvar(1:lv).eq.'ccn2_mass') then
    ivar_type=3
-   ierr=rams_getvar('GCCMP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CN2MP',idim_type,ngrd,a,flnm)
    ierr=rams_getvar('TOPT',idim_type,ngrd,e,flnm)
    if(ierr.eq.0) then
     CALL rams_comp_dn0 (n1,n2,n3,b,c,d,e,ngrd)
@@ -2114,7 +2114,7 @@ elseif(cvar(1:lv).eq.'gccn_mass') then
     CALL rams_comp_mults (n1,n2,n3,a,1.e9)
     CALL rams_comp_noneg (n1,n2,n3,a)
    endif
-   cdname='gccn-mass;'
+   cdname='ccn-mode-2-mass;'
    cdunits='micro-grams/m3;'
 
 elseif(cvar(1:lv).eq.'dust1_mass') then
@@ -2310,24 +2310,24 @@ elseif(cvar(1:lv).eq.'regen2_epsilon') then
    cdname='regen2-solubility-fraction;'
    cdunits='fraction;'
 
-elseif(cvar(1:lv).eq.'ccn_medrad') then
+elseif(cvar(1:lv).eq.'ccn1_medrad') then
    ivar_type=3
-   ierr=rams_getvar('CCCMP',idim_type,ngrd,a,flnm)
-   ierr=rams_getvar('CCCNP',idim_type,ngrd,c,flnm)
+   ierr=rams_getvar('CN1MP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CN2NP',idim_type,ngrd,c,flnm)
    CALL rams_comp_aeromedrad (n1,n2,n3,a,c,1769.) !1769 kg/m3 is solute density
    CALL rams_comp_mults (n1,n2,n3,a,1.e6)
    CALL rams_comp_noneg (n1,n2,n3,a)
-   cdname='ccn-median-radius;'
+   cdname='ccn1-median-radius;'
    cdunits='microns;'
 
-elseif(cvar(1:lv).eq.'gccn_medrad') then
+elseif(cvar(1:lv).eq.'ccn2_medrad') then
    ivar_type=3
-   ierr=rams_getvar('GCCMP',idim_type,ngrd,a,flnm)
-   ierr=rams_getvar('GCCNP',idim_type,ngrd,c,flnm)
+   ierr=rams_getvar('CN2MP',idim_type,ngrd,a,flnm)
+   ierr=rams_getvar('CN2NP',idim_type,ngrd,c,flnm)
    CALL rams_comp_aeromedrad (n1,n2,n3,a,c,1769.) !1769 kg/m3 is solute density
    CALL rams_comp_mults (n1,n2,n3,a,1.e6)
    CALL rams_comp_noneg (n1,n2,n3,a)
-   cdname='gccn-median-radius;'
+   cdname='ccn2-median-radius;'
    cdunits='microns;'
 
 elseif(cvar(1:lv).eq.'dust1_medrad') then

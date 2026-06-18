@@ -141,7 +141,7 @@ do j = 1,m3
        rxloss=0
 
        !Zero out hydrometeor fields if they are below a min threshold for 2-moment
-       if(jnmb(lcat)>=5 .and. (rx(k,lcat) < rxmin .or. cx(k,lcat) <= 0.0)) then
+       if(jnmb(lcat)>=5 .and. (rx(k,lcat) < rxmin .or. cx(k,lcat) < cxmin)) then
          zerocheck=1
          cxloss = cx(k,lcat)
          rxloss = rx(k,lcat)
@@ -355,12 +355,12 @@ do j = 1,m3
    endif
   endif
   if(iaerosol>0)then
-   if(micro%cccnp(k,i,j) > maxaero) then
-     print*,"Too many CCN:",micro%cccnp(k,i,j)
+   if(micro%cn1np(k,i,j) > maxaero) then
+     print*,"Too many CCN1:",micro%cn1np(k,i,j)
      toomany=1  
    endif
-   if(micro%gccnp(k,i,j) > maxaero) then
-     print*,"Too many GCCN:",micro%gccnp(k,i,j)
+   if(micro%cn2np(k,i,j) > maxaero) then
+     print*,"Too many CCN2:",micro%cn2np(k,i,j)
      toomany=1
    endif
   endif
@@ -419,13 +419,13 @@ do j = 1,m3
 
   !SET SMALL VALUES TO ZERO
   if(iaerosol>0) then
-   if(micro%cccnp(k,i,j)<mincon .or. micro%cccmp(k,i,j)<minmas) then
-      micro%cccnp(k,i,j) = 0.0
-      micro%cccmp(k,i,j) = 0.0
+   if(micro%cn1np(k,i,j)<mincon .or. micro%cn1mp(k,i,j)<minmas) then
+      micro%cn1np(k,i,j) = 0.0
+      micro%cn1mp(k,i,j) = 0.0
    endif
-   if(micro%gccnp(k,i,j)<mincon .or. micro%gccmp(k,i,j)<minmas) then
-      micro%gccnp(k,i,j) = 0.0
-      micro%gccmp(k,i,j) = 0.0
+   if(micro%cn2np(k,i,j)<mincon .or. micro%cn2mp(k,i,j)<minmas) then
+      micro%cn2np(k,i,j) = 0.0
+      micro%cn2mp(k,i,j) = 0.0
    endif
   endif
   if(idust>0) then

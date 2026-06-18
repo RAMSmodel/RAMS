@@ -57,8 +57,8 @@ if(iaerodep==1 .and. level<3) then
   do i = ia,iz
 
    CALL aero_copy (1,mzp &
-    ,micro_g(ngrid)%cccnp(1,i,j),micro_g(ngrid)%cccmp(1,i,j) &
-    ,micro_g(ngrid)%gccnp(1,i,j),micro_g(ngrid)%gccmp(1,i,j) &
+    ,micro_g(ngrid)%cn1np(1,i,j),micro_g(ngrid)%cn1mp(1,i,j) &
+    ,micro_g(ngrid)%cn2np(1,i,j),micro_g(ngrid)%cn2mp(1,i,j) &
     ,micro_g(ngrid)%md1np(1,i,j),micro_g(ngrid)%md1mp(1,i,j) &
     ,micro_g(ngrid)%md2np(1,i,j),micro_g(ngrid)%md2mp(1,i,j) &
     ,micro_g(ngrid)%salt_film_np(1,i,j),micro_g(ngrid)%salt_film_mp(1,i,j) &
@@ -84,8 +84,8 @@ if(iaerodep==1 .and. level<3) then
     )
 
    CALL aero_copy (2,mzp &
-    ,micro_g(ngrid)%cccnp(1,i,j),micro_g(ngrid)%cccmp(1,i,j) &
-    ,micro_g(ngrid)%gccnp(1,i,j),micro_g(ngrid)%gccmp(1,i,j) &
+    ,micro_g(ngrid)%cn1np(1,i,j),micro_g(ngrid)%cn1mp(1,i,j) &
+    ,micro_g(ngrid)%cn2np(1,i,j),micro_g(ngrid)%cn2mp(1,i,j) &
     ,micro_g(ngrid)%md1np(1,i,j),micro_g(ngrid)%md1mp(1,i,j) &
     ,micro_g(ngrid)%md2np(1,i,j),micro_g(ngrid)%md2mp(1,i,j) &
     ,micro_g(ngrid)%salt_film_np(1,i,j),micro_g(ngrid)%salt_film_mp(1,i,j) &
@@ -157,7 +157,7 @@ return
 END SUBROUTINE aerosol_init
 
 !##############################################################################
-Subroutine aero_copy (aflag,m1,cccnp,cccmp,gccnp,gccmp,md1np,md1mp &
+Subroutine aero_copy (aflag,m1,cn1np,cn1mp,cn2np,cn2mp,md1np,md1mp &
                     ,md2np,md2mp,salt_film_np,salt_film_mp,salt_jet_np &
                     ,salt_jet_mp,salt_spum_np,salt_spum_mp &
                     ,abc1np,abc1mp,abc2np,abc2mp)
@@ -170,7 +170,7 @@ use micphys
 implicit none
 
 integer :: m1,k,aflag
-real, dimension(m1) :: cccnp,cccmp,gccnp,gccmp,md1np,md1mp &
+real, dimension(m1) :: cn1np,cn1mp,cn2np,cn2mp,md1np,md1mp &
                     ,md2np,md2mp,salt_film_np,salt_film_mp,salt_jet_np &
                     ,salt_jet_mp,salt_spum_np,salt_spum_mp &
                     ,abc1np,abc1mp,abc2np,abc2mp
@@ -185,10 +185,10 @@ if(aflag==1)then
  !Fill scratch arrays for aerosol modes for level=1,2
  do k = 1,m1-1
    if (iaerosol > 0) then
-     aerocon(k,1) = cccnp(k)
-     aeromas(k,1) = cccmp(k)
-     aerocon(k,2) = gccnp(k)
-     aeromas(k,2) = gccmp(k)
+     aerocon(k,1) = cn1np(k)
+     aeromas(k,1) = cn1mp(k)
+     aerocon(k,2) = cn2np(k)
+     aeromas(k,2) = cn2mp(k)
    endif
    if (idust > 0) then
      aerocon(k,3) = md1np(k)
@@ -216,10 +216,10 @@ elseif(aflag==2)then
  !Copy back scratch arrays to aerosol modes for level=1,2
  do k = 1,m1-1
    if (iaerosol > 0) then
-    cccnp(k) = aerocon(k,1)
-    cccmp(k) = aeromas(k,1)
-    gccnp(k) = aerocon(k,2)
-    gccmp(k) = aeromas(k,2)
+    cn1np(k) = aerocon(k,1)
+    cn1mp(k) = aeromas(k,1)
+    cn2np(k) = aerocon(k,2)
+    cn2mp(k) = aeromas(k,2)
    endif
    if (idust > 0) then
     md1np(k) = aerocon(k,3)

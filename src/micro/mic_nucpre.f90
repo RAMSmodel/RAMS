@@ -14,8 +14,8 @@ do acat=1,aerocat
   !Set default values to override if aerosol type exists
   aero_rg(acat) = aero_medrad(acat) ! Default median radius 
       
-  if((acat==1)                  .or. &  ! CCN
-     (acat==2)                  .or. &  ! GCCN
+  if((acat==1)                  .or. &  ! CCN-1
+     (acat==2)                  .or. &  ! CCN-2
      (acat==3 .and. idust>0)    .or. &  ! Small dust mode
      (acat==4 .and. idust>0)    .or. &  ! Large dust mode
      (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
@@ -36,7 +36,9 @@ do acat=1,aerocat
        aero_rg(acat)=((0.23873/rhosol*aeromas(k,acat)/aerocon(k,acat)) &
                     **(1./3.))/aero_rg2rm(acat)
 
-       if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
+       !Saleeby(2023-06-06):Do not limit minimum rg (median radius)
+       !if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
+
        if(aero_rg(acat) > 6.50e-6) aero_rg(acat) = 6.50e-6
 
        aeromas(k,acat) = ((aero_rg(acat)*aero_rg2rm(acat))**3.) &
@@ -75,7 +77,7 @@ real, dimension(m1) :: dn0,rv
  tot_in = 0.0
  total_in(k) = 0.0
 
- !Loop over CCN, GCCN, SMALL DUST, LARGE DUST, REGEN 1&2 (1,2,3,4,8,9)
+ !Loop over CCN-1, CCN-2, SMALL DUST, LARGE DUST, REGEN 1&2 (1,2,3,4,8,9)
  !Not looping over salt species since these cannot act is ice nuclei
  do acat=1,aerocat
 
@@ -83,8 +85,8 @@ real, dimension(m1) :: dn0,rv
    totifnn(k,acat) = 0.0
    totifnm(k,acat) = 0.0
 
-   if((acat==1)                  .or. &  ! CCN
-      (acat==2)                  .or. &  ! GCCN
+   if((acat==1)                  .or. &  ! CCN-1
+      (acat==2)                  .or. &  ! CCN-2
       (acat==3 .and. idust>0)    .or. &  ! Small dust mode
       (acat==4 .and. idust>0)    .or. &  ! Large dust mode
       (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
@@ -183,7 +185,7 @@ real, dimension(m1) :: dn0,rv
  !DeMott IN activation based on total number of all aerosol
  !greater than 0.5 micron diameter.
  nifn(k) = 0.0
- if(tairc(k) .lt. 0.0 .and. total_in(k) .gt. mincon) then
+ if(tairc(k) < 0.0 .and. total_in(k) > mincon) then
    !For DeMott Eqn, the aerosol number to put into the eqn needs to be
    !the remaining of unprocessed aerosols > 0.5 microns + the remaining
    !aerosols > 0.5 microns contained in droplets + 
@@ -202,12 +204,12 @@ real, dimension(m1) :: dn0,rv
    !Input aerosols in #/cm3 and outputs #/L activated
    if(iifn_formula==1) then
     !Original Demott(2010) formula
-    nifn(k) = 0.0000594 * (-tairc(k))**3.33 &
-            * (tot_in)**(0.0264*(-tairc(k))+0.0033)
+    nifn(k) = 0.0000594 * ( -max(-35.0,tairc(k)) )**3.33 &
+            * (tot_in)**(0.0264*( -max(-35.0,tairc(k)) )+0.0033)
    elseif(iifn_formula==2) then
     !Modified Demott(2010) for dust-dominated cases
     !Paul suggested an additional factor of 3 multiplier
-    nifn(k) = 3.0 * 0.0008 * 10 ** (-0.2*(tairc(k)+9.7)) * tot_in ** 1.25
+    nifn(k) = 3.0 * 0.0008 * 10 ** (-0.2*(max(-35.0,tairc(k))+9.7)) * tot_in ** 1.25
    endif
 
    !Adjust units and such
@@ -254,8 +256,8 @@ real, dimension(m1) :: dn0,rv
    totifnn(k,acat) = totifnn(k,acat) * ifnfrac
    totifnm(k,acat) = totifnm(k,acat) * ifnfrac
    if(iccnlev>=1 .and. ifnfrac>0.0) then
-    if((acat==1)                  .or. &  ! CCN
-       (acat==2)                  .or. &  ! GCCN
+    if((acat==1)                  .or. &  ! CCN-1
+       (acat==2)                  .or. &  ! CCN-2
        (acat==3 .and. idust>0)    .or. &  ! Small dust mode
        (acat==4 .and. idust>0)    .or. &  ! Large dust mode
        (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
@@ -296,7 +298,10 @@ real, dimension(m1) :: dn0,rv
        rhosol=aero_rhosol(acat)
        aero_rg(acat)=((0.23873/rhosol*aeromas(k,acat)/aerocon(k,acat)) &
              **(1./3.))/aero_rg2rm(acat)
-       if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
+
+       !Saleeby(2023-06-06):Do not limit minimum rg (median radius)
+       !if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
+
        if(aero_rg(acat) > 6.50e-6) aero_rg(acat) = 6.50e-6
        aeromas(k,acat) = ((aero_rg(acat)*aero_rg2rm(acat))**3.) &
              *aerocon(k,acat)/(0.23873/rhosol)

@@ -50,7 +50,7 @@ if (jnmb(1) == 1 .or. jnmb(1) == 4) then
    enddo
 
 !*************************************************************************
-!Saleeby(6/3/02) Prognosing number concentration of cloud and drizzle ****
+!Saleeby(6/3/2002) Prognosing number concentration of cloud and drizzle ****
 !*************************************************************************
 elseif (jnmb(1) >= 5) then
  do k = 2,m1-1
@@ -68,15 +68,15 @@ elseif (jnmb(1) >= 5) then
    !Set aside ice nuclei for DeMott scheme and recomute aerosol stats 
    if(iifn==3) CALL prenuc_ifn (m1,k,dn0,rv)
 
-!**********LOOP OVER CCN, GCCN, 2 DUST MODES, 3 SALT MODES ***************
+!**********LOOP OVER 2 CCN MODES, 2 DUST MODES, 3 SALT MODES ***************
    !Use the acat loop for turning on aerosol nucleation
    do acat=1,aerocat
 
       concen_tab(acat) = 0.0
       concen_nuc = 0.0
 
-      if((acat==1)                  .or. &  ! CCN
-         (acat==2)                  .or. &  ! GCCN
+      if((acat==1)                  .or. &  ! CCN-1
+         (acat==2)                  .or. &  ! CCN-2
          (acat==3 .and. idust>0)    .or. &  ! Small dust mode
          (acat==4 .and. idust>0)    .or. &  ! Large dust mode
          (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
@@ -181,6 +181,15 @@ elseif (jnmb(1) >= 5) then
         endif
         concen_tab(acat) = concen_nuc * tab * epstemp
 
+        !Saleeby(2023-06-06)
+        !Override nucleation if median radius (rg) less than minimum lookup
+        !table size. In the past we simply forced rg up to the minimum and
+        !continued activation of aerosols with rg < 10nm. Perhaps we need to
+        !limit this activation. So, no activation if rg < 10nm. In this respect,
+        !some aerosols may be carried around without nucleating. They can still
+        !be radiatively important and undergo depositin.
+        if (rg < 0.01e-6) concen_tab(acat) = 0.0
+
        endif !if concen_nuc > mincon
       endif !if acat aerosol type is valid
    enddo !looping over aerocat
@@ -190,8 +199,8 @@ elseif (jnmb(1) >= 5) then
    do acat=1,aerocat
     aero_ratio(acat) = 0.0  ! Aerosol fraction
     aero_vap(acat)   = 0.0  ! Total surface area of aerosol category
-    if((acat==1)                  .or. &  ! CCN
-       (acat==2)                  .or. &  ! GCCN
+    if((acat==1)                  .or. &  ! CCN-1
+       (acat==2)                  .or. &  ! CCN-2
        (acat==3 .and. idust>0)    .or. &  ! Small dust mode
        (acat==4 .and. idust>0)    .or. &  ! Large dust mode
        (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
@@ -220,8 +229,8 @@ elseif (jnmb(1) >= 5) then
    total_drz_nucr=0.0
    do acat=1,aerocat
      ctc = 0
-     if((acat==1)                  .or. &  ! CCN
-        (acat==2)                  .or. &  ! GCCN
+     if((acat==1)                  .or. &  ! CCN-1
+        (acat==2)                  .or. &  ! CCN-2
         (acat==3 .and. idust>0)    .or. &  ! Small dust mode
         (acat==4 .and. idust>0)    .or. &  ! Large dust mode
         (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
@@ -256,6 +265,11 @@ elseif (jnmb(1) >= 5) then
 
         !Vapor allocated to a given aerosol species
         vaprccn = 0.5*excessrv*cldrat !Sum of all nucleation <= 1/2 excessrv
+        !Saleeby(2023-06-01): Replacing line above to try and limit new nucleation.
+        !Anecdotal evidence suggests that we nucleate too many aerosols, so we are
+        !seeing if this will switch more to growth of existing droplets over making
+        !more new ones.
+        !vaprccn = 0.25*excessrv*cldrat !Sum of all nucleation <= 1/4 excessrv
 
         !Determine if nucleated droplets go to cloud or drizzle
         drop=1
@@ -266,8 +280,9 @@ elseif (jnmb(1) >= 5) then
         if(concen_tab(acat) > vaprccn / emb0(drop)) concen_tab(acat) = vaprccn / emb0(drop)
         if(concen_tab(acat) < vaprccn / emb1(drop)) vaprccn = concen_tab(acat) * emb1(drop)
 
-!Nucleate to 2-micron diameter droplets whose mass is emb0
-!if(concen_tab(acat) * emb0(drop) <= vaprccn) vaprccn=concen_tab(acat) * emb0(drop)
+        !Saleeby(2023-05-30)
+        !Nucleate to minimum drop diameter (cloud or drizzle) droplets whose mass is emb0
+        if(concen_tab(acat) * emb0(drop) <= vaprccn) vaprccn=concen_tab(acat) * emb0(drop)
 
         !Accumulated nucleated particles if not removing them
         if(iccnlev==0) then
@@ -370,7 +385,7 @@ elseif (jnmb(1) >= 5) then
             ccncon(ic) = ccncon(ic) + ccncon(ic-1)
             ccnmas(ic) = ccnmas(ic) + ccnmas(ic-1)
            endif
-           !Track immersion freezing droplets that contain large CCN, GCCN, or DUST
+           !Track immersion freezing droplets that contain large CCN1, CCN2, or DUST
            ! Do not track immersion freezing for salt species (acat=5,6,7)
            if(iifn==3.and.(acat==1.or.acat==2.or.acat==3.or.acat==4.or.acat==8.or.acat==9 &
                .or.acat==aerocat-1.or.acat==aerocat) &
@@ -762,12 +777,12 @@ do k = 2,m1-1
        !Input aerosols in #/cm3 and outputs #/L activated
        if(iifn_formula==1) then
         !Original Demott(2010) formula
-        nifn(k) = 0.0000594 * (-tairc(k))**3.33 &
-                * (tot_in)**(0.0264*(-tairc(k))+0.0033)
+        nifn(k) = 0.0000594 * ( -max(-35.0,tairc(k)) )**3.33 &
+                * (tot_in)**(0.0264*( -max(-35.0,tairc(k)) )+0.0033)
        elseif(iifn_formula==2) then
         !Modified Demott(2010) for dust-dominated cases
         !Paul suggested an additional factor of 3 multiplier
-        nifn(k) = 3.0 * 0.0008 * 10 ** (-0.2*(tairc(k)+9.7)) * tot_in ** 1.25
+        nifn(k) = 3.0 * 0.0008 * 10 ** (-0.2*(max(-35.0,tairc(k))+9.7)) * tot_in ** 1.25
        endif
 
        !Adjust units and such
@@ -797,15 +812,15 @@ do k = 2,m1-1
    vapnuc=0.0
    if(jnmb(1)>=5)then
      if(iccnlev==0) then
-       vapnuc = max(0.,haznuc + diagni - cx(k,3))
+       vapnuc = max(0.,haznuc + diagni - cx(k,3) - cx(k,4))
      elseif(iccnlev>=1 .and. iifn==3) then 
        vapnuc = max(0.,haznuc + diagni)
      elseif(iccnlev>=1 .and. iifn<=2) then 
        vapnuc = max(0.,haznuc)
-       vapnuc = vapnuc + max(0.,diagni - cx(k,3))
+       vapnuc = vapnuc + max(0.,diagni - cx(k,3) - cx(k,4))
      endif
    else
-     vapnuc = max(0.,haznuc + diagni - cx(k,3))
+     vapnuc = max(0.,haznuc + diagni - cx(k,3) - cx(k,4))
    endif
 
    !Modify haze nucleation and IN nucleation if not enough vapor available
@@ -894,12 +909,12 @@ do k = 2,m1-1
        !Input aerosols in #/cm3 and outputs #/L activated
        if(iifn_formula==1) then
         !Original Demott(2010) formula
-        ifntemp = 0.0000594 * (-tairc(k))**3.33 &
-                * (tot_in)**(0.0264*(-tairc(k))+0.0033)
+        ifntemp = 0.0000594 * ( -max(-35.0,tairc(k)) )**3.33 &
+                * (tot_in)**(0.0264*( -max(-35.0,tairc(k)) )+0.0033)
        elseif(iifn_formula==2) then
         !Modified Demott(2010) for dust-dominated cases
         !Paul suggested an additional factor of 3 multiplier
-        ifntemp = 3.0 * 0.0008 * 10 ** (-0.2*(tairc(k)+9.7)) * tot_in ** 1.25
+        ifntemp = 3.0 * 0.0008 * 10 ** (-0.2*(max(-35.0,tairc(k))+9.7)) * tot_in ** 1.25
        endif
 
        !Adjust units and such

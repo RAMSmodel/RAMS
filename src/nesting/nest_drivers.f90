@@ -21,32 +21,32 @@ tymeinvs = 1.0 / (dtlt * float(nndtrat(ngrid)+1-isstp))
 !         print*,  jdim,ibcon,ia,iz,ja,jz
 
 
-CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon  &
+CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon,ngrid  &
    ,basic_g(ngrid)%up(1,1,1),tend%ut(1)  &
    ,nbounds(ngrid)%bux(1,1,1),nbounds(ngrid)%buy(1,1,1)  &
    ,nbounds(ngrid)%buz(1,1,1)  &
    ,'u',tymeinvv,nstbot,nsttop,jdim)
 
-CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon  &
+CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon,ngrid  &
    ,basic_g(ngrid)%vp(1,1,1),tend%vt(1)  &
    ,nbounds(ngrid)%bvx(1,1,1),nbounds(ngrid)%bvy(1,1,1)  &
    ,nbounds(ngrid)%bvz(1,1,1)  &
    ,'v',tymeinvv,nstbot,nsttop,jdim)
 
-CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon  &
+CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon,ngrid  &
    ,basic_g(ngrid)%wp(1,1,1),tend%wt(1)  &
    ,nbounds(ngrid)%bwx(1,1,1),nbounds(ngrid)%bwy(1,1,1)  &
    ,nbounds(ngrid)%bwz(1,1,1)  &
    ,'w',tymeinvv,nstbot,nsttop,jdim)
 
-CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon  &
+CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon,ngrid  &
    ,basic_g(ngrid)%pp(1,1,1),tend%pt(1)  &
    ,nbounds(ngrid)%bpx(1,1,1),nbounds(ngrid)%bpy(1,1,1)  &
    ,nbounds(ngrid)%bpz(1,1,1)  &
    ,'p',tymeinvv,nstbot,nsttop,jdim)
 
 do n = 1,num_scalar(ngrid)
-   CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon  &
+   CALL nstbtnd (mzp,mxp,myp,ia,iz,ja,jz,ibcon,ngrid  &
       ,scalar_tab(n,ngrid)%var_p,scalar_tab(n,ngrid)%var_t  &
       ,nbounds(ngrid)%bsx(1,1,1,n),nbounds(ngrid)%bsy(1,1,1,n)  &
       ,nbounds(ngrid)%bsz(1,1,1,n)  &
