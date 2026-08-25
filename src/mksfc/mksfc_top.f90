@@ -219,6 +219,7 @@ integer*8 :: h5_fid
 integer :: iphdf5
 type (hdf5_select_type) :: mem_select,file_select
 integer, dimension(HDF5_MAX_DIMS) :: file_chunks
+real(kind=4):: zfp_accuracy =0.
 
 if (nmachs .gt. 1) then
   iphdf5 = 1
@@ -239,40 +240,40 @@ CALL shdf5_open (flnm,'W',iphdf5,h5_fid,iclobber)
 ! Scalar vars
 CALL shdf5_set_hs_select (1,'W',ifm,mem_select,file_select,file_chunks)
 CALL shdf5_orec (h5_fid,iphdf5,'nx',mem_select,file_select       &
-                ,file_chunks,ivars=nnxp(ifm))
+                ,file_chunks, zfp_accuracy,ivars=nnxp(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'ny',mem_select,file_select       &
-                ,file_chunks,ivars=nnyp(ifm))
+                ,file_chunks, zfp_accuracy,ivars=nnyp(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'dx',mem_select,file_select       &
-                ,file_chunks,rvars=deltaxn(ifm))
+                ,file_chunks, zfp_accuracy,rvars=deltaxn(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'polelat',mem_select,file_select  &
-                ,file_chunks,rvars=polelat)
+                ,file_chunks, zfp_accuracy,rvars=polelat)
 CALL shdf5_orec (h5_fid,iphdf5,'polelon',mem_select,file_select  &
-                ,file_chunks,rvars=polelon)
+                ,file_chunks, zfp_accuracy,rvars=polelon)
 CALL shdf5_orec (h5_fid,iphdf5,'sw_lat',mem_select,file_select   &
-                ,file_chunks,rvars=glatr)
+                ,file_chunks, zfp_accuracy,rvars=glatr)
 CALL shdf5_orec (h5_fid,iphdf5,'sw_lon',mem_select,file_select   &
-                ,file_chunks,rvars=glonr)
+                ,file_chunks, zfp_accuracy,rvars=glonr)
 CALL shdf5_orec (h5_fid,iphdf5,'itoptflg',mem_select,file_select &
-                ,file_chunks,ivars=itoptflg(ifm))
+                ,file_chunks, zfp_accuracy,ivars=itoptflg(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'itopsflg',mem_select,file_select &
-                ,file_chunks,ivars=itopsflg(ifm))
+                ,file_chunks, zfp_accuracy,ivars=itopsflg(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'toptenh',mem_select,file_select  &
-                ,file_chunks,rvars=toptenh(ifm))
+                ,file_chunks, zfp_accuracy,rvars=toptenh(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'toptwvl',mem_select,file_select  &
-                ,file_chunks,rvars=toptwvl(ifm))
+                ,file_chunks, zfp_accuracy,rvars=toptwvl(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'iz0flg',mem_select,file_select   &
-                ,file_chunks,ivars=iz0flg(ifm))
+                ,file_chunks, zfp_accuracy,ivars=iz0flg(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'z0max',mem_select,file_select    &
-                ,file_chunks,rvars=z0max(ifm))
+                ,file_chunks, zfp_accuracy,rvars=z0max(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'z0fact',mem_select,file_select   &
-                ,file_chunks,rvars=z0fact)
+                ,file_chunks, zfp_accuracy,rvars=z0fact)
 
 ! Atmos 2D vars
 CALL shdf5_set_hs_select (2,'W',ifm,mem_select,file_select,file_chunks)
 CALL shdf5_orec (h5_fid,iphdf5,'TOPT',mem_select,file_select  &
-                ,file_chunks,rvara=sfcfile_p(ifm)%topt)
+                ,file_chunks, zfp_accuracy,rvara=sfcfile_p(ifm)%topt)
 CALL shdf5_orec (h5_fid,iphdf5,'TOPZO',mem_select,file_select &
-                ,file_chunks,rvara=sfcfile_p(ifm)%topzo)
+                ,file_chunks, zfp_accuracy,rvara=sfcfile_p(ifm)%topzo)
 
 CALL shdf5_close (h5_fid)
 

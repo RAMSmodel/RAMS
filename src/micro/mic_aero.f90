@@ -79,7 +79,7 @@ if(iaerodep==1 .and. level<3) then
     ,leaf_g(ngrid)%leaf_class(i,j,1:npatch)   &
     ,leaf_g(ngrid)%patch_area(i,j,1:npatch)   &
     ,leaf_g(ngrid)%ustar(i,j,1:npatch)        &
-    ,leaf_g(ngrid)%patch_rough(i,j,1:npatch)  &
+    ,leaf_g(ngrid)%patch_rought(i,j,1:npatch)  &
     ,imonth1                                  &
     )
 

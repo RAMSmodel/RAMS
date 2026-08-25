@@ -128,7 +128,7 @@ implicit none
   ! varfiles have their own smaller memory allocation.
   ! This needs to be called before finishing node decomposition and grid setup.
   if (stopparallel/=1) CALL rams_mem_alloc ()
-  if (stopparallel==1) CALL sfc_mem_alloc ()
+  if (stopparallel==1.and.isfcl.ne.3) CALL sfc_mem_alloc ()
 
   ! Set the buffer sizes for internodal communication
   if(force1node==0) CALL par_set_comm_buff_sizes ()
@@ -140,6 +140,10 @@ implicit none
   ! Any run (INITIAL, HISTORY, MAKESFC, MAKEVFILE, MAKEHFILE, ERROR) needs 
   ! a set of surface files in place so always call update_sfc_var_files() at 
   ! this point.
+  ! Adele - above is true unless ISFCL == 3, in which case surface files are
+  ! not needed. Keep call to update_sfc_var_files for all cases in the unlikely
+  ! event that there are specified fluxes with varfiles or hvarfiles. I 
+  ! turned off surface file creation inside update_sfc_var_files if ISFCL=3
 
   ! Make sure that the correct surface files and varfiles are in place
   CALL update_sfc_var_files ()

@@ -257,7 +257,8 @@ do ifm = ngra,ngrb
       ,leaf_g(ifm)%veg_height      (1,1,1)    &
       ,leaf_g(ifm)%veg_albedo      (1,1,1)    &
       ,leaf_g(ifm)%patch_area      (1,1,1)    &
-      ,leaf_g(ifm)%patch_rough     (1,1,1)    &
+      ,leaf_g(ifm)%patch_rought    (1,1,1)    &
+      ,leaf_g(ifm)%patch_roughm    (1,1,1)    &
       ,leaf_g(ifm)%leaf_class      (1,1,1)    &
       ,leaf_g(ifm)%soil_rough      (1,1,1)    &
       ,leaf_g(ifm)%sfcwater_nlev   (1,1,1)    &
@@ -411,7 +412,8 @@ do ifm = ngra,ngrb
       ,leaf_g(ifm)%veg_height      (1,1,1)    &
       ,leaf_g(ifm)%veg_albedo      (1,1,1)    &
       ,leaf_g(ifm)%patch_area      (1,1,1)    &
-      ,leaf_g(ifm)%patch_rough     (1,1,1)    &
+      ,leaf_g(ifm)%patch_rought    (1,1,1)    &
+      ,leaf_g(ifm)%patch_roughm    (1,1,1)    &
       ,leaf_g(ifm)%leaf_class      (1,1,1)    &
       ,leaf_g(ifm)%soil_rough      (1,1,1)    &
       ,leaf_g(ifm)%sfcwater_nlev   (1,1,1)    &

@@ -13,7 +13,7 @@ real, dimension(m1) :: rv,wp,dn0
 real :: tairc_nuc,w_nuc,rg_nuc,tab,sfcareatotal
 real :: rjw,wtw1,wtw2,rjconcen,wtcon1,wtcon2,jrg1,jrg2,eps1,eps2
 real :: total_cld_nucc,total_drz_nucc,total_cld_nucr,total_drz_nucr
-real, dimension(9) :: concen_tab
+real, dimension(aerocat) :: concen_tab
 
 !Re-set cloud layer before nucleation
 k1cnuc = 2
@@ -491,6 +491,47 @@ return
 END SUBROUTINE cldnuc
 
 !##############################################################################
+Subroutine snownuc (m1,kp1,kp2,ngr,rv,dn0,dtlt,i,j)
+
+use rconstants
+use micphys
+
+implicit none
+
+integer :: m1, kp1, kp2, ngr, i, j, k
+real :: rnuc,nnuc,sati,satw,excessrv,rsnew,dtlt
+real,dimension(m1) :: rv, dn0
+
+kp1 = m1
+kp2 = 0
+do k = 2,m1-1
+   excessrv = rv(k) - rvisair(k)
+   satw = rv(k)/rvlsair(k) - 1.
+   sati = rv(k)/rvisair(k) - 1.
+   rsnew = 0.
+   !rvisair<rvlsair is easy check that T<0C
+   if (sati > 0.05 .and. rvisair(k) < rvlsair(k) &
+      .and. (satw<0. .or. rx(k,1)>=2.e-6)) then
+      !Adele - assuming that cin_max is in 1/L!!!
+      nnuc = max(0.,cin_max/dn0(k)*1.e3-cx(k,3)-cx(k,4))
+      if (nnuc > 0) then
+         rnuc = nnuc * emb0(4)
+         rsnew = min(rnuc,.5*excessrv)
+         rx(k,3) = rx(k,3) + rsnew
+         rv(k) = rv(k) - rsnew
+         !Set sum of pristine ice and snow concentration
+         cx(k,3) = cx(k,3) + nnuc
+         if (k<kp1) kp1=k
+         if (k>kp2) kp2=k
+         if (imbudget >= 1) then
+            xnucicert(k) = xnucicert(k) + rsnew * budget_scalet
+         endif
+      endif
+   endif
+enddo
+return
+END SUBROUTINE snownuc
+!##############################################################################
 Subroutine icenuc (m1,kc1,kc2,kd1,kd2,k1pnuc,k2pnuc,ngr,rv,dn0,dtlt,i,j)
 
 use rconstants
@@ -836,7 +877,7 @@ do k = 2,m1-1
    !(Saleeby10-17-2011) Determine haze nucleation and IN nucleation
    !DeMott(2010) formula already applied for ICLOUD >= 5
    !Allow large DeMott (diagni) particles to preferentially nucleate
-   !over the haze particles (cccnp) for IIFN==3. Perhaps should include
+   !over the haze particles (cn1np) for IIFN==3. Perhaps should include
    !all aerosols into potential haze nucleation?
    if((haznuc.gt.0.0 .or. diagni.gt.0.0) .and. jnmb(3).ge.5) then
 

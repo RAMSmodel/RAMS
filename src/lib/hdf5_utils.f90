@@ -178,7 +178,7 @@ END SUBROUTINE shdf5_info
 
 !##############################################################################
 Subroutine shdf5_orec (fileid,iphdf5,dsetname,mem_select,file_select &
-                      ,file_chunks &
+                      ,file_chunks, zfp_accuracy &
                       ,ivara,rvara,cvara,dvara,lvara  &
                       ,ivars,rvars,cvars,dvars,lvars)
 
@@ -205,6 +205,22 @@ integer, dimension(HDF5_MAX_DIMS) :: f_chunks
 
 character(len=2) :: ctype    ! Variable type: int, real, char
 integer :: hdferr ! Error flag
+
+! 1 to enable truncation, 0 to disable. 
+integer :: enable_zfp_truncation
+real*4 :: zfp_accuracy
+!print*, "Variable: ", dsetname, " ZFP accuracy: ", zfp_accuracy
+if(zfp_accuracy == 0.) then
+enable_zfp_truncation = 0
+elseif(zfp_accuracy>0.) then
+enable_zfp_truncation = 1
+else 
+print*, "Incorrect ZFP Accuracy parameter", zfp_accuracy
+stop 'zfp accuracy wrong'
+endif
+
+!print*, "Enable ZFP Truncation? ", enable_zfp_truncation
+!print*, "ZFP accuracy? ", zfp_accuracy
 
 ! Find which data type is input
     if(present(ivars)) then ; ctype='is'
@@ -277,34 +293,44 @@ CALL shdf5_reverse_array (f_ndims, file_chunks, f_chunks)
 ! Write the dataset.
 if (ctype == 'is') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,ivars,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, 0, &
+                   zfp_accuracy,ivars,hdferr)
 elseif (ctype == 'rs') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,rvars,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, 0, &
+                   zfp_accuracy,rvars,hdferr)
 elseif (ctype == 'cs') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,cvars,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, 0, &
+                   zfp_accuracy,cvars,hdferr)
 elseif (ctype == 'ds') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,dvars,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, 0, &
+                   zfp_accuracy,dvars,hdferr)
 elseif (ctype == 'ls') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,lvars,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, 0, &
+                   zfp_accuracy,lvars,hdferr)
 elseif (ctype == 'ia') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,ivara,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, 0, &
+                   zfp_accuracy,ivara,hdferr)
 elseif (ctype == 'ra') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,rvara,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, enable_zfp_truncation, &
+                   zfp_accuracy,rvara,hdferr)
 elseif (ctype == 'ca') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,cvara,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, 0, &
+                   zfp_accuracy,cvara,hdferr)
 elseif (ctype == 'da') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,dvara,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, enable_zfp_truncation, &
+                   zfp_accuracy,dvara,hdferr)
 elseif (ctype == 'la') then
    CALL fh5d_write (fileid,trim(dsetname)//char(0),h5_type,iphdf5 &
-                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks,lvara,hdferr)
+                   ,m_ndims,m_sel,f_ndims,f_sel,f_chunks, 0, &
+                   zfp_accuracy,lvara,hdferr)
 endif
 
 if (hdferr /= 0) then

@@ -83,6 +83,8 @@ do nvl=1,nlite_vars
    
          if (vtab_r(nv,ng)%name == lite_vars(nvl) ) then
             vtab_r(nv,ng)%ilite = 1
+            vtab_r(nv,ng)%var_acc = lite_var_acc(nvl)
+            !print*, "Loading in vtable. Variable: ", vtab_r(nv,ng)%name, " ZFP Accuracy: ", vtab_r(nv,ng)%var_acc
             ifound=1
          endif
          

@@ -20,7 +20,7 @@ implicit none
                   ustar,tstar,rstar  &  
                  ,veg_fracarea,veg_lai,veg_rough,veg_height  &
                  ,veg_albedo,veg_tai  &
-                 ,patch_area,patch_rough,leaf_class  &
+                 ,patch_area,patch_rought,patch_roughm,leaf_class  &
                  ,soil_rough,sfcwater_nlev,stom_resist  &
                  ,ground_rsat,ground_rvap  &
                  ,veg_water,veg_temp,can_rvap,can_temp &
@@ -36,7 +36,7 @@ implicit none
 
    !-------------------------------------------------------------------------------
    integer                   :: nslcon,nvgcon,nvegpat,isfcl,isoildat,isnowdat
-   real                      :: zrough,pctlcon,ubmin,albedo,drtcon,dthcon,seatmp
+   real                      :: ztrough,zmrough=0.005,pctlcon,ubmin,albedo,drtcon,dthcon,seatmp
    real, dimension(nzgmax)   :: stgoff,slmstr
    real, dimension(nzgmax+1) :: slz
    character(len=strl1)      :: sibfile
@@ -74,7 +74,8 @@ implicit none
    allocate (leaf%veg_tai      (nx,ny,np))
 
    allocate (leaf%patch_area   (nx,ny,np))
-   allocate (leaf%patch_rough  (nx,ny,np))
+   allocate (leaf%patch_rought (nx,ny,np))
+   allocate (leaf%patch_roughm (nx,ny,np))
    allocate (leaf%leaf_class   (nx,ny,np))
    
    allocate (leaf%soil_rough   (nx,ny,np))
@@ -133,7 +134,8 @@ implicit none
   if(allocated(leaf%veg_tai))         deallocate (leaf%veg_tai)
 
   if(allocated(leaf%patch_area))      deallocate (leaf%patch_area)
-  if(allocated(leaf%patch_rough))     deallocate (leaf%patch_rough)
+  if(allocated(leaf%patch_rought))    deallocate (leaf%patch_rought)
+  if(allocated(leaf%patch_roughm))    deallocate (leaf%patch_roughm)
   if(allocated(leaf%leaf_class))      deallocate (leaf%leaf_class)
  
   if(allocated(leaf%soil_rough))      deallocate (leaf%soil_rough)
@@ -233,9 +235,12 @@ implicit none
    CALL vtables2 (leaf%patch_area(1,1,1),leafm%patch_area(1,1,1)  &
                  ,ng, npts, imean,  &
                  'PATCH_AREA :6:anal:mpti')
-   CALL vtables2 (leaf%patch_rough(1,1,1),leafm%patch_rough(1,1,1)  &
+   CALL vtables2 (leaf%patch_rought(1,1,1),leafm%patch_rought(1,1,1)  &
                  ,ng, npts, imean,  &
-                 'PATCH_ROUGH :6:anal:mpti:recycle_sfc')
+                 'PATCH_ROUGHT :6:anal:mpti:recycle_sfc')
+   CALL vtables2 (leaf%patch_roughm(1,1,1),leafm%patch_roughm(1,1,1)  &
+                 ,ng, npts, imean,  &
+                 'PATCH_ROUGHM :6:anal:mpti:recycle_sfc')
    CALL vtables2 (leaf%leaf_class(1,1,1),leafm%leaf_class(1,1,1)  &
                  ,ng, npts, imean,  &
                  'LEAF_CLASS :6:anal:mpti')

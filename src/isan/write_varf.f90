@@ -16,6 +16,7 @@ integer*8 :: h5_fid
 integer :: iphdf5
 type (hdf5_select_type) :: mem_select,file_select
 integer, dimension(HDF5_MAX_DIMS) :: file_chunks
+real(kind=4):: zfp_accuracy = 0
 
 if (nmachs .gt. 1) then
   iphdf5 = 1
@@ -36,74 +37,74 @@ do ng=1,nigrids
    ! scalar values
    CALL shdf5_set_hs_select (1,'W',ng,mem_select,file_select,file_chunks)
    CALL shdf5_orec (h5_fid,iphdf5,'year'   ,mem_select,file_select &
-       ,file_chunks,ivars=iyear)     
+       ,file_chunks, zfp_accuracy,ivars=iyear)     
    CALL shdf5_orec (h5_fid,iphdf5,'month'  ,mem_select,file_select &
-       ,file_chunks,ivars=imonth)    
+       ,file_chunks, zfp_accuracy,ivars=imonth)    
    CALL shdf5_orec (h5_fid,iphdf5,'day'    ,mem_select,file_select &
-       ,file_chunks,ivars=idate)     
+       ,file_chunks, zfp_accuracy,ivars=idate)     
    CALL shdf5_orec (h5_fid,iphdf5,'hour'   ,mem_select,file_select &
-       ,file_chunks,ivars=ihour)     
+       ,file_chunks, zfp_accuracy,ivars=ihour)     
    CALL shdf5_orec (h5_fid,iphdf5,'nx'     ,mem_select,file_select &
-       ,file_chunks,ivars=nnxp(ng))  
+       ,file_chunks, zfp_accuracy,ivars=nnxp(ng))  
    CALL shdf5_orec (h5_fid,iphdf5,'ny'     ,mem_select,file_select &
-       ,file_chunks,ivars=nnyp(ng))  
+       ,file_chunks, zfp_accuracy,ivars=nnyp(ng))  
    CALL shdf5_orec (h5_fid,iphdf5,'nz'     ,mem_select,file_select &
-       ,file_chunks,ivars=nnzp(ng))  
+       ,file_chunks, zfp_accuracy,ivars=nnzp(ng))  
    CALL shdf5_orec (h5_fid,iphdf5,'polelat',mem_select,file_select &
-       ,file_chunks,rvars=polelat)        
+       ,file_chunks, zfp_accuracy,rvars=polelat)        
    CALL shdf5_orec (h5_fid,iphdf5,'polelon',mem_select,file_select &
-       ,file_chunks,rvars=polelon)       
+       ,file_chunks, zfp_accuracy,rvars=polelon)       
    CALL shdf5_orec (h5_fid,iphdf5,'dx'     ,mem_select,file_select &
-       ,file_chunks,rvars=deltaxn(ng))         
+       ,file_chunks, zfp_accuracy,rvars=deltaxn(ng))         
    CALL shdf5_orec (h5_fid,iphdf5,'dz'     ,mem_select,file_select &
-       ,file_chunks,rvars=deltazn(ng))     
+       ,file_chunks, zfp_accuracy,rvars=deltazn(ng))     
    CALL shdf5_orec (h5_fid,iphdf5,'dzrat'  ,mem_select,file_select &
-       ,file_chunks,rvars=dzrat)     
+       ,file_chunks, zfp_accuracy,rvars=dzrat)     
    CALL shdf5_orec (h5_fid,iphdf5,'dzmax'  ,mem_select,file_select &
-       ,file_chunks,rvars=dzmax)
+       ,file_chunks, zfp_accuracy,rvars=dzmax)
 
    ! Atmospheric 3D vars
    CALL shdf5_set_hs_select (3,'W',ng,mem_select,file_select,file_chunks)
    CALL rearrange (nnzp(ng),nnxp(ng),nnyp(ng),is_grids(ng)%rr_u,rr_scr3)
    CALL shdf5_orec (h5_fid,iphdf5,'UP',mem_select,file_select &
-       ,file_chunks,rvara=rr_scr3)
+       ,file_chunks, zfp_accuracy,rvara=rr_scr3)
    CALL rearrange (nnzp(ng),nnxp(ng),nnyp(ng),is_grids(ng)%rr_v,rr_scr3)
    CALL shdf5_orec (h5_fid,iphdf5,'VP',mem_select,file_select &
-       ,file_chunks,rvara=rr_scr3)
+       ,file_chunks, zfp_accuracy,rvara=rr_scr3)
    CALL rearrange (nnzp(ng),nnxp(ng),nnyp(ng),is_grids(ng)%rr_p,rr_scr3)
    CALL shdf5_orec (h5_fid,iphdf5,'PI',mem_select,file_select &
-       ,file_chunks,rvara=rr_scr3)
+       ,file_chunks, zfp_accuracy,rvara=rr_scr3)
    CALL rearrange (nnzp(ng),nnxp(ng),nnyp(ng),is_grids(ng)%rr_t,rr_scr3)
    CALL shdf5_orec (h5_fid,iphdf5,'THETA',mem_select,file_select &
-       ,file_chunks,rvara=rr_scr3)
+       ,file_chunks, zfp_accuracy,rvara=rr_scr3)
    CALL rearrange (nnzp(ng),nnxp(ng),nnyp(ng),is_grids(ng)%rr_r,rr_scr3)
    CALL shdf5_orec (h5_fid,iphdf5,'RV',mem_select,file_select &
-       ,file_chunks,rvara=rr_scr3)
+       ,file_chunks, zfp_accuracy,rvara=rr_scr3)
 
    CALL rearrange (nnzp(ng),nnxp(ng),nnyp(ng),is_grids(ng)%rr_cond,rr_scr3)
    CALL shdf5_orec (h5_fid,iphdf5,'COND',mem_select,file_select &
-       ,file_chunks,rvara=rr_scr3)
+       ,file_chunks, zfp_accuracy,rvara=rr_scr3)
    
    ! Atmospheric 2D vars
    CALL shdf5_set_hs_select (2,'W',ng,mem_select,file_select,file_chunks)
    CALL vmissw (is_grids(ng)%rr_soilmoist1(1,1),nxyp,rr_vt2da(1),1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'SOILMOIST1',mem_select,file_select &
-       ,file_chunks,rvara=rr_vt2da)
+       ,file_chunks, zfp_accuracy,rvara=rr_vt2da)
    CALL vmissw (is_grids(ng)%rr_soilmoist2(1,1),nxyp,rr_vt2da(1),1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'SOILMOIST2',mem_select,file_select &
-       ,file_chunks,rvara=rr_vt2da)
+       ,file_chunks, zfp_accuracy,rvara=rr_vt2da)
    CALL vmissw (is_grids(ng)%rr_soiltemp1(1,1),nxyp,rr_vt2da(1),1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'SOILTEMP1',mem_select,file_select &
-       ,file_chunks,rvara=rr_vt2da)
+       ,file_chunks, zfp_accuracy,rvara=rr_vt2da)
    CALL vmissw (is_grids(ng)%rr_soiltemp2(1,1),nxyp,rr_vt2da(1),1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'SOILTEMP2',mem_select,file_select &
-       ,file_chunks,rvara=rr_vt2da)
+       ,file_chunks, zfp_accuracy,rvara=rr_vt2da)
    CALL vmissw (is_grids(ng)%rr_snowmass(1,1),nxyp,rr_vt2da(1),1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'SNOWMASS',mem_select,file_select &
-       ,file_chunks,rvara=rr_vt2da)
+       ,file_chunks, zfp_accuracy,rvara=rr_vt2da)
    CALL vmissw (is_grids(ng)%rr_snowdepth(1,1),nxyp,rr_vt2da(1),1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'SNOWDEPTH',mem_select,file_select &
-       ,file_chunks,rvara=rr_vt2da)
+       ,file_chunks, zfp_accuracy,rvara=rr_vt2da)
 
    CALL shdf5_close (h5_fid)
 

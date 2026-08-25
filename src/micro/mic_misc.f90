@@ -326,6 +326,18 @@ if (jnmb(3) >= 1) then
          if (k2(3) == 1) k1(3) = k + 1
       endif
    enddo
+elseif (iifn == 4) then
+   !If using a combined pristineice-snow category, this
+   !will be useful
+   do k = 2,m1-1
+      if (micro%rsp(k,i,j) >= rxmin) then
+         k2(3) = k
+         rx(k,3) = micro%rsp(k,i,j)
+         if (jnmb(4) >= 5) cx(k,3) = micro%csp(k,i,j)
+      else
+         if (k2(3) == 1) k1(3) = k + 1
+      endif
+   enddo
 endif
 
 ! fill scratch arrays for snow

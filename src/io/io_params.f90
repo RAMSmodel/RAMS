@@ -6,6 +6,8 @@ use grid_dims
 implicit none
 
 character(len=32) :: lite_vars(maxlite)
+! this must be fixed at a 32 bit float because that is what the C library expects
+real(kind=4) :: lite_var_acc(maxlite)
 character(len=strl1) :: hfilin,afilepref
 
 integer :: ipast_sfc

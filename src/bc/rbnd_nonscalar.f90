@@ -720,7 +720,8 @@ if (iand(ibcon,1) .ne. 0) then
       leaf%veg_tai        (1,j,ipat) = leaf%veg_tai          (2,j,ipat)
       leaf%veg_rough      (1,j,ipat) = leaf%veg_rough        (2,j,ipat)
       leaf%veg_height     (1,j,ipat) = leaf%veg_height       (2,j,ipat)
-      leaf%patch_rough    (1,j,ipat) = leaf%patch_rough      (2,j,ipat)
+      leaf%patch_rought   (1,j,ipat) = leaf%patch_rought     (2,j,ipat)
+      leaf%patch_roughm   (1,j,ipat) = leaf%patch_roughm     (2,j,ipat)
       leaf%soil_rough     (1,j,ipat) = leaf%soil_rough       (2,j,ipat)
       leaf%sfcwater_nlev  (1,j,ipat) = leaf%sfcwater_nlev    (2,j,ipat)
       leaf%stom_resist    (1,j,ipat) = leaf%stom_resist      (2,j,ipat)
@@ -760,7 +761,8 @@ if (iand(ibcon,2) .ne. 0) then
       leaf%veg_tai       (m2,j,ipat) = leaf%veg_tai       (m2-1,j,ipat)
       leaf%veg_rough     (m2,j,ipat) = leaf%veg_rough     (m2-1,j,ipat)
       leaf%veg_height    (m2,j,ipat) = leaf%veg_height    (m2-1,j,ipat)
-      leaf%patch_rough   (m2,j,ipat) = leaf%patch_rough   (m2-1,j,ipat)
+      leaf%patch_rought  (m2,j,ipat) = leaf%patch_rought  (m2-1,j,ipat)
+      leaf%patch_roughm  (m2,j,ipat) = leaf%patch_roughm  (m2-1,j,ipat)
       leaf%soil_rough    (m2,j,ipat) = leaf%soil_rough    (m2-1,j,ipat)
       leaf%sfcwater_nlev (m2,j,ipat) = leaf%sfcwater_nlev (m2-1,j,ipat)
       leaf%stom_resist   (m2,j,ipat) = leaf%stom_resist   (m2-1,j,ipat)
@@ -800,7 +802,8 @@ if ((iand(ibcon,4) .ne. 0) .and. (jdim .eq. 1)) then
          leaf%veg_tai        (i,1,ipat) = leaf%veg_tai          (i,2,ipat)
          leaf%veg_rough      (i,1,ipat) = leaf%veg_rough        (i,2,ipat)
          leaf%veg_height     (i,1,ipat) = leaf%veg_height       (i,2,ipat)
-         leaf%patch_rough    (i,1,ipat) = leaf%patch_rough      (i,2,ipat)
+         leaf%patch_rought   (i,1,ipat) = leaf%patch_rought     (i,2,ipat)
+         leaf%patch_roughm   (i,1,ipat) = leaf%patch_roughm     (i,2,ipat)
          leaf%soil_rough     (i,1,ipat) = leaf%soil_rough       (i,2,ipat)
          leaf%sfcwater_nlev  (i,1,ipat) = leaf%sfcwater_nlev    (i,2,ipat)
          leaf%stom_resist    (i,1,ipat) = leaf%stom_resist      (i,2,ipat)
@@ -840,7 +843,8 @@ if ((iand(ibcon,8) .ne. 0) .and. (jdim .eq. 1)) then
          leaf%veg_tai       (i,m3,ipat) = leaf%veg_tai       (i,m3-1,ipat)
          leaf%veg_rough     (i,m3,ipat) = leaf%veg_rough     (i,m3-1,ipat)
          leaf%veg_height    (i,m3,ipat) = leaf%veg_height    (i,m3-1,ipat)
-         leaf%patch_rough   (i,m3,ipat) = leaf%patch_rough   (i,m3-1,ipat)
+         leaf%patch_rought  (i,m3,ipat) = leaf%patch_rought  (i,m3-1,ipat)
+         leaf%patch_roughm  (i,m3,ipat) = leaf%patch_roughm  (i,m3-1,ipat)
          leaf%soil_rough    (i,m3,ipat) = leaf%soil_rough    (i,m3-1,ipat)
          leaf%sfcwater_nlev (i,m3,ipat) = leaf%sfcwater_nlev (i,m3-1,ipat)
          leaf%stom_resist   (i,m3,ipat) = leaf%stom_resist   (i,m3-1,ipat)
@@ -888,14 +892,17 @@ if (iand(ibcon,1) .ne. 0) then
  do j = 1,m3
   do k = 1,m1
    radiate%fthrd(k,1,j)  = radiate%fthrd(k,2,j)
-   if(ilwrtyp == 3 .or. iswrtyp == 3) then
+   ! GRL 2024-03-22 added lw and sw heating rates
+   radiate%fthrdlw(k,1,j)  = radiate%fthrdlw(k,2,j)
+   radiate%fthrdsw(k,1,j)  = radiate%fthrdsw(k,2,j)
+   if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
      radiate%bext(k,1,j)   = radiate%bext(k,2,j)
    endif
-   if(iswrtyp == 3) then
+   if(iswrtyp >= 3) then
      radiate%swup(k,1,j) = radiate%swup(k,2,j)
      radiate%swdn(k,1,j) = radiate%swdn(k,2,j)
    endif
-   if(ilwrtyp == 3) then
+   if(ilwrtyp >= 3) then
      radiate%lwup(k,1,j) = radiate%lwup(k,2,j)
      radiate%lwdn(k,1,j) = radiate%lwdn(k,2,j)
    endif
@@ -908,14 +915,17 @@ if (iand(ibcon,2) .ne. 0) then
  do j = 1,m3
   do k = 1,m1
    radiate%fthrd(k,m2,j) = radiate%fthrd(k,m2-1,j)
-   if(ilwrtyp == 3 .or. iswrtyp == 3) then
+   ! GRL 2024-03-22 added lw and sw heating rates
+   radiate%fthrdlw(k,m2,j) = radiate%fthrdlw(k,m2-1,j)
+   radiate%fthrdsw(k,m2,j) = radiate%fthrdsw(k,m2-1,j)
+   if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
      radiate%bext(k,m2,j)  = radiate%bext(k,m2-1,j)
    endif
-   if(iswrtyp == 3) then
+   if(iswrtyp >= 3) then
      radiate%swup(k,m2,j) = radiate%swup(k,m2-1,j)
      radiate%swdn(k,m2,j) = radiate%swdn(k,m2-1,j)
    endif
-   if(ilwrtyp == 3) then
+   if(ilwrtyp >= 3) then
      radiate%lwup(k,m2,j) = radiate%lwup(k,m2-1,j)
      radiate%lwdn(k,m2,j) = radiate%lwdn(k,m2-1,j)
    endif
@@ -928,14 +938,17 @@ if ((iand(ibcon,4) .ne. 0) .and. (jdim .eq. 1)) then
   do i = 1,m2
    do k = 1,m1
      radiate%fthrd(k,i,1)   = radiate%fthrd(k,i,2)
-     if(ilwrtyp == 3 .or. iswrtyp == 3) then
+     ! GRL 2024-03-22 added lw and sw heating rates
+     radiate%fthrdlw(k,i,1)   = radiate%fthrdlw(k,i,2)
+     radiate%fthrdsw(k,i,1)   = radiate%fthrdsw(k,i,2)
+     if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
        radiate%bext(k,i,1)    = radiate%bext(k,i,2)
      endif
-     if(iswrtyp == 3) then
+     if(iswrtyp >= 3) then
        radiate%swup(k,i,1) = radiate%swup(k,i,2)
        radiate%swdn(k,i,1) = radiate%swdn(k,i,2)
      endif
-     if(ilwrtyp == 3) then
+     if(ilwrtyp >= 3) then
        radiate%lwup(k,i,1) = radiate%lwup(k,i,2)
        radiate%lwdn(k,i,1) = radiate%lwdn(k,i,2)
      endif
@@ -948,14 +961,17 @@ if ((iand(ibcon,8) .ne. 0) .and. (jdim .eq. 1)) then
   do i = 1,m2
    do k = 1,m1
      radiate%fthrd(k,i,m3)  = radiate%fthrd(k,i,m3-1)
-     if(ilwrtyp == 3 .or. iswrtyp == 3) then
+     ! GRL 2024-03-22 added lw and sw heating rates
+     radiate%fthrdlw(k,i,m3)  = radiate%fthrdlw(k,i,m3-1)
+     radiate%fthrdsw(k,i,m3)  = radiate%fthrdsw(k,i,m3-1)
+     if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
        radiate%bext(k,i,m3)   = radiate%bext(k,i,m3-1)
      endif
-     if(iswrtyp == 3) then
+     if(iswrtyp >= 3) then
        radiate%swup(k,i,m3) = radiate%swup(k,i,m3-1)
        radiate%swdn(k,i,m3) = radiate%swdn(k,i,m3-1)
      endif
-     if(ilwrtyp == 3) then
+     if(ilwrtyp >= 3) then
        radiate%lwup(k,i,m3) = radiate%lwup(k,i,m3-1)
        radiate%lwdn(k,i,m3) = radiate%lwdn(k,i,m3-1)
      endif
@@ -1043,6 +1059,7 @@ if (iand(ibcon,1) .ne. 0) then
   radiate%rshort(1,j)  = radiate%rshort(2,j)
   radiate%rlong(1,j)   = radiate%rlong(2,j)
   radiate%rlongup(1,j) = radiate%rlongup(2,j)
+  radiate%rlontop(1,j) = radiate%rlontop(2,j)
   radiate%albedt(1,j)  = radiate%albedt(2,j)
   radiate%cosz(1,j)    = radiate%cosz(2,j)
   radiate%aodt(1,j)    = radiate%aodt(2,j)
@@ -1055,6 +1072,7 @@ if (iand(ibcon,2) .ne. 0) then
   radiate%rshort(m2,j)  = radiate%rshort(m2-1,j)
   radiate%rlong(m2,j)   = radiate%rlong(m2-1,j)
   radiate%rlongup(m2,j) = radiate%rlongup(m2-1,j)
+  radiate%rlontop(m2,j) = radiate%rlontop(m2-1,j)
   radiate%albedt(m2,j)  = radiate%albedt(m2-1,j)
   radiate%cosz(m2,j)    = radiate%cosz(m2-1,j)
   radiate%aodt(m2,j)    = radiate%aodt(m2-1,j)
@@ -1067,6 +1085,7 @@ if ((iand(ibcon,4) .ne. 0) .and. (jdim .eq. 1)) then
      radiate%rshort(i,1)  = radiate%rshort(i,2)
      radiate%rlong(i,1)   = radiate%rlong(i,2)
      radiate%rlongup(i,1) = radiate%rlongup(i,2)
+     radiate%rlontop(i,1) = radiate%rlontop(i,2)
      radiate%albedt(i,1)  = radiate%albedt(i,2)
      radiate%cosz(i,1)    = radiate%cosz(i,2)
      radiate%aodt(i,1)    = radiate%aodt(i,2)
@@ -1079,6 +1098,7 @@ if ((iand(ibcon,8) .ne. 0) .and. (jdim .eq. 1)) then
      radiate%rshort(i,m3)  = radiate%rshort(i,m3-1)
      radiate%rlong(i,m3)   = radiate%rlong(i,m3-1)
      radiate%rlongup(i,m3) = radiate%rlongup(i,m3-1)
+     radiate%rlontop(i,m3) = radiate%rlontop(i,m3-1)
      radiate%albedt(i,m3)  = radiate%albedt(i,m3-1)
      radiate%cosz(i,m3)    = radiate%cosz(i,m3-1)
      radiate%aodt(i,m3)    = radiate%aodt(i,m3-1)

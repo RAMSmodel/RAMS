@@ -230,6 +230,7 @@ type (hdf5_select_type) :: mem_select,file_select
 integer, dimension(HDF5_MAX_DIMS) :: file_chunks
 
 real, dimension(:), allocatable :: r_scratch
+real(kind=4):: zfp_accuracy = 0.
 
 if (nmachs .gt. 1) then
   iphdf5 = 1
@@ -252,34 +253,34 @@ CALL shdf5_open (flnm,'W',iphdf5,h5_fid,iclobber)
 ! Scalar variables
 CALL shdf5_set_hs_select (1,'W',ifm,mem_select,file_select,file_chunks)
 CALL shdf5_orec (h5_fid,iphdf5,'nx',mem_select,file_select       &
-                ,file_chunks,ivars=nnxp(ifm))
+                ,file_chunks, zfp_accuracy,ivars=nnxp(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'ny',mem_select,file_select       &
-                ,file_chunks,ivars=nnyp(ifm))
+                ,file_chunks, zfp_accuracy,ivars=nnyp(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'nzg',mem_select,file_select      &
-                ,file_chunks,ivars=nzg)
+                ,file_chunks, zfp_accuracy,ivars=nzg)
 CALL shdf5_orec (h5_fid,iphdf5,'npatch',mem_select,file_select   &
-                ,file_chunks,ivars=npatch)
+                ,file_chunks, zfp_accuracy,ivars=npatch)
 CALL shdf5_orec (h5_fid,iphdf5,'dx',mem_select,file_select       &
-                ,file_chunks,rvars=deltaxn(ifm))
+                ,file_chunks, zfp_accuracy,rvars=deltaxn(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'polelat',mem_select,file_select  &
-                ,file_chunks,rvars=polelat)
+                ,file_chunks, zfp_accuracy,rvars=polelat)
 CALL shdf5_orec (h5_fid,iphdf5,'polelon',mem_select,file_select  &
-                ,file_chunks,rvars=polelon)
+                ,file_chunks, zfp_accuracy,rvars=polelon)
 CALL shdf5_orec (h5_fid,iphdf5,'sw_lat',mem_select,file_select   &
-                ,file_chunks,rvars=glatr)
+                ,file_chunks, zfp_accuracy,rvars=glatr)
 CALL shdf5_orec (h5_fid,iphdf5,'sw_lon',mem_select,file_select   &
-                ,file_chunks,rvars=glonr)
+                ,file_chunks, zfp_accuracy,rvars=glonr)
 CALL shdf5_orec (h5_fid,iphdf5,'ivegtflg',mem_select,file_select &
-                ,file_chunks,ivars=ivegtflg(ifm))
+                ,file_chunks, zfp_accuracy,ivars=ivegtflg(ifm))
 CALL shdf5_orec (h5_fid,iphdf5,'isoilflg',mem_select,file_select &
-                ,file_chunks,ivars=isoilflg(ifm))
+                ,file_chunks, zfp_accuracy,ivars=isoilflg(ifm))
 
 ! Leaf3 2D vars
 CALL shdf5_set_hs_select (6,'W',ifm,mem_select,file_select,file_chunks)
 CALL shdf5_orec (h5_fid,iphdf5,'PATCH_AREA',mem_select,file_select &
-                ,file_chunks,rvara=sfcfile_p(ifm)%patch_area)
+                ,file_chunks, zfp_accuracy,rvara=sfcfile_p(ifm)%patch_area)
 CALL shdf5_orec (h5_fid,iphdf5,'LEAF_CLASS',mem_select,file_select &
-                ,file_chunks,rvara=sfcfile_p(ifm)%leaf_class)
+                ,file_chunks, zfp_accuracy,rvara=sfcfile_p(ifm)%leaf_class)
 
 ! Leaf3 Soil 3D vars
 allocate(r_scratch(mmxysp(ifm)))
@@ -287,7 +288,7 @@ CALL rearrange_p (mmxp(ifm),mmyp(ifm),nzg,npatch,sfcfile_p(ifm)%soil_text &
                  ,r_scratch)
 CALL shdf5_set_hs_select (4,'W',ifm,mem_select,file_select,file_chunks)
 CALL shdf5_orec (h5_fid,iphdf5,'SOIL_TEXT',mem_select,file_select &
-                ,file_chunks,rvara=r_scratch)
+                ,file_chunks, zfp_accuracy,rvara=r_scratch)
 deallocate(r_scratch)
 
 CALL shdf5_close (h5_fid)

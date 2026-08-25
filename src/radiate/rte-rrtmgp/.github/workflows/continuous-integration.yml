@@ -1,0 +1,111 @@
+name: Continuous Integration
+on:
+  push:
+    branches-ignore:
+    - documentation
+  pull_request:
+    branches-ignore:
+    - documentation
+
+defaults:
+  run:
+    # Enable Conda environment by using the login shell:
+    shell: bash -leo pipefail {0}
+
+jobs:
+  CI:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        fortran-compiler: [gfortran-10, gfortran-11, gfortran-12]
+        rte-kernels: [default, openacc]
+    env:
+      # Core variables:
+      FC: ${{ matrix.fortran-compiler }}
+      FCFLAGS: "-ffree-line-length-none -m64 -std=f2008 -march=native -fbounds-check -finit-real=nan -g -DRTE_USE_CBOOL"
+      # Make variables:
+      NCHOME: /dummy
+      NFHOME: /usr
+      RRTMGP_ROOT: ${{ github.workspace }}
+      RTE_KERNELS: ${{ matrix.rte-kernels }}
+      RUN_CMD:
+      # Auxiliary variables:
+      RFMIP_CACHEDIR: /home/runner/rfmip-files
+    steps:
+    #
+    # Checks-out repository under $GITHUB_WORKSPACE
+    #
+    - uses: actions/checkout@v3
+    #
+    # Synchronize the package index
+    #
+    - name: Synchronize the package index
+      run: sudo apt-get update
+    #
+    # Install NetCDF-Fortran (compatible with all compilers)
+    #
+    - name: Install NetCDF-Fortran
+      run: sudo apt-get install libnetcdff-dev
+    #
+    # Cache Conda packages
+    #
+    - name: Cache Conda packages
+      uses: actions/cache@v3
+      with:
+        path: ~/conda_pkgs_dir
+        key: conda-pkgs
+    #
+    # Set up Conda
+    #
+    - name: Set up Conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        miniforge-version: latest
+        activate-environment: rte_rrtmgp_test
+        environment-file: environment-noplots.yml
+        python-version: 3.9
+        auto-activate-base: false
+        # Use the cache properly:
+        use-only-tar-bz2: true
+    #
+    # Cache RFMIP files
+    #
+    - name: Cache RFMIP files
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.RFMIP_CACHEDIR }}
+        key: rfmip-files
+    #
+    # Stage RFMIP files
+    #
+    - name: Stage RFMIP files
+      run: |
+        if test ! -d "${RFMIP_CACHEDIR}"; then
+          mkdir -p "${RFMIP_CACHEDIR}" && cd "${RFMIP_CACHEDIR}"
+          python "${GITHUB_WORKSPACE}/examples/rfmip-clear-sky/stage_files.py"
+        fi
+        for file in "${RFMIP_CACHEDIR}"/*; do
+          if test ! -d "${file}"; then
+            echo "copying '${file}'..."
+            cp "${file}" "${GITHUB_WORKSPACE}/examples/rfmip-clear-sky/"
+          fi
+        done
+    #
+    # Build libraries, examples and tests
+    #
+    - name: Build libraries, examples and tests
+      run: |
+        $FC --version
+        make libs
+        make -C build separate-libs
+    #
+    # Run examples and tests
+    #
+    - name: Run examples and tests
+      run: make tests
+    #
+    # Compare the results
+    #
+    - name: Compare the results
+      run: make check

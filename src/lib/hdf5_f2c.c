@@ -6,6 +6,11 @@
 
 #include "hdf5.h"
 
+// for ZFP compression
+#ifdef ENABLE_ZFP_COMPRESSION
+#include "H5Zzfp_plugin.h"
+#endif
+
 // Size of temporary hsize_t arrays
 #define HDF5_MAX_DIMS 10
 
@@ -294,8 +299,8 @@ hid_t  fh5_set_hdf5_dtype (int type_code);
 // See the comments for fh5d_read() for info about the purpose of the hsize_t arrays.
 //
  void fh5d_write (int64_t *fileid,char *dname,int *h5type,int *iphdf5,int *m_ndims
-                ,int *m_select,int *f_ndims,int *f_select,int *f_csize,void *buf
-                ,int *hdferr)
+                ,int *m_select,int *f_ndims,int *f_select,int *f_csize, int *enable_truncation,
+                float *truncation_accuracy, void *buf, int *hdferr)
   {
   hid_t dsetid, fspcid, mspcid, propid;
   int i;
@@ -318,6 +323,12 @@ hid_t  fh5_set_hdf5_dtype (int type_code);
   hsize_t f_stride[HDF5_MAX_DIMS];
 
   hsize_t chunk_size[HDF5_MAX_DIMS]; // for the file data space
+  //bool enable_truncation = true;
+  // ZFP Parameter array
+  int cd_nelmts = 10;
+  unsigned int cd_vals[cd_nelmts];
+  //printf("ZFP Options: enable? %i accuracy? %f \n", *enable_truncation, *truncation_accuracy);
+  //float accuracy = 0.1;
   
   //******************* CONVERT INPUT ARGUMENTS *************************
 
@@ -361,11 +372,37 @@ hid_t  fh5_set_hdf5_dtype (int type_code);
     *hdferr = propid; 
     printf("Error in H5Pcreate, propid: %d", propid);
     return;}
-  
+
+  // Enable compression options. 
+  if(*enable_truncation == 1){
+    #ifdef ENABLE_ZFP_COMPRESSION
+    herr = H5Pset_chunk (propid,*f_ndims,chunk_size);
+      if (herr < 0) { 
+    *hdferr = herr; 
+    printf("Error in chunking, herr: %d", herr);
+    return;}
+
+    //printf("Truncating variable %s to accuracy %f\n", dname, *truncation_accuracy);
+    H5Pset_zfp_accuracy_cdata(*truncation_accuracy, cd_nelmts, cd_vals);
+    herr = H5Pset_filter(propid, H5Z_FILTER_ZFP, H5Z_FLAG_MANDATORY, cd_nelmts, cd_vals);
+
+      if (herr < 0) { 
+    *hdferr = herr; 
+    printf("Error in ZFP, herr: %d", herr);
+    return;}
+
+    #else
+    // we want truncation on, but the ZFP library isn't included.
+    *hdferr=-9999;
+    printf("Error: ZFP compression requested, but ZFP library not included.\n");
+    return;
+    #endif
+  }
+  else{
   herr = H5Pset_chunk (propid,*f_ndims,chunk_size);
   #if H5_VERSION_GE(1,10,3)
   #ifdef ENABLE_PARALLEL_COMPRESSION 
-  
+    
     herr = H5Pset_shuffle (propid);
     herr = H5Pset_deflate (propid,6);
   
@@ -383,6 +420,7 @@ hid_t  fh5_set_hdf5_dtype (int type_code);
     herr = H5Pset_deflate (propid,6);
     }
     #endif //H5_VERSION_GE if
+  }
   if (herr < 0) { 
     *hdferr = herr; 
     printf("Error in chunking, herr: %d", herr);

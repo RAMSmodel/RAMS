@@ -92,11 +92,9 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
          ,radiate_g(ngrid)%cosz    (1,1)    &
          ,radiate_g(ngrid)%rlongup (1,1))
 
-   endif
+   ! Using Harrington, BUGSRAD, or RTE+RRTMGP radiation
 
-   ! Using Harrington radiation
-
-   if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3) then
+   elseif (iswrtyp .ge. 3 .or. ilwrtyp .ge. 3) then
 
       ! If first call for this node, initialize several quantities & Mclatchy
       ! sounding data.
@@ -107,20 +105,42 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
             ,exptabc,ulim,npartob,npartg,ncog,ncb  &
             ,ocoef,bcoef,gcoef,gnu)
 
-         CALL mclatchy (1,mzp  &
-            ,grid_g(ngrid)%glat       (1,1)  &
-            ,grid_g(ngrid)%rtgt       (1,1)  &
-            ,grid_g(ngrid)%topt       (1,1)  &
-            ,radiate_g(ngrid)%rlongup (1,1)  &
-            ,zm,zt,vctr1,vctr2,vctr3,vctr4,vctr5,vctr6,vctr7  &
-            ,vctr8,vctr9,vctr10,vctr11,vctr12 &
-            )
-
+         !Adele - this call to mclatchy only requires the last two values of zt 
+         !and the length of zt. The full profile of zt is unnecessary. As such,
+         !pass in the height array that defines the top of the known atmosphere.
+         !For most simulations, that will likely be zt, the prognostic height levels
+         !For horizontally homogeneous simulations, the input sounding may extend
+         !well beyond the model top. In this case, use the input sounding for 
+         !radiation calculations. Even in this case, more radiation levels may be
+         !necessary. This call to mclatchy will determine how many additional levels
+         !are needed.
+         if ((initial == 1 .or. initorig == 1) .and. hs(nsndg)>zt(mzp)) then
+            CALL mclatchy (1,nsndg  &
+               ,grid_g(ngrid)%glat       (1,1)  &
+               ,grid_g(ngrid)%rtgt       (1,1)  &
+               ,grid_g(ngrid)%topt       (1,1)  &
+               ,radiate_g(ngrid)%rlongup (1,1)  &
+               ,hs,hs,vctr1,vctr2,vctr3,vctr4,vctr5,vctr6,vctr7  &
+               ,vctr8,vctr9,vctr10,vctr11,vctr12 &
+               )
+         else
+            CALL mclatchy (1,mzp  &
+              ,grid_g(ngrid)%glat       (1,1)  &
+              ,grid_g(ngrid)%rtgt       (1,1)  &
+              ,grid_g(ngrid)%topt       (1,1)  &
+              ,radiate_g(ngrid)%rlongup (1,1)  &
+              ,zm,zt,vctr1,vctr2,vctr3,vctr4,vctr5,vctr6,vctr7  &
+              ,vctr8,vctr9,vctr10,vctr11,vctr12 &
+              )
+         endif
          ncall = ncall + 1
       endif
 
       ! For any call, interpolate the mclatchy sounding data by latitude and
       ! season.
+      ! Adele - note that this call to mclatchy does not require any variables 
+      ! to be passed! No modifications then are necessary if we are using 
+      ! the input sounding for radiation
 
       CALL mclatchy (2,mzp  &
          ,grid_g(ngrid)%glat       (1,1)  &
@@ -139,6 +159,9 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
            ! Zero out the radiative heating rate "fthrd" if this this a 
            ! radiation timestep and fthrd will be updated.
            CALL azero (mzp*mxp*myp,radiate_g(ngrid)%fthrd(1,1,1))
+           CALL azero (mzp*mxp*myp,radiate_g(ngrid)%fthrdlw(1,1,1))
+           CALL azero (mzp*mxp*myp,radiate_g(ngrid)%fthrdsw(1,1,1))
+
            ! Run the Harrington radiation for non-LEVEL=3 micro
            CALL radcomp3 (mzp,mxp,myp,ia,iz,ja,jz  &
             ,grid_g(ngrid)%glat       (1,1)    &
@@ -147,12 +170,15 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
             ,radiate_g(ngrid)%albedt  (1,1)    &
             ,radiate_g(ngrid)%cosz    (1,1)    &
             ,radiate_g(ngrid)%rlongup (1,1)    &
+            ,radiate_g(ngrid)%rlontop (1,1)    &
             ,radiate_g(ngrid)%rshort  (1,1)    &
             ,radiate_g(ngrid)%rlong   (1,1)    &
             ,radiate_g(ngrid)%aodt    (1,1)    &
             ,basic_g(ngrid)%rv        (1,1,1)  &
             ,basic_g(ngrid)%dn0       (1,1,1)  &
             ,radiate_g(ngrid)%fthrd   (1,1,1)  &
+            ,radiate_g(ngrid)%fthrdlw   (1,1,1)  &
+            ,radiate_g(ngrid)%fthrdsw   (1,1,1)  &
             ,basic_g(ngrid)%pi0       (1,1,1)  &
             ,basic_g(ngrid)%pp        (1,1,1)  &
             ,basic_g(ngrid)%theta     (1,1,1)  &
@@ -181,7 +207,6 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
             ,micro_g(ngrid)%abc2np     (1,1,1)  &
             ,micro_g(ngrid)%abc2mp     (1,1,1))
       endif
-
    endif
 
 endif
@@ -460,8 +485,8 @@ END SUBROUTINE radcomp
 
 !##############################################################################
 Subroutine radcomp3 (m1,m2,m3,ia,iz,ja,jz  &
-   ,glat,rtgt,topt,albedt,cosz,rlongup,rshort,rlong,aodt  &
-   ,rv,dn0,fthrd,pi0,pp,theta,rcp &
+   ,glat,rtgt,topt,albedt,cosz,rlongup,rlontop,rshort,rlong,aodt  &
+   ,rv,dn0,fthrd,fthrdlw,fthrdsw,pi0,pp,theta,rcp &
    ,bext,swup,swdn,lwup,lwdn &
    ,cn1np,cn1mp,cn2np,cn2mp,md1np,md1mp,md2np,md2mp &
    ,salt_film_np,salt_film_mp,salt_jet_np,salt_jet_mp &
@@ -477,11 +502,11 @@ use micro_prm, only:iceprocs
 
 implicit none
 
-integer :: m1,m2,m3,ia,iz,ja,jz,mcat,i,j,k
+integer :: m1,m2,m3,ia,iz,ja,jz,mcat,i,j,k,kk,k0
 
 real :: cfmasi,cparmi,glg,glgm,picpi
-real, dimension(m2,m3) :: glat,rtgt,topt,cosz,albedt,rlongup,rshort,rlong,aodt
-real, dimension(m1,m2,m3) :: dn0,rv,fthrd,pi0,pp,theta,rcp
+real, dimension(m2,m3) :: glat,rtgt,topt,cosz,albedt,rlongup,rlontop,rshort,rlong,aodt
+real, dimension(m1,m2,m3) :: dn0,rv,fthrd,fthrdlw,fthrdsw,pi0,pp,theta,rcp
 real, dimension(m1,m2,m3) :: bext,swup,swdn,lwup,lwdn
 real, dimension(m1,m2,m3) :: cn1np,cn1mp,cn2np,cn2mp,md1np,md1mp,md2np,md2mp &
   ,salt_film_np,salt_film_mp,salt_jet_np,salt_jet_mp,salt_spum_np,salt_spum_mp &
@@ -548,22 +573,32 @@ do j = ja,jz
            ,abc2np(1,i,j),abc2mp(1,i,j))
       endif
 
-      CALL radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
-         ,glat(i,j),rtgt(i,j),topt(i,j),rv(1,i,j) &
-         ,albedt(i,j)          &
-         ,cosz(i,j)            &
-         ,rlongup(i,j)         &
-         ,rshort(i,j)          &
-         ,rlong(i,j)           &
-         ,aodt(i,j)            &
-         ,fthrd(1,i,j)         &
-         ,bext(1,i,j)          &
-         ,swup(1,i,j)          &
-         ,swdn(1,i,j)          &
-         ,lwup(1,i,j)          &
-         ,lwdn(1,i,j)          &
-         ,dn0(1,i,j)           &
-         )
+      if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3) then
+         CALL radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
+            ,glat(i,j),rtgt(i,j),topt(i,j),rv(1,i,j) &
+            ,albedt(i,j)          &
+            ,cosz(i,j)            &
+            ,rlongup(i,j)         &
+            ,rlontop(i,j)         &
+            ,rshort(i,j)          &
+            ,rlong(i,j)           &
+            ,aodt(i,j)            &
+            ,fthrd(1,i,j)         &
+            ,fthrdlw(1,i,j)         &
+            ,fthrdsw(1,i,j)         &
+            ,bext(1,i,j)          &
+            ,swup(1,i,j)          &
+            ,swdn(1,i,j)          &
+            ,lwup(1,i,j)          &
+            ,lwdn(1,i,j)          &
+            ,dn0(1,i,j)           &
+            )
+      else
+         print*,'iswrtyp and/or ilwrtyp = 4 and level /=3'
+         print*,'this is not currently a compatible combination,'
+         print*,'but feel free to make the code change yourself.'
+         print*,'It shouldnt be too hard. See rad_driv line 569'
+      endif
 
    enddo
 enddo
@@ -654,8 +689,8 @@ END SUBROUTINE zen
 
 !##############################################################################
 Subroutine radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
-   ,glat,rtgt,topt,rv,albedt,cosz,rlongup,rshort,rlong,aodt &
-   ,fthrd,bext,swup,swdn,lwup,lwdn &
+   ,glat,rtgt,topt,rv,albedt,cosz,rlongup,rlontop,rshort,rlong,aodt &
+   ,fthrd,fthrdlw,fthrdsw,bext,swup,swdn,lwup,lwdn &
    ,dn0 &
    )
 
@@ -710,6 +745,7 @@ Subroutine radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
 !  albedt           : surface albedo
 !  cosz             : solar zenith angle
 !  rlongup          : upward longwave radiation at surface (W/m^2)
+!  rlontop          : upward longwave at top radiation level (W/m^2)
 !  rshort           : downward shortwave radiation at surface (W/m^2)
 !  rlong            : downward longwave radiation at surface (W/m^2)
 !  aodt             : total aerosol optical depth (band=3)
@@ -737,7 +773,7 @@ Subroutine radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
 !  dl (nrad)        : air density of all radiation levels (kg/m^3)
 !  rl (nrad)        : vapor density of all radiation levels (kg/m^3)
 !  vp (nrad)        : vapor pressure (Pa)
-!  o3l (nrad)       : stores the calculated ozone profile (g/m^3)
+!  o3l (nrad)       : stores the calculated ozone profile (g/m^3) !GRL pretty sure this is also kg/m3 from values
 !  flxu (nrad)      : Total upwelling flux (W/m^2)
 !  flxd (nrad)      : Total downwelling flux (W/m^2)
 !  t (nrad)         : layer transmission func
@@ -819,12 +855,14 @@ use rconstants
 use rrad3
 use micphys
 use node_mod
+use ref_sounding, only:nzref
+use mem_grid, only:initial, initorig
 
 implicit none
 
 integer m1,maxnzp,mcat,ngrid
 integer :: iswrtyp,ilwrtyp
-integer i,j,k
+integer i,j,k,kk,k0,nzr
 integer, save :: ncall = 0,nradmax
 integer, save :: ngass(mg)=(/1, 1, 1/),ngast(mg)=(/1, 1, 1/)
 !     one can choose the gases of importance here,
@@ -836,8 +874,8 @@ integer, save :: ngass(mg)=(/1, 1, 1/),ngast(mg)=(/1, 1, 1/)
 !       ngas(3) =  O3
 
 real, save :: eps=1.e-15
-real :: glat,rtgt,topt,cosz,albedt,rlongup,rshort,rlong,aodt
-real :: zm(m1),zt(m1),dn0(m1),rv(m1),fthrd(m1)
+real :: glat,rtgt,topt,cosz,albedt,rlongup,rlontop,rshort,rlong,aodt
+real :: zm(m1),zt(m1),dn0(m1),rv(m1),fthrd(m1),fthrdsw(m1),fthrdlw(m1)
 real :: bext(m1),swup(m1),swdn(m1),lwup(m1),lwdn(m1)
 
 real, allocatable, save, dimension(:)     :: zml,ztl,dzl,pl,tl,dl,rl,o3l  &
@@ -854,7 +892,12 @@ real, external :: rslf
 
 if (ncall == 0) then
    ncall = 1
-   nradmax = maxnzp + namax
+   if (initial == 1 .or. initorig == 1) then
+      nrad = nzref - 1 + narad
+   else
+      nrad = m1 - 1 + narad
+   endif
+   nradmax = nrad
    allocate(zml  (nradmax) ,ztl  (nradmax) ,dzl  (nradmax) ,pl (nradmax)  &
            ,tl   (nradmax) ,dl   (nradmax) ,rl   (nradmax) ,o3l(nradmax)  &
            ,vp   (nradmax) ,flxus(nradmax) ,flxds(nradmax) ,tg (nradmax)  &
@@ -867,18 +910,9 @@ if (ncall == 0) then
    tg=0.
 endif
 
-nrad = m1 - 1 + narad
-
-! rlongup used to set tl(1): stephan*tl^4=rlongup
- CALL mclatchy (3,m1  &
-   ,glat,rtgt,topt,rlongup  &
-   ,zm,zt,press,tair,dn0,rv,zml,ztl,pl,tl,dl,rl,o3l,dzl &
-   )
-
-! calculate non-dimensional pressure
-do k=1,m1
-  exner(k) = (press(k)*p00i)**rocp
-enddo
+CALL prep_atm_profiles(nrad,zml,ztl,pl,tl,dl,rl,o3l,dzl, &
+                       m1,zm,zt,dn0,rv, &
+                       glat,rtgt,topt,rlongup) 
 
 ! zero out scratch arrays
  CALL azero (nrad*mg,u)
@@ -914,21 +948,6 @@ endif
  CALL path_lengths (nrad,u,rl,dzl,dl,o3l,vp,pl,eps)
 
 do k = 1,nrad
-   if (rl(k) <   0. .or.  &
-       dl(k) <   0. .or.  &
-       pl(k) <   0. .or.  &
-      o3l(k) <   0.) then
-      print*, 'Negative value of density, vapor, pressure, or ozone'
-      print*, 'when calling Harrington radiation'
-      print*, 'at k,i,j = ',k,i+mi0(ngrid),j+mj0(ngrid)
-      print*, 'ngrid=',ngrid
-      print*, 'stopping model'
-      print*, 'rad: rl(k), dl(k), pl(k), o3l(k)'
-      print*, rv(k), dl(k), pl(k), o3l(k)
-      stop
-   endif
-enddo
-do k = 1,nrad
    if (tl(k) < 160.) then
       print*, 'Temperature too low when calling Harrington radiation' 
       print*, 'at k,i,j = ',k,i+mi0(ngrid),j+mj0(ngrid)
@@ -953,13 +972,15 @@ if (iswrtyp == 3 .and. cosz > 0.03) then
    rshort = flxds(1)
 
    do k = 2,m1-1
+      exner(k) = (press(k)*p00i)**rocp
       !divide by exner to get potential temp heating rate
-      fthrd(k) = fthrd(k)  &
-         + (flxds(k) - flxds(k-1) + flxus(k-1) - flxus(k)) &
+      fthrdsw(k) = (flxds(k) - flxds(k-1) + flxus(k-1) - flxus(k)) &
             / (dl(k) * dzl(k) * cp * exner(k))
+      fthrd(k) = fthrd(k) + fthrdsw(k)
       swup(k) = flxus(k)
       swdn(k) = flxds(k)
     enddo
+
     !lower and upper boundary conditions on swup and swdn
     swup(1) = flxus(1)
     swup(m1) = flxus(nrad) ! use the top radiation value rather than m1 value
@@ -987,15 +1008,19 @@ if (ilwrtyp == 3) then
    !Set rlong to surface level downward longwave flux.
    rlong = flxdl(1)
 
+   ! Save upwelling longwave radiation (OLR) at top radiation level
+   rlontop = flxul(nrad)
+
+
    !Make lowest level upward longwave flux equal to rlongup
    !produced from land surface models (LEAF,SiB).
    flxul(1) = rlongup
 
    do k = 2,m1-1
       !divide by exner to get potential temp heating rate
-      fthrd(k) = fthrd(k)  &
-         + (flxdl(k) - flxdl(k-1) + flxul(k-1) - flxul(k)) &
+      fthrdlw(k) = (flxdl(k) - flxdl(k-1) + flxul(k-1) - flxul(k)) &
             / (dl(k) * dzl(k) * cp * exner(k))
+      fthrd(k) = fthrd(k) +fthrdlw(k)
       lwup(k) = flxul(k)
       lwdn(k) = flxdl(k)
    enddo
@@ -1235,6 +1260,7 @@ END SUBROUTINE sum_opt
 Subroutine path_lengths (nrad,u,rl,dzl,dl,o3l,vp,pl,eps)
 
 ! Get the path lengths for the various gases...
+! GRL 2024-03-14: Converting from mass path length to pressure path length 
 
 implicit none
 
@@ -1244,8 +1270,16 @@ real, dimension(nrad,3) :: u
 real :: rvk0,rvk1,dzl9,rmix,eps
 integer :: k
 
+! water vapor
 u(1,1) = .5 * (rl(2) + rl(1)) * 9.81 * dzl(1)
-u(1,2) = .5 * (dl(2) + dl(1)) * .45575e-3 * 9.81 * dzl(1)
+
+! carbon dioxide
+! GRL edited CO2 concentration to be 420ppm 2024-08-27
+! constant value before 9.81 (g) is CO2(parts per million)/(1,000,000) * (M_co2/M_d)
+! where M_co2/M_d is ratio of molar mass CO2 to dry air = 44.01/28.964= 1.519472
+u(1,2) = .5 * (dl(2) + dl(1)) * .6382e-3 * 9.81 * dzl(1)
+
+! ozone
 u(1,3) = o3l(1) * 9.81 * dzl(1)
 
 rvk0 = rl(1)
@@ -1255,8 +1289,9 @@ do k = 2,nrad
    rmix = rvk1 / dl(k)
    vp(k) = pl(k) * rmix / (.622 + rmix)
    u(k,1) = (rvk1 - rvk0) / (log(rvk1 / rvk0) + eps) * dzl9
+   !GRL edited CO2 profile 2024-08-27
    u(k,2) = (dl(k) - dl(k-1)) / (log(dl(k) / dl(k-1)) + eps)  &
-       * dzl9 * 0.45575e-3
+         * dzl9 * 0.6283e-3
    u(k,3) = 0.5 * dzl9 * (o3l(k) + o3l(k-1))
    rvk0 = rvk1
 enddo
@@ -1395,3 +1430,434 @@ endif !if Iceprocs
 
 return
 END SUBROUTINE cloud_prep_lev4
+!##############################################################################
+Subroutine radcalc4 (m1,maxnzp,mcat,iswrtyp,ilwrtyp  &
+   ,glat,rtgt,topt,albedt,cosz,rlongup,rlontop,rshort,rlong  &
+   ,zm,zt,rv,dn0,pi0,pp,fthrd,i,j,ngrid &
+   ,bext,swup,swdn,lwup,lwdn)
+
+! BUGSRAD radiation
+
+use rconstants
+use rrad3
+use micphys
+use mem_grid, only: time
+use ref_sounding, only:nzref
+use mem_grid, only:initial, initorig
+
+implicit none
+
+integer m1,maxnzp,mcat,ngrid
+integer :: iswrtyp,ilwrtyp
+integer i,j,k,ii,printsound
+integer, save :: ncall = 0,nradmax
+integer, save :: ngass(mg)=(/1, 1, 1/),ngast(mg)=(/1, 1, 1/)
+!     one can choose the gases of importance here,
+!       ngas = 1    gas active
+!            = 0    gas not active
+!
+!       ngas(1) = H2O
+!       ngas(2) = CO2
+!       ngas(3) =  O3
+
+real, save :: eps=1.e-15
+real :: prsnz,prsnzp
+real :: glat,rtgt,topt,cosz,albedt,rlongup,rlontop,rshort,rlong
+real :: zm(m1),zt(m1),dn0(m1),rv(m1),pi0(m1),pp(m1),fthrd(m1)
+real :: bext(m1),swup(m1),swdn(m1),lwup(m1),lwdn(m1)
+
+real, allocatable, save, dimension(:)     :: zml,ztl,dzl,pl,tl,dl,rl,o3l  &
+                                      ,flxus,flxds  &
+                                      ,flxul,flxdl  &
+                                      ,rcl,ncl,rrl,ril,rsl &
+                                      ,fthsw,fthlw
+
+real :: exner(m1) ! non-dimensional pressure
+
+!Saleeby(2011):Variables for radiatively active aerosols
+real :: relh(m1)
+real, external :: rslf
+
+if (ncall == 0) then
+   ncall = 1
+   if (initial == 1 .or. initorig == 1) then
+      nrad = nzref - 1 + narad
+   else
+      nrad = m1 - 1 + narad
+   endif
+   nradmax = nrad
+   
+   allocate(zml  (nradmax) ,ztl  (nradmax) ,dzl  (nradmax) ,pl (nradmax)  &
+           ,tl   (nradmax) ,dl   (nradmax) ,rl   (nradmax) ,o3l(nradmax)  &
+           ,fthsw (nradmax),fthlw(nradmax)                                &
+           ,flxul(nradmax),flxdl(nradmax),flxds(nradmax),flxus(nradmax)   &
+           ,rcl(nradmax),ncl(nradmax),rrl(nradmax),ril(nradmax),rsl(nradmax))
+endif
+
+CALL prep_atm_profiles(nrad,zml,ztl,pl,tl,dl,rl,o3l,dzl, &
+                       m1,zm,zt,dn0,rv, &
+                       glat,rtgt,topt,rlongup) 
+
+if (level.eq.4) then
+   CALL cloud_prep_lev4 (m1,i,j,ngrid)
+endif
+
+rcl(1:m1)=rx(1:m1,1)
+ncl(1:m1)=cx(1:m1,1)
+rrl(1:m1)=rx(1:m1,2)
+ril(1:m1)=rx(1:m1,3)+rx(1:m1,4)
+rsl(1:m1)=rx(1:m1,5)
+rcl(m1:nrad)=0.
+ncl(m1:nrad)=0.
+rrl(m1:nrad)=0.
+ril(m1:nrad)=0.
+rsl(m1:nrad)=0.
+
+! call shortwave and longwave schemes...
+
+CALL azero2 (nrad,fthsw,fthlw)
+CALL azero2 (nrad,flxus,flxds)
+CALL azero2 (nrad,flxul,flxdl)
+
+CALL bugs_driver(nrad,cosz,albedt,pl(1:nrad),tl(1:nrad),rl(1:nrad),rcl(1:nrad) &
+                 ,ncl(1:nrad),ril(1:nrad),rrl(1:nrad),rsl(1:nrad),o3l(1:nrad) &
+                 ,fthsw(1:nrad),fthlw(1:nrad),flxus(1:nrad),flxds(1:nrad) &
+                 ,flxul(1:nrad),flxdl(1:nrad))
+
+do k = 1,m1!2,m1-1
+   exner(k) = (pi0(k)+pp(k))/cp
+   !divide by exner to get potential temp heating rate
+   fthrd(k) = fthrd(k) + (fthsw(k)+fthlw(k))/exner(k)
+   swup(k) = flxus(k)
+   swdn(k) = flxds(k)
+
+   lwup(k) = flxul(k)
+   lwdn(k) = flxdl(k) 
+enddo
+
+rshort = flxds(1)
+
+rlong = flxdl(1)
+
+rlontop = flxul(nrad)
+
+!not integrated with BUGSrad yet. just diagnostic anyway
+bext(:)=0.
+
+return
+END SUBROUTINE radcalc4
+!##############################################################################
+Subroutine radcalc5 (m1,maxnzp,iswrtyp,ilwrtyp  &
+   ,glat,rtgt,topt,albedt,cosz,rlongup,rlontop,rshort,rlong,aodt  &
+   ,zm,zt,rv,dn0,pi0,pp,fthrd,fthrdlw,fthrdsw,i,j,ngrid &
+   ,bext,swup,swdn,lwup,lwdn)
+
+! RTE+RRTMGP radiation
+
+use rconstants
+use rrad3
+use micphys
+use mem_grid, only: time
+use ref_sounding, only:nzref
+use mem_grid, only:initial, initorig
+
+implicit none
+
+integer m1,maxnzp,icat,ihcat,ngrid
+integer :: iswrtyp,ilwrtyp
+integer i,j,k,ii,printsound
+integer, save :: ncall = 0,nradmax
+
+real :: glat,rtgt,topt,cosz,albedt,rlongup,rlontop,rshort,rlong,aodt
+real :: zm(m1),zt(m1),dn0(m1),rv(m1),pi0(m1),pp(m1),fthrd(m1),fthrdlw(m1),fthrdsw(m1)
+real :: bext(m1),swup(m1),swdn(m1),lwup(m1),lwdn(m1)
+
+real, allocatable, save, dimension(:) :: zml,ztl,dzl,pl,tl,dl,rl,o3l  &
+                                      ,flxus,flxds  &
+                                      ,flxul,flxdl  &
+                                      ,fthsw,fthlw
+
+real, allocatable, save, dimension(:,:) :: rrl,reff,amass,acon,arad
+integer, save :: atype(aerocat) 
+integer, allocatable, save, dimension(:,:) :: rcat
+real :: exner(m1) ! non-dimensional pressure
+
+!Variables for radiatively active aerosols
+real, allocatable, save, dimension(:) :: relh
+real, external :: rslf
+
+! From OLAM:
+!     Lookup table category             RAMS/OLAM Microphysics
+! ----------------------------------------------------------------
+!  1:   cloud drops                 1.  cloud drops
+!  2:   drizzle                     2.  rain
+!  3:   rain                        3.  pristine ice columns
+!  4:   hail                        4.  snow columns
+!  5:   aggregates                  5.  aggregates
+!  6:   hollow columns              6.  graupel
+!  7:   solid columns               7.  hail
+!  8:   hexagonal plates            8.  drizzle
+!  9:   rosettes                    9.  pristine ice hexagonal plates
+!                                  10.  pristine ice dendrites
+!                                  11.  pristine ice needles
+!                                  12.  pristine ice rosettes
+!                                  13.  snow hexagonal plates
+!                                  14.  snow dendrites
+!                                  15.  snow needles
+!                                  16.  snow rosettes
+
+                                      ! 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+integer, parameter :: kradcat(16) = (/1,3,6,6,5,4,4,2,8, 8, 7, 9, 8, 8, 7, 9/)
+
+! FIRST CALL INITIALIZATIONS
+ if (ncall == 0) then
+   ncall = 1
+   if (initial == 1 .or. initorig == 1) then
+      nrad = nzref - 1 + narad
+   else
+      nrad = m1 - 1 + narad
+   endif
+   nradmax = nrad
+   allocate(zml  (nradmax) ,ztl  (nradmax) ,dzl  (nradmax) ,pl (nradmax)  &
+           ,tl   (nradmax) ,dl   (nradmax) ,rl   (nradmax) ,o3l(nradmax)  &
+           , fthsw (nradmax),fthlw(nradmax)                               &
+           ,flxul(nradmax),flxdl(nradmax),flxds(nradmax),flxus(nradmax))   
+   allocate(rrl(nradmax,ncat),reff(nradmax,ncat),rcat(nradmax,ncat))
+   allocate(amass(nradmax,aerocat),acon(nradmax,aerocat), &
+                            arad(nradmax,aerocat),relh(nradmax))
+
+   atype(:) = 0
+   if(iaerosol>0) then
+     atype(1)=1
+     atype(2)=1
+   endif
+   if(idust>0) then
+  !Adele - using aerosol type to additionally include the 
+  !R(Im) index
+     atype(3)=30+dust_ref_im
+     atype(4)=30+dust_ref_im
+   endif
+   if(isalt>0) then
+     atype(5)=2
+     atype(6)=2
+     atype(7)=2
+   endif
+   if(iabcarb>0) then
+     atype(8)=4
+     atype(9)=5
+   endif
+   if(iccnlev>=2) then
+     atype(aerocat-1) = 1
+     atype(aerocat)   = 1
+   endif
+
+   call rte_rrtmgp_init()
+ endif
+!END FIRST CALL CODE ------------------------------------------
+  
+
+!GET ATMOSPHERE ABOVE MODEL TOP-------------------------------
+CALL prep_atm_profiles(nrad,zml,ztl,pl,tl,dl,rl,o3l,dzl, &
+                       m1,zm,zt,dn0,rv, &
+                       glat,rtgt,topt,rlongup) 
+
+
+! PREP AEROSOLS FOR RADIATION ----------------------------------
+amass = 0.
+acon = 0.
+arad = 0.
+relh = 0.
+if(iaerorad==1 .and. level .ne. 4) then
+ do k=1,m1
+   amass(k,:) = aeromas(k,:)
+   acon(k,:) = aerocon(k,:)
+ enddo
+ !Could choose to insert a static aerosol layer above the domain top
+
+ do acat=1,aerocat
+   do k = 1,nrad
+    if(acon(k,acat)>mincon .and. amass(k,acat)>=minmas) then
+     arad(k,acat)=((0.23873/aero_rhosol(acat) &
+         *amass(k,acat)/acon(k,acat))**(1./3.))/aero_rg2rm(acat)
+    else
+     arad(k,acat)=0.005e-6
+    endif
+    !convert acon from #/kg to #/m2
+    acon(k,acat) = acon(k,acat)*dl(k)*dzl(k)
+   enddo
+ enddo
+ 
+ do k=1,nrad
+   relh(k) = rl(k)/rslf(pl(k),tl(k))
+ enddo
+endif
+
+! PREP CLOUDS FOR RADIATION --------------------------------------
+! rl is a volume mixing ratio, not a mass mixing ratio
+rrl = 0.
+reff = 0.
+
+if (level.eq.4) then
+   print*,'bin microphysics not coupled to RTE-RRTMGP yet'
+   stop
+   CALL cloud_prep_lev4 (m1,i,j,ngrid)
+endif
+
+do icat = 1,ncat
+   if (jnmb(icat) == 0) then
+      rcat(:,icat) = 0.
+      rrl(:,icat) = 0.
+      reff(:,icat) = 0. 
+   else
+      do k = 2,m1-1
+         ihcat = jhcat(k,icat)
+         rcat(k,icat) = kradcat(ihcat)
+         rrl(k,icat) = rx(k,icat) * dl(k) * dzl(k) * 1000. !layer water path in g/m^2
+         !reff = (nu + 2) * Dn/2
+         reff(k,icat) = (gnu(icat) + 2.) * 0.5 * dnfac(ihcat) * emb(k,icat) ** pwmasi(ihcat) * 1.e6
+         !effective radius in microns
+      enddo
+      !reff, rrl, and rcat have nrad levels. Could insert a static cloud above the model top
+   endif
+enddo
+
+
+! Call RTE-RRTMGP  -----------------------------------------
+
+CALL azero2 (nrad,fthsw,fthlw)
+CALL azero2 (nrad,flxus,flxds)
+CALL azero2 (nrad,flxul,flxdl)
+
+CALL rte_rrtmgp_driver(nrad,ncat,aerocat,cosz,albedt,pl(2:nrad),tl(2:nrad),relh(2:nrad) &
+                 ,ztl(2:nrad),zml(1:nrad) &
+                 ,rl(2:nrad),tl(1), rrl(2:nrad,:),reff(2:nrad,:),rcat(2:nrad,:) &
+                 ,acon(2:nrad,:),arad(2:nrad,:),atype,aodt &
+                 ,o3l(2:nrad),flxus(1:nrad),flxds(1:nrad) &
+                 ,flxul(1:nrad),flxdl(1:nrad),fthsw(2:nrad),fthlw(2:nrad))
+
+! GET FLUXES and HEATING RATES -----------------------------
+! fluxes are defined on zm levels
+do k = 1,m1-1
+   swup(k) = flxus(k)
+   swdn(k) = flxds(k)
+
+   lwup(k) = flxul(k)
+   lwdn(k) = flxdl(k) 
+enddo
+!Use top of radiative atmosphere rather than top of model
+swup(m1)=flxus(nrad)
+swdn(m1)=flxds(nrad)
+lwup(m1)=flxul(nrad)
+lwdn(m1)=flxdl(nrad)
+
+!heating rates are defined on zt levels
+do k = 2,m1
+   exner(k) = (pi0(k)+pp(k))/cp
+   !divide by exner to get potential temp heating rate
+   fthrd(k) = (fthsw(k)+fthlw(k))/exner(k)
+
+   !GRL 2024-03-22 added lw and sw heating rates
+   fthrdlw(k) = fthlw(k)/exner(k)
+   fthrdsw(k) = fthsw(k)/exner(k)
+enddo
+
+rshort = flxds(1)
+
+rlong = flxdl(1)
+
+rlontop = flxul(nrad)
+
+
+!not integrated with RTE+RRTMGP yet. just diagnostic anyway
+bext(:)=0.
+
+return
+END SUBROUTINE radcalc5
+! --------------------------------------------------------------------
+Subroutine prep_atm_profiles(nrad,zml,ztl,pl,tl,dl,rl,o3l,dzl, &
+                             m1,zm,zt,dn0,rv, & 
+                             glat,rtgt,topt,rlongup) 
+
+use ref_sounding
+use micphys, only: press, tair
+use mem_grid, only:zmn, ztn, ngrid, initial, initorig
+use rconstants, only:rgas
+
+integer :: k,kk,k0,nzr,nrad,m1
+real :: dzr
+real, dimension(m1) :: zm,zt,dn0,rv
+real, dimension(nrad) :: zml,ztl,pl,tl,dl,rl,o3l,dzl
+real,allocatable, dimension(:) :: zmt, ztt, dn0t, rvt 
+
+!Adele - if we initialized horizontally homogeneously, then use the 
+!input sounding to define the atm. properties above model top
+!before the call to mclatchy
+
+nzr = m1
+if ((initial == 1 .or. initorig == 1).and.hs(nsndg)>zm(m1)) then
+   k0 = 0
+   do k = 1, nsndg
+      !If we are above the prognostic model top
+      if (hs(k)>zm(m1)) then   
+         if (k0==0) then
+            k0=k
+            nzr = m1 + nsndg - k0 + 1
+            allocate(ztt(nzr), zmt(nzr), rvt(nzr), dn0t(nzr))
+            ztt(1:m1) = zt
+            zmt(1:m1) = zm
+            rvt(1:m1) = rv
+            dn0t(1:m1) = dn0
+         endif
+         kk = m1+k-k0+1
+         press(kk) = ps(k)
+         tair(kk) = ts(k)
+         rvt(kk) = rts(k)
+         dn0t(kk) = press(kk)/rgas/(tair(kk)*(1+0.61*rvt(kk)))
+         ztt(kk) = hs(k)
+      endif
+   enddo
+   do k = m1+1, nzr-2
+      dzr = ((ztt(k+2)-ztt(k+1))/(ztt(k)-ztt(k-1)))**(0.25)
+      zmt(k) = ztt(k) + (ztt(k+1)-ztt(k))/(1.+dzr)
+   enddo
+   if(nzr-m1>1) zmt(nzr-1) = (ztt(nzr)+ztt(nzr-1))/2.
+   zmt(nzr) = zmt(nzr-1) + (ztt(nzr)-ztt(nzr-1))
+else
+   allocate(ztt(m1),zmt(m1),rvt(m1),dn0t(m1))
+   ztt = zt
+   zmt = zm
+   rvt = rv
+   dn0t = dn0
+endif
+
+! rlongup used to set tl(1): stephan*tl^4=rlongup
+CALL mclatchy (3,nzr  &
+  ,glat,rtgt,topt,rlongup  &
+  ,zmt,ztt,press,tair,dn0t,rvt,zml,ztl,pl,tl,dl,rl,o3l,dzl &
+  )
+
+! Overwrite ozone profile if it is available
+if ((initial == 1 .or. initorig == 1) .and. io3flg == 1) then
+   o3l(1:nzr) = o3ref(1:nzr,ngrid)
+endif
+
+do k = 1,nrad
+   if (rl(k) <   0. .or.  &
+       dl(k) <   0. .or.  &
+       pl(k) <   0. .or.  &
+      o3l(k) <   0. .or.  &
+       tl(k) < 160.) then
+
+      print*, 'Temperature too low or negative value of'
+      print*, 'density, vapor, pressure, or ozone'
+      print*, 'when calling Harrington radiation'
+      print*, 'at k,i,j = ',k,i,j,'   ngrid=',ngrid
+      print*, 'stopping model'
+      print*, 'rad: k, rl(k), dl(k), pl(k), o3l(k), tl(k)'
+      print'(i4,5g15.6)', k, rl(k), dl(k), pl(k), o3l(k), tl(k)
+      stop 'stop: radiation call'
+   endif
+enddo
+
+return
+END SUBROUTINE

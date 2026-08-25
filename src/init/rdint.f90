@@ -13,6 +13,7 @@ use mem_cuparm
 use mem_oda
 use io_params
 use micphys
+use ref_sounding, only: iugforce
 use kpp_parameters, only:IKPP
 use node_mod
 
@@ -50,15 +51,18 @@ if(trim(runtype) == 'INITIAL' .or. &
       CALL top_read (ifm)
    enddo
 
-   do ifm = 1,ngrids
-      CALL sfc_read (ifm)
-   enddo
+   if (isfcl .ne. 3) then
+      do ifm = 1,ngrids
+         CALL sfc_read (ifm)
+      enddo
+   endif
 
    ! Define grid topography, transform, latitude-longitude, and map factor arrays.
    ! Note that this call needs to come after the top_read call since grid_setup(2)
    ! is setting rtgt which needs topology elevations (topt).
    CALL grid_setup (2)
 
+   if (isfcl .ne. 3) then
    ! read SST files
    CALL sst_read (1,ifm,ierr)
    if (ierr /= 0) then
@@ -71,6 +75,7 @@ if(trim(runtype) == 'INITIAL' .or. &
    if (ierr /= 0) then
       print*,'rdint: Error in  ndvi surface files'
       stop 'rdint: ndvi surface file error'
+   endif
    endif
 
    ! The following things will be done for INITIAL = 1 or 3...
@@ -90,6 +95,7 @@ if(trim(runtype) == 'INITIAL' .or. &
            print*, ''
          endif
          CALL inithh ()
+         if (iugforce==2 .or. iupdsst==2) CALL readforcing ()
       endif
 
       ! If "history" initialization or restart, call INITHIS.  
@@ -248,18 +254,18 @@ if(trim(runtype) == 'INITIAL' .or. &
    endif
 
 ! Fill land surface data for all grids that have no standard input files
-   CALL sfcdata ()
+   if (isfcl .ne. 3) CALL sfcdata ()
 
 ! Initialize various LEAF variables.
 
-   if((initial==1.or.initial==2).and.ipast_sfc == 0) then
+   if((initial==1.or.initial==2).and.ipast_sfc == 0.and.isfcl.ne.3) then
      CALL geonest_nofile (1,ngrids)
    endif
 
 ! Reinitialize certain surface variables to prevent inconsistencies
 ! that arise from horizontal interpolation related to surface patches.
 ! This is not invoked if current and history grids match.
-   if(initial==3 .or. ((initial==1.or.initial==2).and.ipast_sfc==1)) then
+   if(initial==3 .or. ((initial==1.or.initial==2).and.ipast_sfc==1).and.isfcl.ne.3) then
      if(hrestart == 2) CALL sfcinit_hstart ()
    endif
    

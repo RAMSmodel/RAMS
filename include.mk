@@ -29,7 +29,9 @@ RAMS_VERSION=6.3.04
 # Typically can use "parallel" for either, but some supercomputers require
 # use of the serial executable.
 #############################################################################
-HDF5_ROOT=/home/smsaleeb/software/hdf5-1.10.7
+HDF5_ROOT=#/share/apps/hdf5-1.10.1/intel
+#ZFP Compression requites ZFP
+HDZ_ZFP_ROOT=
 
 #############################################################################
 # Set root locations for parallel processing MPI software.
@@ -54,8 +56,11 @@ UTILS_INCS=-I$(MODEL)/include
 #HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5 \
 #  -Wl,-rpath,/home/smsaleeb/software/szip-2.1/lib \
 #  -Wl,-rpath,/home/smsaleeb/software/zlib-1.2.5/lib
-HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5
-HDF5_INCS=-I$(HDF5_ROOT)/include
+#HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5
+#HDF5_INCS=-I$(HDF5_ROOT)/include
+#HDF5_DEFS=
+HDF5_LIBS= -lhdf5_hl -lhdf5 #
+HDF5_INCS=-I$(HDF5_ROOT)/include #-I$(H5Z_ZFP_ROOT)/include 
 HDF5_DEFS=
 
 #############################################################################
@@ -159,6 +164,7 @@ LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
 #C_COMP=gcc
 C_COMP=/home/smsaleeb/software/mpich-3.3.2/bin/mpicc
 C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DENABLE_PARALLEL_COMPRESSION -w
+#-DENABLE_ZFP_COMPRESSION
 #C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DRAMS_DOUBLE_PREC \
 #  -DENABLE_PARALLEL_COMPRESSION -w
 

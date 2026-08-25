@@ -525,8 +525,11 @@ endif
 
 !     compute 2 horizontal scalar gradients needed for dscp/dt
 
-if (ihorgrad .eq. 1 .and. scalar_tab(n,ngrid)%name /= 'THP') then
-   ! only for ihorgrad = 1 for all scalars except thp
+!GRL 2024-06-04 Made change for IHORGRAD=1 
+! Originally when IHORGRAD=1 different equations were called for THP and other scalars.
+! This seems inconsistnet and couldn't think of any reason this could be the case. 
+! In tests for RCEMIP, this helped to fix energy balance.
+if (ihorgrad .eq. 1) then
    ! vt3df=d(scp)/dx(?)
    CALL grad (m1,m2,m3,1,iz,ja,jz,scp_diffuse,vt3df,'XDIR','TPNT')
    ! vt3dg=d(scp)/dy(?)
@@ -555,17 +558,16 @@ endif
 
 !         horizontal flux divergence for scalars
 
-if (ihorgrad .eq. 1 .and. scalar_tab(n,ngrid)%name /= 'THP') then
-   ! This is called for ihorgrad=1 for all scalars except thp
+if (ihorgrad .eq. 1) then
+   ! This is called for ihorgrad=1 for all scalars 
    ! fluxdivx = scalar flux divergence in x direction [scp*kg/m3/s]
    ! fluxdivy = scalar flux divergence in y direction
    CALL divcart (m1,m2,m3,ia,iz,ja,jz,vt3df,fluxdivx,'XDIR','UPNT')
 
    CALL divcart (m1,m2,m3,ia,iz,ja,jz,vt3dg,fluxdivy,'YDIR','VPNT')
 
-elseif (ihorgrad .eq. 2 .or. scalar_tab(n,ngrid)%name == 'THP') then
-   ! This is called for ihorgrad=2 for all scalars, or just for 
-   !  thp if ihorgrad=1 - haven't gone through this subroutine
+elseif (ihorgrad .eq. 2) then
+   ! This is called for ihorgrad=2 for all scalars
    CALL truhor (m1,m2,m3,ia,iz,ja,jz  &
               ,scp_diffuse,fluxdivx,'xdir','dxu',grid_g(ngrid)%dxu(1,1)  &
               ,grid_g(ngrid)%topt(1,1),grid_g(ngrid)%rtgt(1,1)  &

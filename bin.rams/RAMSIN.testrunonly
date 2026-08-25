@@ -32,7 +32,7 @@
  
    NNXP     = 25,30,        ! Number of x gridpoints
    NNYP     = 35,50,        ! Number of y gridpoints
-   NNZP     = 40,40,        ! Number of z gridpoints
+   NNZP     = 60,40,        ! Number of z gridpoints
    NZG      = 11,           ! Number of soil layers
    NZS      = 1,            ! Maximum number of snow layers
  
@@ -44,9 +44,10 @@
 
    IHTRAN   = 0,              ! 0-Cartesian, 1-Polar stereo
    DELTAX   = 2000.,          ! X-Y grid spacing (meters)
-   DELTAZ   = 100.,           ! Z grid spacing (set to 0. to use ZZ)
-   DZRAT    = 1.10,           ! Vertical grid stretch ratio
-   DZMAX    = 1000.,          ! Maximum delta Z for vertical stretch
+   DELTAZ   = 30.,            ! Z grid spacing (set to 0. to use ZZ)
+   DZRAT    = 1.08,           ! Vertical grid stretch ratio
+   ZDELAY   = 0.,             ! Height at which to begin the stretching
+   DZMAX    = 400.,           ! Maximum delta Z for vertical stretch
  
    ZZ       = 0.0,            ! Vertical levels if DELTAZ = 0
      20.0,      46.0,      80.0,     120.0,     165.0,
@@ -58,7 +59,7 @@
   10700., 11700., 12700., 13700., 14700., 15700., 16700.,
   17700., 18700., 19700.,
  
-   DTLONG   = 10.,          ! Coarse grid long timestep
+   DTLONG   = 1.,          ! Coarse grid long timestep
    NACOUST  = 5,           ! Small timestep ratio
 
    ! Nest ratios between this grid and the next coarser grid.
@@ -184,7 +185,7 @@
 
 ! History start (if RUNTYPE='HISTORY')
 
-   HFILIN   = './testrun.output/a-A-1991-04-26-213000-head.txt',
+   HFILIN   = './testrun.output/a-A-1991-04-26-210006-head.txt',
                              ! Input state file name
 
 ! Analysis file input for assimilation: 1=yes, 0=no
@@ -203,7 +204,7 @@
                               !   state,mean,lite,both
                               
 !------------------------------------------------------------------------
-   FRQSTATE   = 600.,600.,3600.,1800., ! "state" file write frequency
+   FRQSTATE   = 60.,600.,3600.,1800., ! "state" file write frequency
                               !  can be different for each grid
                               !  works best if grids are multiples of each other
    FRQST_KEEP   =    0.,      ! If > 0., frequency at which "state" files will be 
@@ -242,7 +243,8 @@
    
    IUPDNDVI  = 0,             ! 0 - No update of NDVI values during run
    IUPDSST  = 0,              ! 0 - No update of SST values during run
-                              ! 1 - Update values during run
+                              ! 1 - Update values during run from 2D files
+                              ! 2 - Update values during run from 0D FORCINGFILE (see below)
  
                              ! The following only apply for IxxxxFLG=1
    ITOPTFN  = '../../sfctypehdf5/gmted2010-h5/TM',
@@ -285,6 +287,17 @@
  
    ICORFLG  = 1,             ! Coriolis flag/2D v-component  -  0=off, 1=on
 
+   IUGFORCE = 1,             ! Geostrophic wind forcing
+                             ! 0=off
+                             ! 1=on using input sounding winds. 
+                             ! 2=on using time-varying winds from FORCINGFILE
+                             ! Turn on only if INITIAL = 1 or restarting from INITIAL = 1 run
+                             ! Highly recommended if ICORFLG = 1 with INITIAL = 1
+   FORCINGFILE = '',         ! Forcing file for IUGFORCE = 2 and IUPDSST = 2
+                             ! Could easily modify source code to include other forcing datasets
+
+   DIVLS = 0.,               ! Large-scale divergence rate for calculating imposed subsidence
+                             
    IBND     = 1,             ! Lateral boundary condition flags
    JBND     = 1,             ! 1-Klemp/Wilhelmson, 2-cyclic
 
@@ -303,10 +316,10 @@
  
 ! Radiation parameters
  
-   ISWRTYP  = 3,             ! Shortwave radiation type
-   ILWRTYP  = 3,             ! Longwave radiation type
+   ISWRTYP  = 4,             ! Shortwave radiation type
+   ILWRTYP  = 4,             ! Longwave radiation type
                              !    0-none, 2-Mahrer/Pielke, 1-Chen, 3-Harrington
-   RADFRQ   = 600.,          ! Freq. of radiation tendency update (s)
+   RADFRQ   = 60.,          ! Freq. of radiation tendency update (s)
    LONRAD   = 1,             ! Longitudinal variation of shortwave  
                              !    (0-no, 1-yes)
  
@@ -340,9 +353,12 @@
                              ! vegetation files 
                              !    (min of 1, max of NPATCH-1)
                        
-   ISFCL    = 1,             ! Surface layer/soil/veg model
+   ISFCL    = 3,             ! Surface layer/soil/veg model
                              !  0-specified surface layer gradients
                              !  1-LEAF3 model, 2-SiB model
+                             !  3-specified fluxes, albedo, and surf. T
+                             !   - fluxes specified with DTHCON and DRTCON
+                             !   - albedo with ALBEDO, surface T with SEATMP
 
    IFREESLIP = 0,            ! Freeslip BC: 0=NO, 1=YES
 
@@ -380,12 +396,16 @@
    !   7 -- silty clay loam  8 -- clay loam       9 -- sandy clay
    !  10 -- silty clay      11 -- clay           12 -- peat
 
-   ZROUGH   = .05,           ! Constant roughness if for all domain
+   ZTROUGH   = .05,          ! Constant scalar roughness if for all domain
+   ZMROUGH   = .05,          ! Constant momentum roughness if for all domain
+   ICHARNOCK = 1,            ! Use Charnock ocean roughness for patch 1
+
    ALBEDO   = .2,            ! Constant albedo if not running soil model
    SEATMP   = 300.,          ! Constant water surface temperature
 
-   DTHCON   = 0.,            ! Constant sfc layer  temp grad for no soil
-   DRTCON   = 0.,            ! Constant sfc layer moist grad for no soil
+   DTHCON   = 10.,            ! Constant sfc layer  temp grad for no soil
+   DRTCON   = 10.,            ! Constant sfc layer moist grad for no soil
+                              ! OR constant surface fluxes (W/m2) for ISFCL = 3
    
    SLZ      = -.50,-.40,-.30,-.25,-.20,-.16,-.12,-.09,-.06,-.03,-.01,
                              ! Soil grid levels
@@ -440,7 +460,7 @@
    IBDYJA  = 5,              ! DY start grid point
    IBDYJZ  = 13,             ! DY end grid point
    IBDZK1  = 2,              ! Lower k level
-   IBDZK2  = 16,             ! Upper k level
+   IBDZK2  = 10,             ! Upper k level
    BTHP    = 3.0,            ! Theta-il perturbation(K) (THP + BTHP)
    BRTP    = 0.2,            ! Mixing ratio perturbation (RTP * (1 + BRTP)
 
@@ -542,7 +562,7 @@
    IAEROSOL = 1,             ! CCN-1,CCN-2: 0=off, 1=userset
    ISALT    = 1,             ! Sea Salt: 0=off, 1=userset, 2=saltmodel
    IDUST    = 1,             ! Dust: 0=off, 1=userset 2=dustmodel
-   IABCARB = 0,              ! Absorbing carbon: 0=off, 1=userset
+   IABCARB = 1,              ! Absorbing carbon: 0=off, 1=userset
 
    IDUSTLOFT = 0,            ! 0 = idealized lofting
                              ! 1 = Ginoux(2001) erodible fraction data
@@ -561,14 +581,15 @@
                              ! 1 = Meyers formula (CIN_MAX)
                              ! 2 = DeMott(2010) (CIN_MAX)
                              ! 3 = DeMott(2010) (aerosols D>0.5 microns)
+                             ! 4 = quasi-constant (CIN_MAX)
 
    IIFN_FORMULA = 2,         ! DeMott IN Formulation if IIFN = 2 or 3
                              ! 1 = DeMott(2010) (composite aerosol types)
                              ! 2 = DeMott(2014) (dust formula)
 
-   IAERORAD  = 1,            ! Aerosol-Radiation Model: 0 = Off, 1 = On
+   IAERORAD  = 0,            ! Aerosol-Radiation Model: 0 = Off, 1 = On
 
-   IAERODEP  = 1,            ! Aerosol wet and dry deposition
+   IAERODEP  = 0,            ! Aerosol wet and dry deposition
                              ! (track scavenged aerosols if iccnlev>=2)
                              ! 0 = Off, 1 = On
 
@@ -578,7 +599,8 @@
                              ! ------------------------------------------
    IAEROPRNT  = 1,           ! Print aerosol init profiles (0=no,1=yes)
    IAEROHIST  = 0,           ! Re-initialize aerosols on hist restart:0,1 
-   CIN_MAX    = 0.01,        ! Ice Nuclei (#/mg)
+   CIN_MAX    = 0.01,        ! Ice Nuclei (#/mg) for IIFN = 1-3
+                             ! Quasi-constant ice concentration (#/L) for IIFN = 4
    CCN1_MAX   = 1000.,       ! CCN-mode-1 (#/mg)
    CCN2_MAX   = 0.01,        ! CCN-mode-2 (#/mg)
    DUST1_MAX  = 100.,        ! Small Dust Mode (#/mg)
@@ -586,8 +608,8 @@
    SALTF_MAX  = 100.,        ! Film Sea Salt (#/mg)
    SALTJ_MAX  = 0.1,         ! Jet Sea Salt (#/mg)
    SALTS_MAX  = 1.e-3,       ! Spume Sea Salt (#/mg)
-   ABC1_MAX   = 0.,          ! Absorbing carbon Mode-1 (#/mg)
-   ABC2_MAX   = 0.,          ! Absorbing carbon Mode-2 (#/mg)
+   ABC1_MAX   = 10.,          ! Absorbing carbon Mode-1 (#/mg)
+   ABC2_MAX   = 100.,          ! Absorbing carbon Mode-2 (#/mg)
 
    ! Aerosol 9 categories soluble chemistry type: 1=(NH4)2S04, 2=NaCl
    IAERO_CHEM   = 1,1,1,1,2,2,2,1,1,1,1,
@@ -633,7 +655,13 @@
    IUSFLG   = 0,             ! Specifies what is in US and VS arrays
                              ! 0-u,v component(m/s) 
                              ! 1-umoms-direction, vmoms-speed
+
+   IO3FLG   = 0,             ! Optional ozone profile
+                             ! 0-ozone not provided
+                             ! 1-ozone provided in ppb
  
+   SOUND_FILE = 'SOUND_IN',  ! Input sounding file name. Only used 
+                             ! if PS(1)=0.
    HS       = 0.,
 
    PS= 990.00,100.00,210.00,331.00,464.10,610.51,771.56,948.72,
@@ -665,6 +693,8 @@
       13.72,13.62,13.83,14.26,15.47,16.03,18.87,19.09,18.60,18.91,
       19.98,21.18,21.62,21.84,22.34,22.70,22.74,19.84,18.16,16.17,
       11.90,8.50,3.47,3.50,3.53,
+
+  O3S= 0.,
  
  $END
 

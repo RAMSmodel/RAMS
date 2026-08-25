@@ -1,0 +1,13 @@
+#!/bin/bash -l
+#SBATCH -J supercell 
+#SBATCH -o ./out.txt
+#SBATCH -e ./out.txt
+#SBATCH -p high2
+#SBATCH -t 24:00:00
+#SBATCH -N 1
+#SBATCH -n 12
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=aigel@ucdavis.edu
+
+mpiexec -np 12 ../bin.rams/rams -f RAMSIN.supercell
+

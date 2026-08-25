@@ -15,9 +15,12 @@ implicit none
 
 if(ilwrtyp+iswrtyp > 0) then
  CALL trsetns (mzp,mxp,myp,radiate_g(ngrid)%fthrd,1)
+ !GRL 2024-03-22 added lw and sw heating rates
+ CALL trsetns (mzp,mxp,myp,radiate_g(ngrid)%fthrdlw,1)
+ CALL trsetns (mzp,mxp,myp,radiate_g(ngrid)%fthrdsw,1)
 endif
 
-if(ilwrtyp == 3 .or. iswrtyp == 3) then
+if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
  CALL trsetns (mzp,mxp,myp,radiate_g(ngrid)%bext,2)
 endif
 

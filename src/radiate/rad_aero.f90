@@ -151,7 +151,7 @@ DO acat=1,aerocat
       ! asymmetry parameter (gp) in a form to interact with cloud_opt.
       ! Some values of dzl may be <0; in this case set tp to 0.
       ! Factor in layer depth for optical depth extinction
-      aodt       = aodt        + ext
+      if(ib==3) aodt       = aodt        + ext
       tp(k,ib)   = tp(k,ib)    + ext
       omgp(k,ib) = omgp(k,ib)  + om * ext
       gp(k,ib)   = gp(k,ib)    + gg * om * ext

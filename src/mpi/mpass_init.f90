@@ -19,7 +19,7 @@ Subroutine broadcast_config ()
 use mem_all
 use isan_coms
 use node_mod
-use leaf_coms, only:ifreeslip
+use leaf_coms, only:ifreeslip, icharnock
 
 implicit none
 
@@ -29,7 +29,7 @@ implicit none
   !Saleeby(2016)
   !Increment memory buffer size here if you add RAMSIN Namelist variables.
   !Add to the appropriate section below as (#-of-them * arraysize).
-  nwords = 219 * 1                 & !single values
+  nwords = 224 * 1                 & !single values
          +   1 * 8                 & !micro (8-hydromet types for gnu)
          +   3 * aerocat           & !micro (number aerosol species)
          +  44 * maxgrds           & !grid-dependent (max grids)
@@ -40,7 +40,7 @@ implicit none
          +   6 * maxsndg           & !max input sounding levels
          +   2 * 32                & !32 character length strings
          +   1 * maxlite * 32      & !lite variables 32 char length strings
-         +  17 *       1 * strl1   & !individual input strings
+         +  18 *       1 * strl1   & !individual input strings
          +   1 *      50 * strl1   & !array of input strings
          +   5 * maxgrds * strl1   & !grid-dependent array of input strings
          + 100                       !extras so we have enough buffer
@@ -84,6 +84,7 @@ implicit none
     CALL par_put_float (DELTAX,1)
     CALL par_put_float (DELTAZ,1)
     CALL par_put_float (DZRAT,1)
+    CALL par_put_float (ZDELAY,1)
     CALL par_put_float (DZMAX,1)
     CALL par_put_float (ZZ,NZPMAX)
     CALL par_put_float (DTLONG,1)
@@ -160,6 +161,7 @@ implicit none
        print*,'lite pack:',nm,trim(LITE_VARS(nm))
        CALL par_put_char (LITE_VARS(nm),32)
     enddo
+    CALL par_put_float (LITE_VAR_ACC, MAXLITE)
     CALL par_put_float (AVGTIM,1)
     CALL par_put_float (FRQMEAN,1)
     CALL par_put_float (FRQBOTH,1)
@@ -188,6 +190,8 @@ implicit none
 
     ! $MODEL_OPTIONS namelist group
     CALL par_put_int   (ICORFLG,1)
+    CALL par_put_int   (IUGFORCE,1)
+    CALL par_put_float (DIVLS,1)
     CALL par_put_int   (IBND,1)
     CALL par_put_int   (JBND,1)
     CALL par_put_int   (ISPONGE_PTS,MAXGRDS)
@@ -225,7 +229,9 @@ implicit none
     CALL par_put_int   (NVGCON,1)
     CALL par_put_float (PCTLCON,1)
     CALL par_put_int   (NSLCON,1)
-    CALL par_put_float (ZROUGH,1)
+    CALL par_put_float (ZTROUGH,1)
+    CALL par_put_float (ZMROUGH,1)
+    CALL par_put_int   (ICHARNOCK,1)
     CALL par_put_float (ALBEDO,1)
     CALL par_put_float (SEATMP,1)
     CALL par_put_float (DTHCON,1)
@@ -340,12 +346,15 @@ implicit none
     CALL par_put_int   (ITSFLG,1)
     CALL par_put_int   (IRTSFLG,1)
     CALL par_put_int   (IUSFLG,1)
+    CALL par_put_int   (IO3FLG,1)
     CALL par_put_float (HS,MAXSNDG)
     CALL par_put_float (PS,MAXSNDG)
     CALL par_put_float (TS,MAXSNDG)
     CALL par_put_float (RTS,MAXSNDG)
     CALL par_put_float (US,MAXSNDG)
     CALL par_put_float (VS,MAXSNDG)
+    CALL par_put_float (O3S,MAXSNDG)
+    CALL par_put_char  (SOUND_FILE,strl1)
 
     ! $ISAN_CONTROL namelist group
     CALL par_put_int   (ISZSTAGE,1)
@@ -419,6 +428,7 @@ implicit none
     CALL par_get_float (DELTAX,1)
     CALL par_get_float (DELTAZ,1)
     CALL par_get_float (DZRAT,1)
+    CALL par_get_float (ZDELAY,1)
     CALL par_get_float (DZMAX,1)
     CALL par_get_float (ZZ,NZPMAX)
     CALL par_get_float (DTLONG,1)
@@ -494,6 +504,7 @@ implicit none
     do nm = 1, nlite_vars
        CALL par_get_char (LITE_VARS(nm),32)
     enddo
+    CALL par_get_float (LITE_VAR_ACC, MAXLITE)
     CALL par_get_float (AVGTIM,1)
     CALL par_get_float (FRQMEAN,1)
     CALL par_get_float (FRQBOTH,1)
@@ -522,6 +533,8 @@ implicit none
 
     ! $MODEL_OPTIONS namelist group
     CALL par_get_int   (ICORFLG,1)
+    CALL par_get_int   (IUGFORCE,1)
+    CALL par_get_float (DIVLS,1)
     CALL par_get_int   (IBND,1)
     CALL par_get_int   (JBND,1)
     CALL par_get_int   (ISPONGE_PTS,MAXGRDS)
@@ -559,7 +572,9 @@ implicit none
     CALL par_get_int   (NVGCON,1)
     CALL par_get_float (PCTLCON,1)
     CALL par_get_int   (NSLCON,1)
-    CALL par_get_float (ZROUGH,1)
+    CALL par_get_float (ZTROUGH,1)
+    CALL par_get_float (ZMROUGH,1)
+    CALL par_get_int   (ICHARNOCK,1)
     CALL par_get_float (ALBEDO,1)
     CALL par_get_float (SEATMP,1)
     CALL par_get_float (DTHCON,1)
@@ -674,12 +689,15 @@ implicit none
     CALL par_get_int   (ITSFLG,1)
     CALL par_get_int   (IRTSFLG,1)
     CALL par_get_int   (IUSFLG,1)
+    CALL par_get_int   (IO3FLG,1)
     CALL par_get_float (HS,MAXSNDG)
     CALL par_get_float (PS,MAXSNDG)
     CALL par_get_float (TS,MAXSNDG)
     CALL par_get_float (RTS,MAXSNDG)
     CALL par_get_float (US,MAXSNDG)
     CALL par_get_float (VS,MAXSNDG)
+    CALL par_get_float (O3S,MAXSNDG)
+    CALL par_get_char  (SOUND_FILE,strl1)
 
     ! $ISAN_CONTROL namelist group
     CALL par_get_int   (ISZSTAGE,1)
@@ -1032,7 +1050,7 @@ implicit none
 
   !Saleeby(2018): Increment "nwords" buffer if added "par_put" and
   !"par_get" calls below.
-  nwords = 17 + ((3 + (6 * nzpmax)) * maxgrds) + (6 * maxsndg) &
+  nwords = 17 + ((3 + (6 * nzpmax)) * maxgrds) + (8 * maxsndg) &
            + (maxvars * atable_elem_words)
 
   ! note that what got allocated was nwords*sizeof(real) bytes
@@ -1076,10 +1094,13 @@ implicit none
     CALL par_put_float (vs,maxsndg)
     CALL par_put_float (ts,maxsndg)
     CALL par_put_float (thds,maxsndg)
+    CALL par_put_float (rts,maxsndg)
     CALL par_put_float (ps,maxsndg)
     CALL par_put_float (hs,maxsndg)
+    CALL par_put_float (o3s,maxsndg)
 
     ! 1-D reference state for all grids
+    CALL par_put_float (wsub,nzpmax*maxgrds)
     CALL par_put_float (u01dn,nzpmax*maxgrds)
     CALL par_put_float (v01dn,nzpmax*maxgrds)
     CALL par_put_float (pi01dn,nzpmax*maxgrds)
@@ -1124,10 +1145,13 @@ implicit none
     CALL par_get_float (vs,maxsndg)
     CALL par_get_float (ts,maxsndg)
     CALL par_get_float (thds,maxsndg)
+    CALL par_get_float (rts,maxsndg)
     CALL par_get_float (ps,maxsndg)
     CALL par_get_float (hs,maxsndg)
+    CALL par_get_float (o3s,maxsndg)
 
     ! 1-D reference state for all grids
+    CALL par_get_float (wsub,nzpmax*maxgrds)
     CALL par_get_float (u01dn,nzpmax*maxgrds)
     CALL par_get_float (v01dn,nzpmax*maxgrds)
     CALL par_get_float (pi01dn,nzpmax*maxgrds)
@@ -1425,3 +1449,90 @@ implicit none
 
 return
 END SUBROUTINE broadcast_dustsource
+!##########################################################################
+Subroutine broadcast_forcing_dims (n1,n2)
+
+use node_mod
+
+implicit none
+
+  real, allocatable :: buff(:)
+  integer :: nwords,n1,n2
+
+  nwords = 50 
+  allocate (buff(nwords)) ! note that what got allocated was nwords*sizeof(real) bytes
+
+  ! The mainnum process will send data, all others will receive in the broadcast
+  !
+  ! Therefore, the algorithm is:
+  !   For mainnum
+  !     pack buffer
+  !     broadcast buffer to other processes
+  !   For the other processes
+  !     receive buffer from mainnum
+  !     unpack buffer
+  if (my_rams_num .eq. mainnum) then
+    ! sending node: pack data into the buffer, then send
+    CALL par_init_put (buff,nwords)
+
+    ! forcing data
+    CALL par_put_int (n1,1)
+    CALL par_put_int (n2,1)
+
+    CALL par_broadcast (machnum(mainnum))
+  else
+    ! receiving nodes
+    CALL par_init_recv_bcast (buff,nwords) ! don't call this if you are mainnum
+    CALL par_broadcast (machnum(mainnum))
+
+    CALL par_get_int (n1,1)
+    CALL par_get_int (n2,1)
+  endif
+
+  deallocate (buff)
+
+return
+END SUBROUTINE broadcast_forcing_dims
+!##########################################################################
+Subroutine broadcast_forcing (forcdata,n1,n2)
+
+use node_mod
+
+implicit none
+
+  real, allocatable :: buff(:)
+  integer :: nwords,n1,n2
+  real, dimension(n1,n2) :: forcdata
+
+  nwords = 50 + n1*n2
+  allocate (buff(nwords)) ! note that what got allocated was nwords*sizeof(real) bytes
+
+  ! The mainnum process will send data, all others will receive in the broadcast
+  !
+  ! Therefore, the algorithm is:
+  !   For mainnum
+  !     pack buffer
+  !     broadcast buffer to other processes
+  !   For the other processes
+  !     receive buffer from mainnum
+  !     unpack buffer
+  if (my_rams_num .eq. mainnum) then
+    ! sending node: pack data into the buffer, then send
+    CALL par_init_put (buff,nwords)
+
+    ! forcing data
+    CALL par_put_float (forcdata,n1*n2)
+
+    CALL par_broadcast (machnum(mainnum))
+  else
+    ! receiving nodes
+    CALL par_init_recv_bcast (buff,nwords) ! don't call this if you are mainnum
+    CALL par_broadcast (machnum(mainnum))
+
+    CALL par_get_float (forcdata,n1*n2)
+  endif
+
+  deallocate (buff)
+
+return
+END SUBROUTINE broadcast_forcing
