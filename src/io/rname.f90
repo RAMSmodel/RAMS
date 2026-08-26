@@ -25,7 +25,7 @@ character(len=*) :: group,vr,cc
 real :: ff
 integer :: ii,nv
 integer :: inrflg
-integer, parameter ::nvgrid=38,nvstrt=78,nvindat=152,nvsound=13
+integer, parameter ::nvgrid=38,nvstrt=79,nvindat=154,nvsound=13
 integer ::  igrids(nvgrid),istart(nvstrt),iindat(nvindat),isound(nvsound)
 character(len=16) :: grids(nvgrid),start(nvstrt),indat(nvindat),sound(nvsound)
 data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
@@ -47,8 +47,8 @@ DATA START/  &
      ,'WT_ODA_PI','WT_ODA_RT','RODA_SFCE','RODA_SFC0','RODA_UPAE'        &
      ,'RODA_UPA0','RODA_HGT','RODA_ZFAC','ODA_SFC_TIL','ODA_SFC_TEL'     &
      ,'ODA_UPA_TIL','ODA_UPA_TEL','HFILIN','IPAST_SFC','ICLOBBER'        &
-     ,'IOUTPUT','AFILEPREF','FRQSTATE','FRQST_KEEP','FRQLITE'            &
-     ,'NLITE_VARS','LITE_VARS','ACC_LT_VAR','AVGTIM','FRQMEAN','FRQBOTH','TOPFILES'   &
+     ,'IOUTPUT','AFILEPREF','FRQSTATE','FRQST_KEEP','FRQLITE','ITRUNCLITE' &
+     ,'NLITE_VARS','LITE_VARS','ACC_LT_VAR','AVGTIM','FRQMEAN','FRQBOTH','TOPFILES' &
      ,'SFCFILES','SSTFPFX','NDVIFPFX','ITOPTFLG','ISSTFLG','IVEGTFLG'    &
      ,'ISOILFLG','NDVIFLG','IUPDNDVI','IUPDSST','ITOPTFN'                &
      ,'ISSTFN','IVEGTFN','ISOILFN','NDVIFN','ITOPSFLG','TOPTENH'         &
@@ -69,12 +69,12 @@ DATA INDAT/  &
      ,'ICVERT','ICKMAX','CZRAD','ICKCENT','CDIVMAX','CTAU','CTMAX'       &
      ,'IRCE','RCE_SZEN','RCE_SOLC','RCE_UBMN','RCE_BUBL','LEVEL','ISCM'  &
      ,'ICHECKMIC','ITRACER','ITRACHIST','IMBUDGET','IRIME','IPLAWS'      &
-     ,'ISEDIM','ICLOUD','IDRIZ','IRAIN','IPRIS','ISNOW','IAGGR'          &
+     ,'ISEDIM','IKERNELA','ICLOUD','IDRIZ','IRAIN','IPRIS','ISNOW','IAGGR'&
      ,'IGRAUP','IHAIL','CPARM','DPARM','RPARM','PPARM','SPARM','APARM'   &
      ,'GPARM','HPARM','GNU','HUCMFILE','NDTCOLL','IAEROSOL','ISALT'      &
      ,'IDUST','IDUSTLOFT','DUSTFILE','ICCNLEV','IIFN','IIFN_FORMULA'     &
      ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','CCN1_MAX' &
-     ,'CCN2_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'         &
+     ,'CCN2_MAX','CCN3_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'&
      ,'SALTS_MAX','IAEROLBC','ICO2LBC','BCTAU','IAERO_CHEM'              &
      ,'AERO_EPSILON','AERO_MEDRAD','ITRKEPSILON','ITRKDUST'              &
      ,'ITRKDUSTIFN','SCMTIME','ISCMX','ISCMY','FRACSAT','IABCARB'        &
@@ -205,7 +205,8 @@ IF(GROUP.EQ.'$MODEL_FILE_INFO') THEN
  IF(VR.EQ.'AFILEPREF')   CALL varsetc (VR,AFILEPREF,NV,1,CC,1,strl1)
  IF(VR.EQ.'FRQSTATE')    CALL varsetf (VR,FRQSTATE(NV),NV,MAXGRDS,FF,0.,1.E20)
  IF(VR.EQ.'FRQST_KEEP')  CALL varsetf (VR,FRQST_KEEP,NV,1,FF,0.,1.E20)
- IF(VR.EQ.'FRQLITE')     CALL varsetf (VR,FRQLITE,NV,1,FF,0.,1.E20)
+ IF(VR.EQ.'FRQLITE')     CALL varsetf (VR,FRQLITE(NV),NV,MAXGRDS,FF,0.,1.E20)
+ IF(VR.EQ.'ITRUNCLITE')  CALL varseti (VR,ITRUNCLITE,NV,1,II,0,1)
  IF(VR.EQ.'NLITE_VARS')  CALL varseti (VR,NLITE_VARS,NV,1,II,0,MAXLITE)
  IF(VR.EQ.'LITE_VARS')   CALL varsetc (VR,LITE_VARS(NV),NV,MAXLITE,CC,1,32)
  IF(VR.EQ.'ACC_LT_VAR')  CALL varsetf (VR,LITE_VAR_ACC(NV),NV,MAXLITE,FF,0.,1.e20)
@@ -340,6 +341,7 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'IRIME')        CALL varseti (VR,IRIME,NV,1,II,0,1)
  IF(VR.EQ.'IPLAWS')       CALL varseti (VR,IPLAWS,NV,1,II,0,2)
  IF(VR.EQ.'ISEDIM')       CALL varseti (VR,ISEDIM,NV,1,II,0,1)
+ IF(VR.EQ.'IKERNELA')     CALL varseti (VR,IKERNELA,NV,1,II,1,2)
  IF(VR.EQ.'ICLOUD')       CALL varseti (VR,ICLOUD,NV,1,II,0,5)
  IF(VR.EQ.'IDRIZ')        CALL varseti (VR,IDRIZ,NV,1,II,0,5)
  IF(VR.EQ.'IRAIN')        CALL varseti (VR,IRAIN,NV,1,II,0,5)
@@ -359,7 +361,7 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'GNU')          CALL varsetf (VR,GNU(NV),NV,8,FF,0.,20.)
  IF(VR.EQ.'HUCMFILE')     CALL varsetc (VR,HUCMFILE,NV,1,CC,1,strl1)
  IF(VR.EQ.'NDTCOLL')      CALL varseti (VR,NDTCOLL,NV,1,II,1,10)
- IF(VR.EQ.'IAEROSOL')     CALL varseti (VR,IAEROSOL,NV,1,II,0,1)
+ IF(VR.EQ.'IAEROSOL')     CALL varseti (VR,IAEROSOL,NV,1,II,0,3)
  IF(VR.EQ.'IABCARB')      CALL varseti (VR,IABCARB,NV,1,II,0,1)
  IF(VR.EQ.'ISALT')        CALL varseti (VR,ISALT,NV,1,II,0,2)
  IF(VR.EQ.'IDUST')        CALL varseti (VR,IDUST,NV,1,II,0,2)
@@ -373,8 +375,9 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'IAEROPRNT')    CALL varseti (VR,IAEROPRNT,NV,1,II,0,1)
  IF(VR.EQ.'IAEROHIST')    CALL varseti (VR,IAEROHIST,NV,1,II,0,1)
  IF(VR.EQ.'CIN_MAX')      CALL varsetf (VR,CIN_MAX,NV,1,FF,-2.,1.E3)
- IF(VR.EQ.'CCN1_MAX')     CALL varsetf (VR,CCN1_MAX,NV,1,FF,0.,1.E4)
- IF(VR.EQ.'CCN2_MAX')     CALL varsetf (VR,CCN2_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'CCN1_MAX')     CALL varsetf (VR,CCN1_MAX,NV,1,FF,0.,2.E4)
+ IF(VR.EQ.'CCN2_MAX')     CALL varsetf (VR,CCN2_MAX,NV,1,FF,0.,2.E4)
+ IF(VR.EQ.'CCN3_MAX')     CALL varsetf (VR,CCN3_MAX,NV,1,FF,0.,2.E4)
  IF(VR.EQ.'DUST1_MAX')    CALL varsetf (VR,DUST1_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST2_MAX')    CALL varsetf (VR,DUST2_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'ABC1_MAX')     CALL varsetf (VR,ABC1_MAX,NV,1,FF,0.,1.E4)
@@ -479,6 +482,7 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'ICLOBBER=',ICLOBBER               &
  ,'IOUTPUT=',IOUTPUT                 &
  ,'NLITE_VARS=',NLITE_VARS           &
+ ,'ITRUNCLITE=',ITRUNCLITE           &
  ,'IUPDNDVI=',IUPDNDVI               &
  ,'IUPDSST=',IUPDSST                 &
  ,'ICORFLG=',ICORFLG                 &
@@ -532,6 +536,7 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'IRIME=',IRIME                     &
  ,'IPLAWS=',IPLAWS                   &
  ,'ISEDIM=',ISEDIM                   &
+ ,'IKERNELA=',IKERNELA               &
  ,'ICLOUD=',ICLOUD                   &
  ,'IDRIZ=',IDRIZ                     &
  ,'IRAIN=',IRAIN                     &
@@ -627,6 +632,7 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'CIN_MAX=',CIN_MAX                 &
  ,'CCN1_MAX=',CCN1_MAX               &
  ,'CCN2_MAX=',CCN2_MAX               &
+ ,'CCN3_MAX=',CCN3_MAX               &
  ,'DUST1_MAX=',DUST1_MAX             &
  ,'DUST2_MAX=',DUST2_MAX             &
  ,'ABC1_MAX=',ABC1_MAX               &
@@ -709,9 +715,9 @@ write(6,1301)(gnu(k),k=1,8)
 
 PRINT*, ' '
 WRITE(6,*)'IAERO_CHEM    AERO_EPSILON    AERO_MEDRAD-(default)'
-WRITE(6,*)'(category)     (fraction)      (microns)'
-WRITE(6,1404)(iaero_chem(K),aero_epsilon(K),aero_medrad(K)*1.e6,K=1,aerocat)
-1404  FORMAT(I6,F17.3,F16.2)
+WRITE(6,*)'(category)     (fraction)      (nanometers)'
+WRITE(6,1404)(iaero_chem(K),aero_epsilon(K),aero_medrad(K)*1.e9,K=1,aerocat)
+1404  FORMAT(I6,F17.3,F16.1)
 
 PRINT*, ' '
 

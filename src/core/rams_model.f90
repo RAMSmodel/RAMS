@@ -588,12 +588,9 @@ do ifm = 1,ngrids
                         iflag == 1                                &
       ) analwrite=.true.
    !FOR LITE FILE OUTPUT
-   if(frqlite > 0.) then
-      if( mod(time,frqlite) < dtlongn(1).or.  &
-                         time  >=  timmaxr ) then
-        analwrite=.true.
-      endif
-   endif
+   if(mod(time,frqlite(ifm))  <  dtlongn(ifm)               .or.  &
+                        time  >= timmaxr                          &
+      ) analwrite=.true.
    !FOR MEAN FILE OUTPUT
    if (frqmean > 0.) then
       if(avgtim > 0.0.and.mod(time-avgtim/2.,frqmean) < dtlongn(1)  &
@@ -634,12 +631,13 @@ enddo
 if (analwrite) CALL anal_write ('INST')
 
 !     call the analysis writing routine again for the other var types
-if(frqlite > 0.) then
-   if( mod(time,frqlite) < dtlongn(1).or.  &
-                      time  >=  timmaxr ) then
+do ifm = 1,ngrids
+  if(frqlite(ifm) > 0. .and. NLITE_VARS>0)then
+   if(mod(time,frqlite(ifm)) < dtlongn(1) .or. time >= timmaxr) then
     CALL anal_write ('LITE')
    endif
-endif
+  endif
+enddo
 
 if (frqmean > 0.) then
    if(iprntstmt>=1.and.print_msg)print*,'check avg',time,frqmean,avgtim,dtlongn(1)

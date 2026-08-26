@@ -74,17 +74,19 @@ do k = 1,mzp
         isnanr(micro_g(ngrid)%salt_spum_mp(k,i,j)) ) prtflg=1
    endif
    !CHECK CCN Modes
-   if(iaerosol > 0)then
+   if(iaerosol >= 1)then
      if(isnanr(micro_g(ngrid)%cn1np(k,i,j)) .or. &
-        isnanr(micro_g(ngrid)%cn1mp(k,i,j)) .or. &
-        isnanr(micro_g(ngrid)%cn2np(k,i,j)) .or. &
-        isnanr(micro_g(ngrid)%cn2mp(k,i,j)) ) prtflg=1
+        isnanr(micro_g(ngrid)%cn1mp(k,i,j)) ) prtflg=1
      tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn1nt(1))
      if(isnanr(tempvar)) prtflg=1
      if(tempvar>1.e30) prtflg=1
      tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn1mt(1))
      if(isnanr(tempvar)) prtflg=1
      if(tempvar>1.e30) prtflg=1
+   endif
+   if(iaerosol >= 2)then
+     if(isnanr(micro_g(ngrid)%cn2np(k,i,j)) .or. &
+        isnanr(micro_g(ngrid)%cn2mp(k,i,j)) ) prtflg=1
      tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn2nt(1))
      if(isnanr(tempvar)) prtflg=1
      if(tempvar>1.e30) prtflg=1
@@ -92,6 +94,17 @@ do k = 1,mzp
      if(isnanr(tempvar)) prtflg=1
      if(tempvar>1.e30) prtflg=1
    endif
+   if(iaerosol >= 3)then
+     if(isnanr(micro_g(ngrid)%cn3np(k,i,j)) .or. &
+        isnanr(micro_g(ngrid)%cn3mp(k,i,j)) ) prtflg=1
+     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn3nt(1))
+     if(isnanr(tempvar)) prtflg=1
+     if(tempvar>1.e30) prtflg=1
+     tempvar = valugp(mzp,mxp,myp,k,i,j,tend%cn3mt(1))
+     if(isnanr(tempvar)) prtflg=1
+     if(tempvar>1.e30) prtflg=1
+   endif
+
    !CHECK REGENERATED AEROSOL MODES
    if(iccnlev>=2)then
      if(isnanr(micro_g(ngrid)%regen_aero1_np(k,i,j)) .or. &
@@ -375,15 +388,23 @@ do k = 1,mzp
       print*,'cifnp:         ',micro_g(ngrid)%cifnp(k,i,j)
       print*,'cifnp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cifnt(1))
     endif
-    if(iaerosol > 0)then
+    if(iaerosol >= 1)then
       print*,'cn1np:         ',micro_g(ngrid)%cn1np(k,i,j)
       print*,'cn1np-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn1nt(1))
       print*,'cn1mp:         ',micro_g(ngrid)%cn1mp(k,i,j)
       print*,'cn1mp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn1mt(1))
+    endif
+    if(iaerosol >= 2)then
       print*,'cn2np:         ',micro_g(ngrid)%cn2np(k,i,j)
       print*,'cn2np-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn2nt(1))
       print*,'cn2mp:         ',micro_g(ngrid)%cn2mp(k,i,j)
       print*,'cn2mp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn2mt(1))
+    endif
+    if(iaerosol >= 3)then
+      print*,'cn3np:         ',micro_g(ngrid)%cn3np(k,i,j)
+      print*,'cn3np-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn3nt(1))
+      print*,'cn3mp:         ',micro_g(ngrid)%cn3mp(k,i,j)
+      print*,'cn3mp-tend:    ',valugp(mzp,mxp,myp,k,i,j,tend%cn3mt(1))
     endif
     if(idust > 0)then
       print*,'md1np:         ',micro_g(ngrid)%md1np(k,i,j)

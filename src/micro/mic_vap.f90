@@ -342,7 +342,7 @@ do k = k1,k2
    !Vapor deposition and evaporation budgets for all species.
    !Deposition, condensation, evaporation, sublimation are all given positive
    ! values as process rates.
-   if(imbudget >= 1) then
+   if(imbudget>=1)then
     if(lcat.eq.1 .or. lcat.eq.2 .or. lcat.eq.8) then
      if(vap(k,lcat) > 0.00) xvapliqt(k)  = xvapliqt(k)  + vap(k,lcat)*budget_scalet
      if(vap(k,lcat) < 0.00) xevapliqt(k) = xevapliqt(k) - vap(k,lcat)*budget_scalet
@@ -353,7 +353,7 @@ do k = k1,k2
     endif
    endif
 
-   if(imbudget >= 2) then
+   if(imbudget>=2)then
     if(vap(k,lcat) > 0.00) then
      if(lcat==1) xvapcldt(k)  = xvapcldt(k)  + vap(k,lcat)*budget_scalet
      if(lcat==2) xvapraint(k) = xvapraint(k) + vap(k,lcat)*budget_scalet

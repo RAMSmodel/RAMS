@@ -101,11 +101,10 @@ real, dimension(m2,m3,npatch) :: vegrough
 
     !Update mass of dust species using mean mass radii rather than median radii
     md1mp(2,i,j) = md1mp(2,i,j) + &
-        (dust1_size**3.)*num_dust_s(i,j)/(0.23873/aero_rhosol(3))
+        (dust1_size**3.)*num_dust_s(i,j)/(0.23873/aero_rhosol(4))
     md1mp(1,i,j) = md1mp(2,i,j)
-
     md2mp(2,i,j) = md2mp(2,i,j) + &
-        (dust2_size**3.)*num_dust_l(i,j)/(0.23873/aero_rhosol(4))
+        (dust2_size**3.)*num_dust_l(i,j)/(0.23873/aero_rhosol(5))
     md2mp(1,i,j) = md2mp(2,i,j)
    endif
 
@@ -177,15 +176,15 @@ do j = ja,jz
     
     !Update mass of salt species
     salt_film_mp(2,i,j) = salt_film_mp(2,i,j) + &
-        ((sf_size*aero_rg2rm(5))**3.)*film_source(i,j)/(0.23873/aero_rhosol(5))
+        ((sf_size*aero_rg2rm(6))**3.)*film_source(i,j)/(0.23873/aero_rhosol(6))
     salt_film_mp(1,i,j) = salt_film_mp(2,i,j)
 
     salt_jet_mp(2,i,j) = salt_jet_mp(2,i,j) + &
-        ((sj_size*aero_rg2rm(6))**3.)*jet_source(i,j) /(0.23873/aero_rhosol(6))
+        ((sj_size*aero_rg2rm(7))**3.)*jet_source(i,j) /(0.23873/aero_rhosol(7))
     salt_jet_mp(1,i,j) = salt_jet_mp(2,i,j)
 
     salt_spum_mp(2,i,j) = salt_spum_mp(2,i,j) + &
-        ((ss_size*aero_rg2rm(7))**3.)*spm_source(i,j) /(0.23873/aero_rhosol(7))
+        ((ss_size*aero_rg2rm(8))**3.)*spm_source(i,j) /(0.23873/aero_rhosol(8))
     salt_spum_mp(1,i,j) = salt_spum_mp(2,i,j)
 
  enddo

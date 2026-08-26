@@ -394,7 +394,7 @@ real, dimension(mzs) :: sfcwater_energy
 
 integer :: ksn,nsoil,i,j
 
-real :: gdrm,tempkk,fracliqq,slpotvn,alpha,beta
+real :: gdrm,tempkk,fracliqq,slpotvn,beta
 real, external :: rslif
 
 gdrm = g / rm
@@ -411,7 +411,7 @@ else
 
 ! Without snowcover, ground_rvap is the effective saturation mixing
 ! ratio of soil and is used for soil evaporation.  First, compute the
-! "alpha" term or soil "relative humidity" and the "beta" term.
+! "beta" term (Lee and Pielke 1992, JAM).
 
    nsoil = nint(soil_text)
    
@@ -419,9 +419,8 @@ else
    ground_rsat = rslif(prsg,tempkk)
 
    slpotvn = slpots(nsoil) * (slmsts(nsoil) / soil_water) ** slbs(nsoil)
-   alpha = exp(gdrm * slpotvn / tempkk)
    beta = .25 * (1. - cos (min(1.,soil_water / sfldcap(nsoil)) * 3.14159)) ** 2
-   ground_rvap = ground_rsat * alpha * beta + (1. - beta) * can_rvap
+   ground_rvap = ground_rsat * beta + (1. - beta) * can_rvap
 
 endif
 

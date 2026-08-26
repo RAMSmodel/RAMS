@@ -13,7 +13,7 @@ implicit none
         ,fncnt, ffcdt, ffict, ffipt, ffidt           &
         ,ffsnt, ffglt, ffhlt, ffint                  &
         ,cifnt, tket                                 &
-        ,cn1mt, cn2mt, cn1nt, cn2nt                  &
+        ,cn1mt, cn2mt, cn3mt, cn1nt, cn2nt, cn3nt    &
         ,md1nt, md2nt, md1mt, md2mt                  &
         ,salt_film_nt,salt_jet_nt,salt_spum_nt       &
         ,salt_film_mt,salt_jet_mt,salt_spum_mt       &
@@ -111,8 +111,10 @@ implicit none
 
    if (allocated(micro_g(1)%cn1np))   allocate (tend%cn1nt(ntpts))
    if (allocated(micro_g(1)%cn2np))   allocate (tend%cn2nt(ntpts))
+   if (allocated(micro_g(1)%cn3np))   allocate (tend%cn3nt(ntpts))
    if (allocated(micro_g(1)%cn1mp))   allocate (tend%cn1mt(ntpts))
    if (allocated(micro_g(1)%cn2mp))   allocate (tend%cn2mt(ntpts))
+   if (allocated(micro_g(1)%cn3mp))   allocate (tend%cn3mt(ntpts))
    if (allocated(micro_g(1)%md1np))   allocate (tend%md1nt(ntpts))
    if (allocated(micro_g(1)%md2np))   allocate (tend%md2nt(ntpts))
    if (allocated(micro_g(1)%md1mp))   allocate (tend%md1mt(ntpts))
@@ -238,10 +240,12 @@ integer :: nsc,ng,ngrs
 
    if (allocated(tend%tket)) deallocate (tend%tket)
 
-   if (allocated(tend%cn1nt))deallocate (tend%cn1nt)
-   if (allocated(tend%cn2nt))deallocate (tend%cn2nt)
+   if (allocated(tend%cn1nt)) deallocate (tend%cn1nt)
+   if (allocated(tend%cn2nt)) deallocate (tend%cn2nt)
+   if (allocated(tend%cn3nt)) deallocate (tend%cn3nt)
    if (allocated(tend%cn1mt)) deallocate (tend%cn1mt)
    if (allocated(tend%cn2mt)) deallocate (tend%cn2mt)
+   if (allocated(tend%cn3mt)) deallocate (tend%cn3mt)
    if (allocated(tend%md1nt)) deallocate (tend%md1nt)
    if (allocated(tend%md2nt)) deallocate (tend%md2nt)
    if (allocated(tend%md1mt)) deallocate (tend%md1mt)
@@ -393,10 +397,14 @@ implicit none
       CALL vtables_scalar (micro%cn1np(1,1,1),tend%cn1nt(1),ng,'CN1NP')
    if (allocated(tend%cn2nt))  &
       CALL vtables_scalar (micro%cn2np(1,1,1),tend%cn2nt(1),ng,'CN2NP')
+   if (allocated(tend%cn3nt))  &
+      CALL vtables_scalar (micro%cn3np(1,1,1),tend%cn3nt(1),ng,'CN3NP')
    if (allocated(tend%cn1mt))  &
       CALL vtables_scalar (micro%cn1mp(1,1,1),tend%cn1mt(1),ng,'CN1MP')
    if (allocated(tend%cn2mt))  &
       CALL vtables_scalar (micro%cn2mp(1,1,1),tend%cn2mt(1),ng,'CN2MP')
+   if (allocated(tend%cn3mt))  &
+      CALL vtables_scalar (micro%cn3mp(1,1,1),tend%cn3mt(1),ng,'CN3MP')
    if (allocated(tend%md1nt))  &
       CALL vtables_scalar (micro%md1np(1,1,1),tend%md1nt(1),ng,'MD1NP')
    if (allocated(tend%md2nt))  &

@@ -32,11 +32,11 @@
 # flags in this test example are turned on for testing only and are not
 # appropriate for a real simulation to study.
 ###############################################################################
-# Set your RAMS root path
-rd=`pwd`/..
+# Set your path to RAMS executable, RAMSIN namelist file, and machs file
+rd=`pwd`
 # RAMSIN name
 ramsin="RAMSIN.testrunonly"
-# RAMS version (ie. 6.1.6)
+# RAMS version (ie. 6.3.02)
 vs=6.3.04
 # Set flag for type of test (0=sequential, 1=parallel)
 runtype=1
@@ -53,14 +53,12 @@ machsmake=1
 # Set your parallel executable here
 a1=/home/smsaleeb/software/mpich-3.3.2/bin/mpiexec
 # Set you machines file path here
-a2=$rd/bin.rams/machs
+a2=$rd/machs
 # Set RAMS executable path and name
-a3=$rd/bin.rams/rams-$vs
-# Set REVU post-processor executable path and name
-a4=$rd/bin.revu/revu-$vs
+a3=$rd/rams-$vs
 
 #Check to see that RAMSIN namelist exists
-if [ ! -f $rd/bin.rams/$ramsin ]; then
+if [ ! -f $rd/$ramsin ]; then
  echo "Input paths for this file is incorrect: RAMSIN.testrunonly"
  exit
 fi
@@ -96,7 +94,7 @@ fi
 # DONE WITH NECESSARY USER CHANGES
 ###############################################################################
 
-for dirname in $rd/bin.rams/testrun.output
+for dirname in $rd/testrun.output
 do
   if [ -d $dirname -a $del -eq 1 ]; then
    rm -f $dirname/*.h5 $dirname/*.txt
@@ -105,11 +103,9 @@ do
   fi
 done
 
-rc="$a3 -f"
-
 #Check on runtype settings for sequential or parallel
 if [ $runtype -eq 0 ]; then
-  rc1=$rc
+  rc1="$a3 -f"
 elif [ $runtype -eq 1 ]; then
   rc1="$a1 -machinefile $a2 -np $n $a3 -f"
 else
@@ -117,4 +113,5 @@ else
   exit
 fi
 
-$rc1 $rd/bin.rams/$ramsin
+#Execute simulation
+$rc1 $rd/$ramsin

@@ -633,31 +633,37 @@ endif
 !is not changed by microphysics when used.
 
 !Copyback AEROSOLS
-if (iaerosol > 0) then
+if (iaerosol >= 1) then
    CALL ae1kmic (2,m1-1,micro%cn1np(1,i,j),aerocon(1,1))
    CALL ae1kmic (2,m1-1,micro%cn1mp(1,i,j),aeromas(1,1))
+endif
+if (iaerosol >= 2) then
    CALL ae1kmic (2,m1-1,micro%cn2np(1,i,j),aerocon(1,2))
    CALL ae1kmic (2,m1-1,micro%cn2mp(1,i,j),aeromas(1,2))
 endif
+if (iaerosol >= 3) then
+   CALL ae1kmic (2,m1-1,micro%cn3np(1,i,j),aerocon(1,3))
+   CALL ae1kmic (2,m1-1,micro%cn3mp(1,i,j),aeromas(1,3))
+endif
 if (idust > 0) then
-   CALL ae1kmic (2,m1-1,micro%md1np(1,i,j),aerocon(1,3))
-   CALL ae1kmic (2,m1-1,micro%md1mp(1,i,j),aeromas(1,3))
-   CALL ae1kmic (2,m1-1,micro%md2np(1,i,j),aerocon(1,4))
-   CALL ae1kmic (2,m1-1,micro%md2mp(1,i,j),aeromas(1,4))
+   CALL ae1kmic (2,m1-1,micro%md1np(1,i,j),aerocon(1,4))
+   CALL ae1kmic (2,m1-1,micro%md1mp(1,i,j),aeromas(1,4))
+   CALL ae1kmic (2,m1-1,micro%md2np(1,i,j),aerocon(1,5))
+   CALL ae1kmic (2,m1-1,micro%md2mp(1,i,j),aeromas(1,5))
 endif
 if (isalt > 0) then
-   CALL ae1kmic (2,m1-1,micro%salt_film_np(1,i,j),aerocon(1,5))
-   CALL ae1kmic (2,m1-1,micro%salt_film_mp(1,i,j),aeromas(1,5))
-   CALL ae1kmic (2,m1-1,micro%salt_jet_np(1,i,j) ,aerocon(1,6))
-   CALL ae1kmic (2,m1-1,micro%salt_jet_mp(1,i,j) ,aeromas(1,6))
-   CALL ae1kmic (2,m1-1,micro%salt_spum_np(1,i,j),aerocon(1,7))
-   CALL ae1kmic (2,m1-1,micro%salt_spum_mp(1,i,j),aeromas(1,7))
+   CALL ae1kmic (2,m1-1,micro%salt_film_np(1,i,j),aerocon(1,6))
+   CALL ae1kmic (2,m1-1,micro%salt_film_mp(1,i,j),aeromas(1,6))
+   CALL ae1kmic (2,m1-1,micro%salt_jet_np(1,i,j) ,aerocon(1,7))
+   CALL ae1kmic (2,m1-1,micro%salt_jet_mp(1,i,j) ,aeromas(1,7))
+   CALL ae1kmic (2,m1-1,micro%salt_spum_np(1,i,j),aerocon(1,8))
+   CALL ae1kmic (2,m1-1,micro%salt_spum_mp(1,i,j),aeromas(1,8))
 endif
 if (iabcarb > 0) then
-   CALL ae1kmic (2,m1-1,micro%abc1np(1,i,j),aerocon(1,8))
-   CALL ae1kmic (2,m1-1,micro%abc1mp(1,i,j),aeromas(1,8))
-   CALL ae1kmic (2,m1-1,micro%abc2np(1,i,j),aerocon(1,9))
-   CALL ae1kmic (2,m1-1,micro%abc2mp(1,i,j),aeromas(1,9))
+   CALL ae1kmic (2,m1-1,micro%abc1np(1,i,j),aerocon(1,9))
+   CALL ae1kmic (2,m1-1,micro%abc1mp(1,i,j),aeromas(1,9))
+   CALL ae1kmic (2,m1-1,micro%abc2np(1,i,j),aerocon(1,10))
+   CALL ae1kmic (2,m1-1,micro%abc2mp(1,i,j),aeromas(1,10))
 endif
 
 !Copyback AEROSOL TRACKING VARIABLES
@@ -808,31 +814,50 @@ if (jnmb(8) >= 1) then
 endif
 
 !Copyback Microphysical Budget Variables
-if(imbudget>=1) then
+if(imbudget>=1)then
   CALL ae1kmic (1,m1,micro%latheatvap(1,i,j),xlatheatvap(1))
   CALL ae1kmic (1,m1,micro%latheatfrz(1,i,j),xlatheatfrz(1))
+  CALL ae1kmic (1,m1,micro%latheatvapt(1,i,j),xlatheatvapt(1))
+  CALL ae1kmic (1,m1,micro%latheatfrzt(1,i,j),xlatheatfrzt(1))
   CALL ae1kmic (1,m1,micro%nuccldrt(1,i,j),xnuccldrt(1))
-  CALL ae1kmic (1,m1,micro%cld2raint(1,i,j),xcld2raint(1))
-  CALL ae1kmic (1,m1,micro%ice2raint(1,i,j),xice2raint(1))
+  CALL ae1kmic (1,m1,micro%nuccldct(1,i,j),xnuccldct(1))
   CALL ae1kmic (1,m1,micro%nucicert(1,i,j),xnucicert(1))
+  CALL ae1kmic (1,m1,micro%nucicect(1,i,j),xnucicect(1))
   CALL ae1kmic (1,m1,micro%vapliqt(1,i,j),xvapliqt(1))
   CALL ae1kmic (1,m1,micro%vapicet(1,i,j),xvapicet(1))
   CALL ae1kmic (1,m1,micro%evapliqt(1,i,j),xevapliqt(1))
   CALL ae1kmic (1,m1,micro%evapicet(1,i,j),xevapicet(1))
-  CALL ae1kmic (1,m1,micro%freezingt(1,i,j),xfreezingt(1))
-  CALL ae1kmic (1,m1,micro%meltingt(1,i,j),xmeltingt(1))
-  CALL ae1kmic (1,m1,micro%melticet(1,i,j),xmelticet(1))
+  CALL ae1kmic (1,m1,micro%melt2liqthermt(1,i,j),xmelt2liqthermt(1))
+  CALL ae1kmic (1,m1,micro%melt2raincolt(1,i,j),xmelt2raincolt(1))
+  CALL ae1kmic (1,m1,micro%meltvapt(1,i,j),xmeltvapt(1))
+  CALL ae1kmic (1,m1,micro%meltcolmeltt(1,i,j),xmeltcolmeltt(1))
+  CALL ae1kmic (1,m1,micro%freezvapt(1,i,j),xfreezvapt(1))
+  CALL ae1kmic (1,m1,micro%freezcolmeltt(1,i,j),xfreezcolmeltt(1))
+  CALL ae1kmic (1,m1,micro%freezicenuct(1,i,j),xfreezicenuct(1))
+  CALL ae1kmic (1,m1,micro%cld2raint(1,i,j),xcld2raint(1))
+  CALL ae1kmic (1,m1,micro%cld2drizt(1,i,j),xcld2drizt(1))
+  CALL ae1kmic (1,m1,micro%drz2raint(1,i,j),xdrz2raint(1))
   CALL ae1kmic (1,m1,micro%rimecldt(1,i,j),xrimecldt(1))
-  CALL ae1kmic (1,m1,micro%rain2icet(1,i,j),xrain2icet(1))
-  CALL ae1kmic (1,m1,micro%aggregatet(1,i,j),xaggregatet(1))
-  CALL ae1kmic (1,m1,micro%latheatvapt(1,i,j),xlatheatvapt(1))
-  CALL ae1kmic (1,m1,micro%latheatfrzt(1,i,j),xlatheatfrzt(1))
+  CALL ae1kmic (1,m1,micro%rimedrzt(1,i,j),xrimedrzt(1))
+  CALL ae1kmic (1,m1,micro%rimeraint(1,i,j),xrimeraint(1))
+  CALL ae1kmic (1,m1,micro%aggrselfprist(1,i,j),xaggrselfprist(1))
+  CALL ae1kmic (1,m1,micro%aggrselfsnowt(1,i,j),xaggrselfsnowt(1))
+  CALL ae1kmic (1,m1,micro%aggrpsprist(1,i,j),xaggrpsprist(1))
+  CALL ae1kmic (1,m1,micro%aggrpssnowt(1,i,j),xaggrpssnowt(1))
+  CALL ae1kmic (1,m1,micro%rainbreakupt(1,i,j),xrainbreakupt(1))
+  CALL ae1kmic (1,m1,micro%cldsiphmt(1,i,j),xcldsiphmt(1))
+  CALL ae1kmic (1,m1,micro%drzsiphmt(1,i,j),xdrzsiphmt(1))
+  CALL ae1kmic (1,m1,micro%rainshedt(1,i,j),xrainshedt(1))
 endif
-if(imbudget>=2) then
+if(imbudget>=2)then
   CALL ae1kmic (1,m1,micro%inuchomrt(1,i,j),xinuchomrt(1))
   CALL ae1kmic (1,m1,micro%inuccontrt(1,i,j),xinuccontrt(1))
   CALL ae1kmic (1,m1,micro%inucifnrt(1,i,j),xinucifnrt(1))
   CALL ae1kmic (1,m1,micro%inuchazrt(1,i,j),xinuchazrt(1))
+  CALL ae1kmic (1,m1,micro%inuchomct(1,i,j),xinuchomct(1))
+  CALL ae1kmic (1,m1,micro%inuccontct(1,i,j),xinuccontct(1))
+  CALL ae1kmic (1,m1,micro%inucifnct(1,i,j),xinucifnct(1))
+  CALL ae1kmic (1,m1,micro%inuchazct(1,i,j),xinuchazct(1))
   CALL ae1kmic (1,m1,micro%vapcldt(1,i,j),xvapcldt(1))
   CALL ae1kmic (1,m1,micro%vapraint(1,i,j),xvapraint(1))
   CALL ae1kmic (1,m1,micro%vapprist(1,i,j),xvapprist(1))
@@ -849,25 +874,31 @@ if(imbudget>=2) then
   CALL ae1kmic (1,m1,micro%evapgraut(1,i,j),xevapgraut(1))
   CALL ae1kmic (1,m1,micro%evaphailt(1,i,j),xevaphailt(1))
   CALL ae1kmic (1,m1,micro%evapdrizt(1,i,j),xevapdrizt(1))
-  CALL ae1kmic (1,m1,micro%meltprist(1,i,j),xmeltprist(1))
-  CALL ae1kmic (1,m1,micro%meltsnowt(1,i,j),xmeltsnowt(1))
-  CALL ae1kmic (1,m1,micro%meltaggrt(1,i,j),xmeltaggrt(1))
-  CALL ae1kmic (1,m1,micro%meltgraut(1,i,j),xmeltgraut(1))
-  CALL ae1kmic (1,m1,micro%melthailt(1,i,j),xmelthailt(1))
+  CALL ae1kmic (1,m1,micro%meltpristhmt(1,i,j),xmeltpristhmt(1))
+  CALL ae1kmic (1,m1,micro%meltsnowthmt(1,i,j),xmeltsnowthmt(1))
+  CALL ae1kmic (1,m1,micro%meltaggrthmt(1,i,j),xmeltaggrthmt(1))
+  CALL ae1kmic (1,m1,micro%meltgrauthmt(1,i,j),xmeltgrauthmt(1))
+  CALL ae1kmic (1,m1,micro%melthailthmt(1,i,j),xmelthailthmt(1))
+  CALL ae1kmic (1,m1,micro%meltpriscolt(1,i,j),xmeltpriscolt(1))
+  CALL ae1kmic (1,m1,micro%meltsnowcolt(1,i,j),xmeltsnowcolt(1))
+  CALL ae1kmic (1,m1,micro%meltaggrcolt(1,i,j),xmeltaggrcolt(1))
+  CALL ae1kmic (1,m1,micro%meltgraucolt(1,i,j),xmeltgraucolt(1))
+  CALL ae1kmic (1,m1,micro%melthailcolt(1,i,j),xmelthailcolt(1))
   CALL ae1kmic (1,m1,micro%rimecldsnowt(1,i,j),xrimecldsnowt(1))
   CALL ae1kmic (1,m1,micro%rimecldaggrt(1,i,j),xrimecldaggrt(1))
   CALL ae1kmic (1,m1,micro%rimecldgraut(1,i,j),xrimecldgraut(1))
   CALL ae1kmic (1,m1,micro%rimecldhailt(1,i,j),xrimecldhailt(1))
-  CALL ae1kmic (1,m1,micro%rain2prt(1,i,j),xrain2prt(1))
-  CALL ae1kmic (1,m1,micro%rain2snt(1,i,j),xrain2snt(1))
-  CALL ae1kmic (1,m1,micro%rain2agt(1,i,j),xrain2agt(1))
-  CALL ae1kmic (1,m1,micro%rain2grt(1,i,j),xrain2grt(1))
-  CALL ae1kmic (1,m1,micro%rain2hat(1,i,j),xrain2hat(1))
-  CALL ae1kmic (1,m1,micro%aggrselfprist(1,i,j),xaggrselfprist(1))
-  CALL ae1kmic (1,m1,micro%aggrselfsnowt(1,i,j),xaggrselfsnowt(1))
-  CALL ae1kmic (1,m1,micro%aggrprissnowt(1,i,j),xaggrprissnowt(1))
+  CALL ae1kmic (1,m1,micro%rimedrzsnowt(1,i,j),xrimedrzsnowt(1))
+  CALL ae1kmic (1,m1,micro%rimedrzaggrt(1,i,j),xrimedrzaggrt(1))
+  CALL ae1kmic (1,m1,micro%rimedrzgraut(1,i,j),xrimedrzgraut(1))
+  CALL ae1kmic (1,m1,micro%rimedrzhailt(1,i,j),xrimedrzhailt(1))
+  CALL ae1kmic (1,m1,micro%rimerainprist(1,i,j),xrimerainprist(1))
+  CALL ae1kmic (1,m1,micro%rimerainsnowt(1,i,j),xrimerainsnowt(1))
+  CALL ae1kmic (1,m1,micro%rimerainaggrt(1,i,j),xrimerainaggrt(1))
+  CALL ae1kmic (1,m1,micro%rimeraingraut(1,i,j),xrimeraingraut(1))
+  CALL ae1kmic (1,m1,micro%rimerainhailt(1,i,j),xrimerainhailt(1))
 endif
-if(imbudget==3 .and. idust>=1) then
+if(imbudget==3 .and. idust>=1)then
   CALL ae1kmic (1,m1,micro%dust1cldrt(1,i,j),xdust1cldrt(1))
   CALL ae1kmic (1,m1,micro%dust2cldrt(1,i,j),xdust2cldrt(1))
   CALL ae1kmic (1,m1,micro%dust1drzrt(1,i,j),xdust1drzrt(1))
@@ -875,31 +906,50 @@ if(imbudget==3 .and. idust>=1) then
 endif
 
 !Set Micro Budgets bottom level with first level above ground
-if(imbudget>=1) then
-  micro%latheatvap(1,i,j)  = micro%latheatvap(2,i,j)
-  micro%latheatfrz(1,i,j)  = micro%latheatfrz(2,i,j)
-  micro%nuccldrt(1,i,j)    = micro%nuccldrt(2,i,j)
-  micro%cld2raint(1,i,j)   = micro%cld2raint(2,i,j)
-  micro%ice2raint(1,i,j)   = micro%ice2raint(2,i,j)
-  micro%nucicert(1,i,j)    = micro%nucicert(2,i,j)
-  micro%vapliqt(1,i,j)     = micro%vapliqt(2,i,j)
-  micro%vapicet(1,i,j)     = micro%vapicet(2,i,j)
-  micro%evapliqt(1,i,j)    = micro%evapliqt(2,i,j)
-  micro%evapicet(1,i,j)    = micro%evapicet(2,i,j)
-  micro%freezingt(1,i,j)   = micro%freezingt(2,i,j)
-  micro%meltingt(1,i,j)    = micro%meltingt(2,i,j)
-  micro%melticet(1,i,j)    = micro%melticet(2,i,j)
-  micro%rimecldt(1,i,j)    = micro%rimecldt(2,i,j)
-  micro%rain2icet(1,i,j)   = micro%rain2icet(2,i,j)
-  micro%aggregatet(1,i,j)  = micro%aggregatet(2,i,j)
-  micro%latheatvapt(1,i,j) = micro%latheatvapt(2,i,j)
-  micro%latheatfrzt(1,i,j) = micro%latheatfrzt(2,i,j)
+if(imbudget>=1)then
+  micro%latheatvap(1,i,j)      = micro%latheatvap(2,i,j)
+  micro%latheatfrz(1,i,j)      = micro%latheatfrz(2,i,j)
+  micro%latheatvapt(1,i,j)     = micro%latheatvapt(2,i,j)
+  micro%latheatfrzt(1,i,j)     = micro%latheatfrzt(2,i,j)
+  micro%nuccldrt(1,i,j)        = micro%nuccldrt(2,i,j)
+  micro%nuccldct(1,i,j)        = micro%nuccldct(2,i,j)
+  micro%nucicert(1,i,j)        = micro%nucicert(2,i,j)
+  micro%nucicect(1,i,j)        = micro%nucicect(2,i,j)
+  micro%vapliqt(1,i,j)         = micro%vapliqt(2,i,j)
+  micro%vapicet(1,i,j)         = micro%vapicet(2,i,j)
+  micro%evapliqt(1,i,j)        = micro%evapliqt(2,i,j)
+  micro%evapicet(1,i,j)        = micro%evapicet(2,i,j)
+  micro%melt2liqthermt(1,i,j)  = micro%melt2liqthermt(2,i,j)
+  micro%melt2raincolt(1,i,j)   = micro%melt2raincolt(2,i,j)
+  micro%meltvapt(1,i,j)        = micro%meltvapt(2,i,j)
+  micro%meltcolmeltt(1,i,j)    = micro%meltcolmeltt(2,i,j)
+  micro%freezvapt(1,i,j)       = micro%freezvapt(2,i,j)
+  micro%freezcolmeltt(1,i,j)   = micro%freezcolmeltt(2,i,j)
+  micro%freezicenuct(1,i,j)    = micro%freezicenuct(2,i,j)
+  micro%cld2raint(1,i,j)       = micro%cld2raint(2,i,j)
+  micro%cld2drizt(1,i,j)       = micro%cld2drizt(2,i,j)
+  micro%drz2raint(1,i,j)       = micro%drz2raint(2,i,j)
+  micro%rimecldt(1,i,j)        = micro%rimecldt(2,i,j)
+  micro%rimedrzt(1,i,j)        = micro%rimedrzt(2,i,j)
+  micro%rimeraint(1,i,j)       = micro%rimeraint(2,i,j)
+  micro%aggrselfprist(1,i,j)   = micro%aggrselfprist(2,i,j)
+  micro%aggrselfsnowt(1,i,j)   = micro%aggrselfsnowt(2,i,j)
+  micro%aggrpsprist(1,i,j)     = micro%aggrpsprist(2,i,j)
+  micro%aggrpssnowt(1,i,j)     = micro%aggrpssnowt(2,i,j)
+  micro%rainbreakupt(1,i,j)    = micro%rainbreakupt(2,i,j)
+  micro%cldsiphmt(1,i,j)       = micro%cldsiphmt(2,i,j)
+  micro%drzsiphmt(1,i,j)       = micro%drzsiphmt(2,i,j)
+  micro%rainshedt(1,i,j)       = micro%rainshedt(2,i,j)
 endif
-if(imbudget>=2) then
+if(imbudget>=2)then
   micro%inuchomrt(1,i,j)     = micro%inuchomrt(2,i,j)
   micro%inuccontrt(1,i,j)    = micro%inuccontrt(2,i,j)
   micro%inucifnrt(1,i,j)     = micro%inucifnrt(2,i,j)
   micro%inuchazrt(1,i,j)     = micro%inuchazrt(2,i,j)
+  micro%inuchomct(1,i,j)     = micro%inuchomct(2,i,j)
+  micro%inuccontct(1,i,j)    = micro%inuccontct(2,i,j)
+  micro%inucifnct(1,i,j)     = micro%inucifnct(2,i,j)
+  micro%inuchazct(1,i,j)     = micro%inuchazct(2,i,j)
   micro%vapcldt(1,i,j)       = micro%vapcldt(2,i,j)
   micro%vapraint(1,i,j)      = micro%vapraint(2,i,j)
   micro%vapprist(1,i,j)      = micro%vapprist(2,i,j)
@@ -916,25 +966,27 @@ if(imbudget>=2) then
   micro%evapgraut(1,i,j)     = micro%evapgraut(2,i,j)
   micro%evaphailt(1,i,j)     = micro%evaphailt(2,i,j)
   micro%evapdrizt(1,i,j)     = micro%evapdrizt(2,i,j)
-  micro%meltprist(1,i,j)     = micro%meltprist(2,i,j)
-  micro%meltsnowt(1,i,j)     = micro%meltsnowt(2,i,j)
-  micro%meltaggrt(1,i,j)     = micro%meltaggrt(2,i,j)
-  micro%meltgraut(1,i,j)     = micro%meltgraut(2,i,j)
-  micro%melthailt(1,i,j)     = micro%melthailt(2,i,j)
+  micro%meltpristhmt(1,i,j)  = micro%meltpristhmt(2,i,j)
+  micro%meltsnowthmt(1,i,j)  = micro%meltsnowthmt(2,i,j)
+  micro%meltaggrthmt(1,i,j)  = micro%meltaggrthmt(2,i,j)
+  micro%meltgrauthmt(1,i,j)  = micro%meltgrauthmt(2,i,j)
+  micro%melthailthmt(1,i,j)  = micro%melthailthmt(2,i,j)
+  micro%meltpriscolt(1,i,j)  = micro%meltpriscolt(2,i,j)
+  micro%meltsnowcolt(1,i,j)  = micro%meltsnowcolt(2,i,j)
+  micro%meltaggrcolt(1,i,j)  = micro%meltaggrcolt(2,i,j)
+  micro%meltgraucolt(1,i,j)  = micro%meltgraucolt(2,i,j)
+  micro%melthailcolt(1,i,j)  = micro%melthailcolt(2,i,j)
   micro%rimecldsnowt(1,i,j)  = micro%rimecldsnowt(2,i,j)
   micro%rimecldaggrt(1,i,j)  = micro%rimecldaggrt(2,i,j)
   micro%rimecldgraut(1,i,j)  = micro%rimecldgraut(2,i,j)
   micro%rimecldhailt(1,i,j)  = micro%rimecldhailt(2,i,j)
-  micro%rain2prt(1,i,j)      = micro%rain2prt(2,i,j)
-  micro%rain2snt(1,i,j)      = micro%rain2snt(2,i,j)
-  micro%rain2agt(1,i,j)      = micro%rain2agt(2,i,j)
-  micro%rain2grt(1,i,j)      = micro%rain2grt(2,i,j)
-  micro%rain2hat(1,i,j)      = micro%rain2hat(2,i,j)
-  micro%aggrselfprist(1,i,j) = micro%aggrselfprist(2,i,j)
-  micro%aggrselfsnowt(1,i,j) = micro%aggrselfsnowt(2,i,j)
-  micro%aggrprissnowt(1,i,j) = micro%aggrprissnowt(2,i,j)
+  micro%rimerainprist(1,i,j) = micro%rimerainprist(2,i,j)
+  micro%rimerainsnowt(1,i,j) = micro%rimerainsnowt(2,i,j)
+  micro%rimerainaggrt(1,i,j) = micro%rimerainaggrt(2,i,j)
+  micro%rimeraingraut(1,i,j) = micro%rimeraingraut(2,i,j)
+  micro%rimerainhailt(1,i,j) = micro%rimerainhailt(2,i,j)
 endif
-if(imbudget==3 .and. idust>=1) then
+if(imbudget==3 .and. idust>=1)then
   micro%dust1cldrt(1,i,j)     = micro%dust1cldrt(2,i,j)
   micro%dust2cldrt(1,i,j)     = micro%dust2cldrt(2,i,j)
   micro%dust1drzrt(1,i,j)     = micro%dust1drzrt(2,i,j)
@@ -1025,9 +1077,9 @@ if(imbudget>=1)then
         ! Compute total freezing or melting and enter as positive values 
         rxchange = (rx(k,lcat)*(1.-fracliq2)-rx(k,lcat)*(1.-fracliq1))
         if (rxchange >= 0.0) then
-          xfreezingt(k) = xfreezingt(k) + rxchange
+          xfreezvapt(k) = xfreezvapt(k) + rxchange*budget_scalet
         else
-          xmeltingt(k)  = xmeltingt(k)  - rxchange
+          xmeltvapt(k)  = xmeltvapt(k)  - rxchange*budget_scalet
         endif
       endif
 
@@ -1102,9 +1154,9 @@ if(imbudget>=1)then
    endif
    ! Compute total freezing or melting and enter as positive values
    if (rice2(k)-rice1(k) >= 0.0) then
-     xfreezingt(k) = xfreezingt(k) + (rice2(k)-rice1(k))
+     xfreezcolmeltt(k) = xfreezcolmeltt(k) + (rice2(k)-rice1(k))*budget_scalet
    else
-     xmeltingt(k)  = xmeltingt(k)  - (rice2(k)-rice1(k))
+     xmeltcolmeltt(k)  = xmeltcolmeltt(k)  - (rice2(k)-rice1(k))*budget_scalet
    endif
  enddo
 
@@ -1191,11 +1243,12 @@ if(imbudget>=1)then
  ! Ice nucleation only changes the mixing ratio 
  ! (and number concentration) of pristine ice
  if (jnmb(3) .ge. 1) then
-  ! However, some comes from contact nucleation of cloud1 and cloud2, 
+  ! Some comes from contact nucleation and homogeneous freezing of cloud1 and cloud2,
   ! and some from vapor deposition...
   ! These need to be treated seperately due to different latent heats...
   
-  ! First, changes in cloud1 and cloud2 (contact nucleation)
+  ! First, changes in cloud1 and cloud2 from
+  ! (contact nucleation + immersion freezing nucleation + homogeneous freezing nucleation)
   if (jnmb(1) .ge. 1) then
     do k=k1(1),k2(1) ! Loss of cloud1
       if (lhrtheta) then
@@ -1205,6 +1258,9 @@ if(imbudget>=1)then
         xlatheatvap(k) = xlatheatvap(k) - alli * cpi * (rx(k,1)-rx_lhr(k,1))
         xlatheatvapt(k) = xlatheatvapt(k) - alli * cpi * (rx(k,1)-rx_lhr(k,1))
       endif
+      ! Compute freezing from (contact nucleation + immersion freezing nucleation +
+      ! homogeneous freezing nucleation)
+      xfreezicenuct(k) = xfreezicenuct(k) - (rx(k,1)-rx_lhr(k,1))*budget_scalet
     enddo
   endif
   if (jnmb(8) .ge. 1) then
@@ -1216,11 +1272,14 @@ if(imbudget>=1)then
         xlatheatvap(k) = xlatheatvap(k) - alli * cpi * (rx(k,8)-rx_lhr(k,8))
         xlatheatvapt(k) = xlatheatvapt(k) - alli * cpi * (rx(k,8)-rx_lhr(k,8))
       endif
+      ! Compute freezing from (contact nucleation + immersion freezing nucleation +
+      ! homogeneous freezing nucleation)
+      xfreezicenuct(k) = xfreezicenuct(k) - (rx(k,8)-rx_lhr(k,8))*budget_scalet
     enddo
   endif
 
   ! Then, changes in pristine ice minus changes in 
-  ! cloud1 and cloud2 (vapor deposition)
+  ! cloud1 and cloud2 (vapor deposition + haze nucleation)
   do k=k1(3),k2(3)
     ! First, compute total change in pristine ice (should be positive)
     vapdep(k) = (rx(k,3)-rx_lhr(k,3))

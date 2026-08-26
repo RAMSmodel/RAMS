@@ -525,10 +525,6 @@ endif
 
 !     compute 2 horizontal scalar gradients needed for dscp/dt
 
-!GRL 2024-06-04 Made change for IHORGRAD=1 
-! Originally when IHORGRAD=1 different equations were called for THP and other scalars.
-! This seems inconsistnet and couldn't think of any reason this could be the case. 
-! In tests for RCEMIP, this helped to fix energy balance.
 if (ihorgrad .eq. 1) then
    ! vt3df=d(scp)/dx(?)
    CALL grad (m1,m2,m3,1,iz,ja,jz,scp_diffuse,vt3df,'XDIR','TPNT')
@@ -559,7 +555,6 @@ endif
 !         horizontal flux divergence for scalars
 
 if (ihorgrad .eq. 1) then
-   ! This is called for ihorgrad=1 for all scalars 
    ! fluxdivx = scalar flux divergence in x direction [scp*kg/m3/s]
    ! fluxdivy = scalar flux divergence in y direction
    CALL divcart (m1,m2,m3,ia,iz,ja,jz,vt3df,fluxdivx,'XDIR','UPNT')
@@ -567,7 +562,6 @@ if (ihorgrad .eq. 1) then
    CALL divcart (m1,m2,m3,ia,iz,ja,jz,vt3dg,fluxdivy,'YDIR','VPNT')
 
 elseif (ihorgrad .eq. 2) then
-   ! This is called for ihorgrad=2 for all scalars
    CALL truhor (m1,m2,m3,ia,iz,ja,jz  &
               ,scp_diffuse,fluxdivx,'xdir','dxu',grid_g(ngrid)%dxu(1,1)  &
               ,grid_g(ngrid)%topt(1,1),grid_g(ngrid)%rtgt(1,1)  &
@@ -775,23 +769,6 @@ endif
         CALL topobnd (m1,m2,m3,i,j,-1,0,'r',vc3da,dxy(i+jf,j)  &
                     ,vctr1,vctr2,vctr3,zintl,dxynu)
 
-        !Saleeby(2009):Limit lapse rate to prevent runaway cooling
-        if (sclrname == 'THP') then
-          lapse_rate_max = 0.010
-          if (zintr(2) < vc3da(2,i+je,j)) then
-             dthdz = (vc3da(2,i+je,j)-zintr(2))/(vctr3(2)-vctr3(1))
-             if (dthdz > lapse_rate_max) dthdz = lapse_rate_max
-             zintr(2) = vc3da(2,i+je,j) - dthdz*(vctr3(2)-vctr3(1))
-          endif
-          if (zintl(2) < vc3da(2,i+jf,j)) then
-             dthdz = (vc3da(2,i+jf,j)-zintl(2))/(vctr1(2)-vctr1(1))
-             if (dthdz > lapse_rate_max) dthdz = lapse_rate_max
-             zintl(2) = vc3da(2,i+jf,j) - dthdz*(vctr1(2)-vctr1(1))
-          endif
-          !if(ngrid==3.and.i==50.and.j==50) &
-          !print*,'Lapse1:',sclrname,ngrid,zintr(2),zintl(2)
-        endif 
-
         do k=2,m1
           distnu=1./dxytem(k)+1./dxynu(k)
           distold=1./dxy(i+je,j)+1./dxy(i+jf,j)
@@ -846,23 +823,6 @@ endif
         !check intersection of cartesian sfc. on right side of mtn.
         CALL topobnd (m1,m2,m3,i,j,0,-1,'r',vc3da,dxy(i,j+jf)  &
                     ,vctr1,vctr2,vctr3,zintl,dxynu)
-
-        !Saleeby(2009):Limit lapse rate to prevent runaway cooling
-        if (sclrname == 'THP') then
-          lapse_rate_max = 0.010
-          if (zintr(2) < vc3da(2,i,j+je)) then
-             dthdz = (vc3da(2,i,j+je)-zintr(2))/(vctr3(2)-vctr3(1))
-             if (dthdz > lapse_rate_max) dthdz = lapse_rate_max
-             zintr(2) = vc3da(2,i,j+je) - dthdz*(vctr3(2)-vctr3(1))
-          endif
-          if (zintl(2) < vc3da(2,i,j+jf)) then
-             dthdz = (vc3da(2,i,j+jf)-zintl(2))/(vctr1(2)-vctr1(1))
-             if (dthdz > lapse_rate_max) dthdz = lapse_rate_max
-             zintl(2) = vc3da(2,i,j+jf) - dthdz*(vctr1(2)-vctr1(1))
-          endif
-          !if(ngrid==3.and.i==50.and.j==50) &
-          !print*,'Lapse1:',sclrname,ngrid,zintr(2),zintl(2)
-        endif
 
         do k=2,m1
           distnu=1./dxytem(k)+1./dxynu(k)

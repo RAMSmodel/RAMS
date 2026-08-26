@@ -29,15 +29,15 @@ implicit none
   !Saleeby(2016)
   !Increment memory buffer size here if you add RAMSIN Namelist variables.
   !Add to the appropriate section below as (#-of-them * arraysize).
-  nwords = 224 * 1                 & !single values
+  nwords = 225 * 1                 & !single values
          +   1 * 8                 & !micro (8-hydromet types for gnu)
          +   3 * aerocat           & !micro (number aerosol species)
-         +  44 * maxgrds           & !grid-dependent (max grids)
+         +  45 * maxgrds           & !grid-dependent (max grids)
          +   3 * nzpmax            & !max vertical levels
          +   3 * nzgmax            & !max soil levels
          +   1 * maxisn            & !max isentropic levels
          +   4 * maxagrds          & !max varfile grids
-         +   6 * maxsndg           & !max input sounding levels
+         +   7 * maxsndg           & !max input sounding levels
          +   2 * 32                & !32 character length strings
          +   1 * maxlite * 32      & !lite variables 32 char length strings
          +  18 *       1 * strl1   & !individual input strings
@@ -155,7 +155,8 @@ implicit none
     CALL par_put_char  (AFILEPREF,strl1)
     CALL par_put_float (FRQSTATE,MAXGRDS)
     CALL par_put_float (FRQST_KEEP,1)
-    CALL par_put_float (FRQLITE,1)
+    CALL par_put_float (FRQLITE,MAXGRDS)
+    CALL par_put_float (ITRUNCLITE,1)
     CALL par_put_float (NLITE_VARS,1)
     do nm = 1, nlite_vars
        print*,'lite pack:',nm,trim(LITE_VARS(nm))
@@ -288,6 +289,7 @@ implicit none
     CALL par_put_int   (IRIME,1)
     CALL par_put_int   (IPLAWS,1)
     CALL par_put_int   (ISEDIM,1)
+    CALL par_put_int   (IKERNELA,1)
     CALL par_put_int   (ICLOUD,1)
     CALL par_put_int   (IDRIZ,1)
     CALL par_put_int   (IRAIN,1)
@@ -323,6 +325,7 @@ implicit none
     CALL par_put_float (CIN_MAX,1)
     CALL par_put_float (CCN1_MAX,1)
     CALL par_put_float (CCN2_MAX,1)
+    CALL par_put_float (CCN3_MAX,1)
     CALL par_put_float (DUST1_MAX,1)
     CALL par_put_float (DUST2_MAX,1)
     CALL par_put_float (SALTF_MAX,1)
@@ -499,7 +502,8 @@ implicit none
     CALL par_get_char  (AFILEPREF,strl1)
     CALL par_get_float (FRQSTATE,MAXGRDS)
     CALL par_get_float (FRQST_KEEP,1)
-    CALL par_get_float (FRQLITE,1)
+    CALL par_get_float (FRQLITE,MAXGRDS)
+    CALL par_get_float (ITRUNCLITE,1)
     CALL par_get_float (NLITE_VARS,1)
     do nm = 1, nlite_vars
        CALL par_get_char (LITE_VARS(nm),32)
@@ -631,6 +635,7 @@ implicit none
     CALL par_get_int   (IRIME,1)
     CALL par_get_int   (IPLAWS,1)
     CALL par_get_int   (ISEDIM,1)
+    CALL par_get_int   (IKERNELA,1)
     CALL par_get_int   (ICLOUD,1)
     CALL par_get_int   (IDRIZ,1)
     CALL par_get_int   (IRAIN,1)
@@ -666,6 +671,7 @@ implicit none
     CALL par_get_float (CIN_MAX,1)
     CALL par_get_float (CCN1_MAX,1)
     CALL par_get_float (CCN2_MAX,1)
+    CALL par_get_float (CCN3_MAX,1)
     CALL par_get_float (DUST1_MAX,1)
     CALL par_get_float (DUST2_MAX,1)
     CALL par_get_float (SALTF_MAX,1)

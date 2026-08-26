@@ -192,6 +192,8 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
             ,micro_g(ngrid)%cn1mp     (1,1,1)  &
             ,micro_g(ngrid)%cn2np     (1,1,1)  &
             ,micro_g(ngrid)%cn2mp     (1,1,1)  &
+            ,micro_g(ngrid)%cn3np     (1,1,1)  &
+            ,micro_g(ngrid)%cn3mp     (1,1,1)  &
             ,micro_g(ngrid)%md1np     (1,1,1)  &
             ,micro_g(ngrid)%md1mp     (1,1,1)  &
             ,micro_g(ngrid)%md2np     (1,1,1)  &
@@ -488,7 +490,7 @@ Subroutine radcomp3 (m1,m2,m3,ia,iz,ja,jz  &
    ,glat,rtgt,topt,albedt,cosz,rlongup,rlontop,rshort,rlong,aodt  &
    ,rv,dn0,fthrd,fthrdlw,fthrdsw,pi0,pp,theta,rcp &
    ,bext,swup,swdn,lwup,lwdn &
-   ,cn1np,cn1mp,cn2np,cn2mp,md1np,md1mp,md2np,md2mp &
+   ,cn1np,cn1mp,cn2np,cn2mp,cn3np,cn3mp,md1np,md1mp,md2np,md2mp &
    ,salt_film_np,salt_film_mp,salt_jet_np,salt_jet_mp &
    ,salt_spum_np,salt_spum_mp,abc1np,abc1mp,abc2np,abc2mp)
 
@@ -508,7 +510,7 @@ real :: cfmasi,cparmi,glg,glgm,picpi
 real, dimension(m2,m3) :: glat,rtgt,topt,cosz,albedt,rlongup,rlontop,rshort,rlong,aodt
 real, dimension(m1,m2,m3) :: dn0,rv,fthrd,fthrdlw,fthrdsw,pi0,pp,theta,rcp
 real, dimension(m1,m2,m3) :: bext,swup,swdn,lwup,lwdn
-real, dimension(m1,m2,m3) :: cn1np,cn1mp,cn2np,cn2mp,md1np,md1mp,md2np,md2mp &
+real, dimension(m1,m2,m3) :: cn1np,cn1mp,cn2np,cn2mp,cn3np,cn3mp,md1np,md1mp,md2np,md2mp &
   ,salt_film_np,salt_film_mp,salt_jet_np,salt_jet_mp,salt_spum_np,salt_spum_mp &
   ,abc1np,abc1mp,abc2np,abc2mp
 real, external :: gammln
@@ -564,6 +566,7 @@ do j = ja,jz
         CALL aero_copy (1,m1 &
            ,cn1np(1,i,j),cn1mp(1,i,j) &
            ,cn2np(1,i,j),cn2mp(1,i,j) &
+           ,cn3np(1,i,j),cn3mp(1,i,j) &
            ,md1np(1,i,j),md1mp(1,i,j) &
            ,md2np(1,i,j),md2mp(1,i,j) &
            ,salt_film_np(1,i,j),salt_film_mp(1,i,j) &

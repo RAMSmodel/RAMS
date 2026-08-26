@@ -26,14 +26,14 @@ logical :: exans,skip
 integer, save :: ioaunt=10,ncall_head=0,nvtota=0,nvtotl=0,nvtotm=0  &
                 ,nvtot
 integer :: ngr,nv,nvcnt,lenl,npointer,iwrite,npts,idtype,nvl,litecheck
-real :: timeold
+real :: timeold,makeheader
 logical :: first_call=.true.
 character(len=strl1), save :: anameold
 real, save :: time_save
 integer :: ndims,idims(4)
 real, pointer :: v_pointer
 integer*8 :: h5_fid
-integer :: iphdf5
+integer :: iphdf5,checklitegrids=0
 type (hdf5_select_type) :: mem_select,file_select
 integer, dimension(HDF5_MAX_DIMS) :: file_chunks
 real, dimension(:,:,:,:), allocatable :: temp_var1, temp_var2
@@ -44,6 +44,23 @@ real :: zfp_accuracy
 type (head_table), allocatable,save :: aw_table(:)
 
 if (ioutput == 0) return
+
+!Default flag to determine if we should make header file
+makeheader=1
+
+!Specific instance of NOT making header if grid-dependent LITE file info turned off
+if(vtype == 'LITE')then
+  if(NLITE_VARS == 0)then
+    makeheader=0
+  elseif(NLITE_VARS > 0)then
+    makeheader=1
+    checklitegrids=0
+    do ngr=1,ngrids
+     if(frqlite(ngr) == 0.0) checklitegrids=checklitegrids+1
+    enddo
+    if(checklitegrids == ngrids) makeheader=0
+  endif
+endif
 
 if (nmachs .gt. 1) then
   iphdf5 = 1
@@ -100,13 +117,23 @@ do ngr=1,ngrids
       if(mod(time,frqstate(ngr)) > dtlongn(1).and.  &
                          time  <  timmax - .01*dtlongn(1) .and.  &
                          iflag == 0) cycle 
+   elseif(vtype == 'LITE') then
+      ! If this routine is called, then 1 or more grids will get written.
+      !     See if this isn't one of them...
+      if(NLITE_VARS == 0)then
+         cycle
+      elseif(frqlite(ngr) == 0.)then
+         cycle
+      elseif(mod(time,frqlite(ngr)) > dtlongn(1).and.  &
+           time  <  timmax - .01*dtlongn(1) .and. iflag == 0)then
+         cycle
+      endif
    else
       ! If it isn't the instantaneous files, then we will be outputting all
       !  grids. We would need grid dependent frqmean, etc, and maybe averaging
       !  times also to vary the grids for other write types.
    endif
-                        
-      
+
    write(cgrid,'(a1,i1)') 'g',ngr
    CALL makefnam (anamel,afilepref,time,iyear1,imonth1,idate1,  &
            itime1*100,vnam,cgrid,'h5')
@@ -247,7 +274,24 @@ do ngr=1,ngrids
 
          CALL shdf5_set_hs_select (vtab_r(nv,ngr)%idim_type,'W',ngr &
                 ,mem_select,file_select,file_chunks)
-         
+
+         !For LITE files, call data truncation routines to round to user-chosen decimal
+         !places, which allows for much better data compression. We can do this on LITE
+         !file if we do not need super-precision on some variables. Cannot do this on
+         !INST analysis files since we need full precision for history restarts.
+         !Set the actual precision you need in the subroutines called here like
+         !(e.g. "trunc_3d_vars)
+         if(vtype=='LITE' .and. itrunclite==1)then
+          !Call this subroutine for 3D z,y,x variables
+          if(vtab_r(nv,ngr)%idim_type==3)then
+            CALL trunc_3d_vars (varn,mmzp(ngr),mmxp(ngr),mmyp(ngr),temp_var1)
+          elseif(vtab_r(nv,ngr)%idim_type==2)then
+            CALL trunc_2d_vars (varn,mmxp(ngr),mmyp(ngr),temp_var1)
+          endif
+          !print*,'smslite',nv,' ',vtype,' ',trim(varn),vtab_r(nv,ngr)%idim_type &
+          !      ,maxval(temp_var1)
+         endif
+
          CALL shdf5_orec (h5_fid,iphdf5,varn &
                 ,mem_select,file_select,file_chunks,zfp_accuracy,rvara=temp_var1)
          !print*,'done all ',vtype,' ',trim(varn)
@@ -374,6 +418,24 @@ do ngr=1,ngrids
 
          CALL shdf5_set_hs_select (idtype,'W',ngr &
                  ,mem_select,file_select,file_chunks)
+
+         !For LITE files, call data truncation routines to round to user-chosen decimal
+         !places, which allows for much better data compression. We can do this on LITE
+         !file if we do not need super-precision on some variables. Cannot do this on
+         !INST analysis files since we need full precision for history restarts.
+         !Set the actual precision you need in the subroutines called here like
+         !(e.g. "trunc_3d_vars)
+         if(vtype=='LITE' .and. itrunclite==1)then
+          !Call this subroutine for 3D z,y,x variables
+          if(vtab_r(nv,ngr)%idim_type==3)then
+            CALL trunc_3d_vars (varn,mmzp(ngr),mmxp(ngr),mmyp(ngr),temp_var2)
+          elseif(vtab_r(nv,ngr)%idim_type==2)then
+            CALL trunc_2d_vars (varn,mmxp(ngr),mmyp(ngr),temp_var2)
+          endif
+          !print*,'smsliteextra',nv,' ',vtype,' ',trim(varn),vtab_r(nv,ngr)%idim_type &
+          !      ,maxval(temp_var2)
+         endif
+
          CALL shdf5_orec (h5_fid,iphdf5,varn &
                  ,mem_select,file_select,file_chunks, zfp_accuracy,rvara=temp_var2)
          !print*,'done xtra ',vtype,' ',trim(varn)
@@ -393,7 +455,7 @@ enddo
 ! the mainnum node do this so that you don't have many processors
 ! trying to write this file at the same time.
 
-if ((my_rams_num .eq. mainnum) .or. (nmachs .eq. 1)) then
+if (makeheader==1 .and. ( (my_rams_num .eq. mainnum) .or. (nmachs .eq. 1)) ) then
   CALL rams_f_open (ioaunt,anamelh,'FORMATTED','REPLACE','WRITE',iclobber)
 
   write(ioaunt,110) nvcnt
@@ -422,7 +484,7 @@ else
    subaname='  Analysis write               '
 endif
 
-if(print_msg) then
+if(print_msg .and. makeheader==1) then
   print 12,subaname,time,anamelh
 12 format(/,1X,79('*'),/,  &
        A35,'  Time = ',F9.0,/,'      Header file name - ',A60  &

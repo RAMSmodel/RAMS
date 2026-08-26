@@ -99,10 +99,14 @@ CMACH=PC_LINUX1  #Standard Linux (only option available now)
 # (-check uninit) for finding uninitialized variables, (-free) for free format
 #F_COMP=/home/smsaleeb/intel/composer_xe_2011_sp1.8.273/bin/intel64/ifort
 F_COMP=/home/smsaleeb/software/mpich-3.3.2/bin/mpif90
-F_OPTS1=-free -O1 -fp-model precise
-F_OPTS2=-free -O2 -fp-model precise
+F_OPTS1=-free -O1 -fp-model precise -diag-disable=10448
+F_OPTS2=-free -O2 -fp-model precise -diag-disable=10448
 LOADER_OPTS= -free -O2 -fp-model precise
-LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
+#F_OPTS1=-free -O1 -fp-model precise -real-size 64 -diag-disable=10448
+#F_OPTS2=-free -O2 -fp-model precise -real-size 64 -diag-disable=10448
+#LOADER_OPTS= -free -O2 -fp-model precise -real-size 64
+#LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
+LIBS=
 
 #*****************************
 # FORTRAN INTEL IFORT COMPILER Double Precision

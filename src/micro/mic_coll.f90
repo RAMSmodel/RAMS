@@ -275,7 +275,7 @@ if(jnmb(8) .eq. 0) then
    enxfer(k,1,1) = enxfer(k,1,1) + un1 - un2cc
    enxfer(k,1,2) = enxfer(k,1,2) + un2cc
 
-   if(imbudget >= 1) xcld2raint(k) = xcld2raint(k) + um12 * budget_scalet
+   if(imbudget>=1) xcld2raint_tmp(k) = um12 * budget_scalet
 endif
 
 if(jnmb(8) .ne. 0) then
@@ -311,7 +311,11 @@ if(jnmb(8) .ne. 0) then
    enxfer(k,8,8) = enxfer(k,8,8) + un8 - un3dd - un2cd
    enxfer(k,8,2) = enxfer(k,8,2) + un3dd + un2cd
 
-   if(imbudget >= 1) xcld2raint(k) = xcld2raint(k) + (um12 + um82) * budget_scalet
+   if(imbudget>=1)then
+     xcld2raint_tmp(k) = um12 * budget_scalet
+     xcld2drizt_tmp(k) = um18 * budget_scalet
+     xdrz2raint_tmp(k) = um82 * budget_scalet
+   endif
 endif
 
 !USING CLOUD_2 TRANSFER TO TRANSFER CC2 COLLISION NUMBER TO
@@ -506,6 +510,10 @@ endif
    enxfer(k,jcat,3) = enxfer(k,jcat,3) + sip
    rxfer(k,jcat,3)  = rxfer(k,jcat,3) + rsip
    qrxfer(k,jcat,3) = qrxfer(k,jcat,3) + qrsip
+   if(imbudget>=1)then
+     if(jcat==1) xcldsiphmt_tmp(k) = sip * budget_scalent
+     if(jcat==8) xdrzsiphmt_tmp(k) = sip * budget_scalent
+   endif
  endif
 
  !For Cloud-ice collisions 4=snow, 5=aggregates, 6=graupel, 7=hail
@@ -526,12 +534,22 @@ endif
  ytoz = rfinlz - xtoz
  ccat=mcatc(lcat)
 
- if(imbudget >= 1) xrimecldt(k) = xrimecldt(k) + umcld * budget_scalet
- if(imbudget >= 2) then
-    if(lcat.eq.4) xrimecldsnowt(k) = xrimecldsnowt(k) + umcld * budget_scalet
-    if(lcat.eq.5) xrimecldaggrt(k) = xrimecldaggrt(k) + umcld * budget_scalet
-    if(lcat.eq.6) xrimecldgraut(k) = xrimecldgraut(k) + umcld * budget_scalet
-    if(lcat.eq.7) xrimecldhailt(k) = xrimecldhailt(k) + umcld * budget_scalet
+ if(jcat==1)then
+   if(imbudget>=1) xrimecldt_tmp(k) = xrimecldt_tmp(k) + umcld * budget_scalet
+   if(imbudget>=2)then
+     if(lcat.eq.4) xrimecldsnowt_tmp(k) = umcld * budget_scalet
+     if(lcat.eq.5) xrimecldaggrt_tmp(k) = umcld * budget_scalet
+     if(lcat.eq.6) xrimecldgraut_tmp(k) = umcld * budget_scalet
+     if(lcat.eq.7) xrimecldhailt_tmp(k) = umcld * budget_scalet
+   endif
+ elseif(jcat==8)then
+   if(imbudget>=1) xrimedrzt_tmp(k) = xrimedrzt_tmp(k) + umcld * budget_scalet
+   if(imbudget>=2)then
+     if(lcat.eq.4) xrimedrzsnowt_tmp(k) = umcld * budget_scalet
+     if(lcat.eq.5) xrimedrzaggrt_tmp(k) = umcld * budget_scalet
+     if(lcat.eq.6) xrimedrzgraut_tmp(k) = umcld * budget_scalet
+     if(lcat.eq.7) xrimedrzhailt_tmp(k) = umcld * budget_scalet
+   endif
  endif
 
  rxfer(k,jcat,ccat)  =  rxfer(k,jcat,ccat) + xtoz
@@ -543,7 +561,7 @@ endif
  if(lcat.ne.ccat) &
    qrxfer(k,lcat,ccat) = qrxfer(k,lcat,ccat) + qx(k,lcat) * ytoz
 
- enxfer(k,jcat,jcat) = enxfer(k,jcat,jcat) + min(uncld,cx(k,mx))
+ enxfer(k,jcat,jcat) = enxfer(k,jcat,jcat) + min(uncld,cx(k,jcat))
  if(lcat.ne.ccat) enxfer(k,lcat,ccat) = enxfer(k,lcat,ccat) &
    + ytoz * min(uncld,cx(k,lcat)) / max(1.0e-20,rx(k,lcat))
 
@@ -783,6 +801,11 @@ if(rx(k,mx) .ge. rxmin) then
 
    colnum = colfacc(k) * eff(k,mc1) * cx(k,mx) ** 2 * 10. ** (-tabval)
    enxfer(k,mx,mx) = enxfer(k,mx,mx) + min(0.5 * cx(k,mx),colnum)
+
+   ! Raindrop breakup number increase
+   if(imbudget>=1 .and. mx == 2 .and. eff(k,mc1) < 0.0) then
+     xrainbreakupt(k) = xrainbreakupt(k)-(min(0.5*cx(k,mx),colnum)*budget_scalent)
+   endif
 endif
 enddo
 
@@ -814,10 +837,9 @@ if(rx(k,mx) .ge. rxmin) then
    rxfer(k,mx,mz) = rxfer(k,mx,mz) + colamt
    qrxfer(k,mx,mz) = qrxfer(k,mx,mz) + colamt * qx(k,mx)
 
-   if(imbudget >= 1) xaggregatet(k) = xaggregatet(k) + colamt*budget_scalet
-   if(imbudget >= 2) then
-    if(mx.eq.3) xaggrselfprist(k) = xaggrselfprist(k) + colamt*budget_scalet
-    if(mx.eq.4) xaggrselfsnowt(k) = xaggrselfsnowt(k) + colamt*budget_scalet
+   if(imbudget>=1)then
+    if(mx.eq.3) xaggrselfprist_tmp(k) = colamt * budget_scalet
+    if(mx.eq.4) xaggrselfsnowt_tmp(k) = colamt * budget_scalet
    endif
 
    if (jnmb(mz) >= 5) then
@@ -877,8 +899,10 @@ if(rx(k,mx) .ge. rxmin .and. rx(k,my) .ge. rxmin) then
    rxfer(k,my,mz) = rxfer(k,my,mz) + rcy
    qrxfer(k,my,mz) = qrxfer(k,my,mz) + rcy * qx(k,my)
 
-   if(imbudget >= 1) xaggregatet(k) = xaggregatet(k) + (rcx + rcy)*budget_scalet
-   if(imbudget >= 2) xaggrprissnowt(k) = xaggrprissnowt(k) + (rcx + rcy)*budget_scalet
+   if(imbudget>=1)then
+     xaggrpsprist_tmp(k) = rcx * budget_scalet
+     xaggrpssnowt_tmp(k) = rcy * budget_scalet
+   endif
 
    tabvaln  &
        = wct1(k,mx) * wct1(k,my) * coltabc (ict1(k,mx),ict1(k,my),ipc)  &
@@ -1056,6 +1080,10 @@ if(rx(k,mx) .ge. rxmin .and. rx(k,my) .ge. rxmin) then
       enxfer(k,mx,3) = enxfer(k,mx,3) + sip
       rxfer(k,mx,3) = rxfer(k,mx,3) + rsip
       qrxfer(k,mx,3) = qrxfer(k,mx,3) + qrsip
+      if(imbudget>=1)then
+        if(mx==1) xcldsiphmt_tmp(k) = sip * budget_scalent
+        if(mx==8) xdrzsiphmt_tmp(k) = sip * budget_scalent
+      endif
    endif
 
 ! ALWAYS NEED (ALPHA + BETA) .GE. 1 but in the (rare) case that
@@ -1068,12 +1096,22 @@ if(rx(k,mx) .ge. rxmin .and. rx(k,my) .ge. rxmin) then
 
    xtoz = min(rcx,rfinlz)
 
-   if(imbudget >= 1) xrimecldt(k) = xrimecldt(k) + rcx * budget_scalet
-   if(imbudget >= 2) then
-    if(my.eq.4) xrimecldsnowt(k) = xrimecldsnowt(k) + rcx * budget_scalet
-    if(my.eq.5) xrimecldaggrt(k) = xrimecldaggrt(k) + rcx * budget_scalet
-    if(my.eq.6) xrimecldgraut(k) = xrimecldgraut(k) + rcx * budget_scalet
-    if(my.eq.7) xrimecldhailt(k) = xrimecldhailt(k) + rcx * budget_scalet
+   if(mx==1)then
+     if(imbudget>=1) xrimecldt_tmp(k) = xrimecldt_tmp(k) + rcx * budget_scalet
+     if(imbudget>=2) then
+       if(my.eq.4) xrimecldsnowt_tmp(k) = rcx * budget_scalet
+       if(my.eq.5) xrimecldaggrt_tmp(k) = rcx * budget_scalet
+       if(my.eq.6) xrimecldgraut_tmp(k) = rcx * budget_scalet
+       if(my.eq.7) xrimecldhailt_tmp(k) = rcx * budget_scalet
+     endif
+   elseif(mx==8)then
+     if(imbudget>=1) xrimedrzt_tmp(k) = xrimedrzt_tmp(k) + rcx * budget_scalet
+     if(imbudget>=2) then
+       if(my.eq.4) xrimedrzsnowt_tmp(k) = rcx * budget_scalet
+       if(my.eq.5) xrimedrzaggrt_tmp(k) = rcx * budget_scalet
+       if(my.eq.6) xrimedrzgraut_tmp(k) = rcx * budget_scalet
+       if(my.eq.7) xrimedrzhailt_tmp(k) = rcx * budget_scalet
+     endif
    endif
 
    rxfer(k,mx,mz) = rxfer(k,mx,mz) + xtoz
@@ -1203,7 +1241,17 @@ do k = k1,k2
       if (jnmb(mx) >= 5)  &
          enxfer(k,my,my) = enxfer(k,my,my) + colnumy
 
-      if(imbudget >= 1) xice2raint(k) = xice2raint(k) + rcy * budget_scalet
+      ! xmelt2raincolt could be overestimated since it cannot undergo the
+      ! possible "colxfers" limiter adjustment. The individual collisional
+      ! melting variables below do undergo the adjustment if needed.
+      if(imbudget>=1) xmelt2raincolt(k) = xmelt2raincolt(k) + rcy * budget_scalet
+      if(imbudget>=2)then
+        if(my==3) xmeltpriscolt_tmp(k) = rcy * budget_scalet
+        if(my==4) xmeltsnowcolt_tmp(k) = rcy * budget_scalet
+        if(my==5) xmeltaggrcolt_tmp(k) = rcy * budget_scalet
+        if(my==6) xmeltgraucolt_tmp(k) = rcy * budget_scalet
+        if(my==7) xmelthailcolt_tmp(k) = rcy * budget_scalet
+      endif
 
    else
 
@@ -1301,13 +1349,13 @@ do k = k1,k2
       endif !end of my >= 4 and my < 7
       33 continue
 
-      if(imbudget >= 1) xrain2icet(k) = xrain2icet(k) + rcx * budget_scalet
-      if(imbudget >= 2) then
-        if(my==3) xrain2prt(k) = xrain2prt(k) + rcx * budget_scalet
-        if(my==4) xrain2snt(k) = xrain2snt(k) + rcx * budget_scalet
-        if(my==5) xrain2agt(k) = xrain2agt(k) + rcx * budget_scalet
-        if(my==6) xrain2grt(k) = xrain2grt(k) + rcx * budget_scalet
-        if(my==7) xrain2hat(k) = xrain2hat(k) + rcx * budget_scalet
+      if(imbudget>=1) xrimeraint_tmp(k) = xrimeraint_tmp(k) + rcx * budget_scalet
+      if(imbudget>=2)then
+        if(my==3) xrimerainprist_tmp(k) = rcx * budget_scalet
+        if(my==4) xrimerainsnowt_tmp(k) = rcx * budget_scalet
+        if(my==5) xrimerainaggrt_tmp(k) = rcx * budget_scalet
+        if(my==6) xrimeraingraut_tmp(k) = rcx * budget_scalet
+        if(my==7) xrimerainhailt_tmp(k) = rcx * budget_scalet
       endif
 
       rxfer(k,mx,mz) = rxfer(k,mx,mz) + xtoz !from rain to cat z
@@ -1425,7 +1473,9 @@ integer, dimension(11) :: k1,k2
 real, dimension(m1) :: rloss,enloss
 real :: cldnumratio
 
-!  All rxfer values are nonnegative.
+! Make sure all rxfer values are nonnegative
+
+!Loop over origination hydrometeor categories
 do lcat = 1,8
    if (jnmb(lcat) .ge. 1) then
       kd1 = k1(lcat)
@@ -1436,6 +1486,8 @@ do lcat = 1,8
          enloss(k) = 0.
       enddo
 
+      !Loop over destination hydrometeor categories to compute total
+      !loss from origination category.
       do jcat = 1,8
 ! change this to include enxfer of the same categories
          if (jnmb(jcat) .ge. 1) then
@@ -1450,11 +1502,91 @@ do lcat = 1,8
          endif
       enddo
 
+      !Compute loss adjustment fraction at each level due to collection
+      !and prevent loss from exceeding the total original mass and number.
       do k = kd1,kd2
+
+         !Compute the potential reduction loss fraction
          rloss(k) = min(1.,rx(k,lcat) / max(1.0e-20,rloss(k)))
          enloss(k) = min(1.,cx(k,lcat) / max(1.0e-10,enloss(k)))
-      enddo
 
+         !Adjustment for CLOUD transfers due to collision-coalescence
+         if(lcat==1)then
+           if(imbudget>=1)then
+             xcld2drizt(k) = xcld2drizt(k) + xcld2drizt_tmp(k) * rloss(k)
+             xcld2raint(k) = xcld2raint(k) + xcld2raint_tmp(k) * rloss(k)
+             xrimecldt(k)  = xrimecldt(k)  + xrimecldt_tmp(k)  * rloss(k)
+             xcldsiphmt(k) = xcldsiphmt(k) + xcldsiphmt_tmp(k) * enloss(k)
+           endif
+           if(imbudget>=2)then
+             xrimecldsnowt(k)  = xrimecldsnowt(k) + xrimecldsnowt_tmp(k) * rloss(k)
+             xrimecldaggrt(k)  = xrimecldaggrt(k) + xrimecldaggrt_tmp(k) * rloss(k)
+             xrimecldgraut(k)  = xrimecldgraut(k) + xrimecldgraut_tmp(k) * rloss(k)
+             xrimecldhailt(k)  = xrimecldhailt(k) + xrimecldhailt_tmp(k) * rloss(k)
+           endif
+         !Adjustment for DRIZZLE transfers due to collision-coalescence
+         elseif(lcat==8)then
+           if(imbudget>=1)then
+             xdrz2raint(k) = xdrz2raint(k) + xdrz2raint_tmp(k) * rloss(k)
+             xrimedrzt(k)  = xrimedrzt(k)  + xrimedrzt_tmp(k)  * rloss(k)
+             xdrzsiphmt(k) = xdrzsiphmt(k) + xdrzsiphmt_tmp(k) * enloss(k)
+           endif
+           if(imbudget>=2)then
+             xrimedrzsnowt(k)  = xrimedrzsnowt(k) + xrimedrzsnowt_tmp(k) * rloss(k)
+             xrimedrzaggrt(k)  = xrimedrzaggrt(k) + xrimedrzaggrt_tmp(k) * rloss(k)
+             xrimedrzgraut(k)  = xrimedrzgraut(k) + xrimedrzgraut_tmp(k) * rloss(k)
+             xrimedrzhailt(k)  = xrimedrzhailt(k) + xrimedrzhailt_tmp(k) * rloss(k)
+           endif
+         !Adjustment for RAIN transfers due to collision-coalescence
+         elseif(lcat==2)then
+           if(imbudget>=1)then
+             xrimeraint(k) = xrimeraint(k) + xrimeraint_tmp(k) * rloss(k)
+           endif
+           if(imbudget>=2)then
+             xrimerainprist(k) = xrimerainprist(k) + xrimerainprist_tmp(k) * rloss(k)
+             xrimerainsnowt(k) = xrimerainsnowt(k) + xrimerainsnowt_tmp(k) * rloss(k)
+             xrimerainaggrt(k) = xrimerainaggrt(k) + xrimerainaggrt_tmp(k) * rloss(k)
+             xrimeraingraut(k) = xrimeraingraut(k) + xrimeraingraut_tmp(k) * rloss(k)
+             xrimerainhailt(k) = xrimerainhailt(k) + xrimerainhailt_tmp(k) * rloss(k)
+           endif
+         !Adjustment for PRISTINE ICE xfers
+         elseif(lcat==3)then
+           if(imbudget>=1)then
+             xaggrselfprist(k) = xaggrselfprist(k) + xaggrselfprist_tmp(k) * rloss(k)
+             xaggrpsprist(k)   = xaggrpsprist(k)   + xaggrpsprist_tmp(k)   * rloss(k)
+           endif
+           if(imbudget>=2)then
+             xmeltpriscolt(k)  = xmeltpriscolt(k)  + xmeltpriscolt_tmp(k)  * rloss(k)
+           endif
+         !Adjustment for SNOW xfers
+         elseif(lcat==4)then
+           if(imbudget>=1)then
+             xaggrselfsnowt(k) = xaggrselfsnowt(k) + xaggrselfsnowt_tmp(k) * rloss(k)
+             xaggrpssnowt(k)   = xaggrpssnowt(k)   + xaggrpssnowt_tmp(k)   * rloss(k)
+           endif
+           if(imbudget>=2)then
+             xmeltsnowcolt(k)  = xmeltsnowcolt(k)  + xmeltsnowcolt_tmp(k)  * rloss(k)
+           endif
+         !Adjustment for AGGREGATE xfers
+         elseif(lcat==5)then
+           if(imbudget>=2)then
+             xmeltaggrcolt(k)  = xmeltaggrcolt(k)  + xmeltaggrcolt_tmp(k)  * rloss(k)
+           endif
+         !Adjustment for GRAUPEL xfers
+         elseif(lcat==6)then
+           if(imbudget>=2)then
+             xmeltgraucolt(k)  = xmeltgraucolt(k)  + xmeltgraucolt_tmp(k)  * rloss(k)
+           endif
+         !Adjustment for HAIL xfers
+         elseif(lcat==7)then
+           if(imbudget>=2)then
+             xmelthailcolt(k)  = xmelthailcolt(k)  + xmelthailcolt_tmp(k)  * rloss(k)
+           endif
+         endif ! if LCAT
+
+      enddo !end compute loss adjustment fraction for each vertical level
+
+      !Loop over destination hydrometeor categories
       do jcat = 1,8
          if (jnmb(jcat) .ge. 1) then
             if (lcat .ne. jcat) then
@@ -1468,6 +1600,7 @@ do lcat = 1,8
             enddo
          endif
       enddo
+
    endif
 enddo
 

@@ -1506,8 +1506,6 @@ IF(DEL_T.LT.0.AND.any(FF1>0.)) THEN
       IF (imbudget >= 1) THEN
           micro_g(ngrid)%nucicert(k,i,j) = micro_g(ngrid)%nucicert(k,i,j) + SUM_ICE
           micro_g(ngrid)%nucicect(k,i,j) = micro_g(ngrid)%nucicect(k,i,j) + SUM_NUM
-      END IF
-      IF (imbudget >= 2) THEN
          micro_g(ngrid)%inuchomrt(k,i,j) = micro_g(ngrid)%inuchomrt(k,i,j) + SUM_ICE
          micro_g(ngrid)%inuchomct(k,i,j) = micro_g(ngrid)%inuchomct(k,i,j) + SUM_NUM
       END IF    
@@ -1537,27 +1535,27 @@ REAL FF1(NKR),FF2(NKR,ICEMAX),FF3(NKR),FF4(NKR),FF5(NKR)
 
 IF (IMBUDGET >= 2) THEN !Everything melts - just add it all up
    IF (IPRIS >=2) THEN
-      micro_g(ngrid)%meltprist(k,i,j) = micro_g(ngrid)%meltprist(k,i,j) &
+      micro_g(ngrid)%meltpristhmt(k,i,j) = micro_g(ngrid)%meltpristhmt(k,i,j) &
                         + SUM_MASS(FF2(:,1),XI(:,1),RO,1,KRPRIS(1)-1) &
                         + SUM_MASS(FF2(:,2),XI(:,2),RO,1,KRPRIS(2)-1) &
                         + SUM_MASS(FF2(:,3),XI(:,3),RO,1,KRPRIS(3)-1)
 
-      micro_g(ngrid)%meltsnowt(k,i,j) = micro_g(ngrid)%meltsnowt(k,i,j) &
+      micro_g(ngrid)%meltsnowthmt(k,i,j) = micro_g(ngrid)%meltsnowthmt(k,i,j) &
                         + SUM_MASS(FF2(:,1),XI(:,1),RO,KRPRIS(1),NKR) &
                         + SUM_MASS(FF2(:,2),XI(:,2),RO,KRPRIS(2),NKR) &
                         + SUM_MASS(FF2(:,3),XI(:,3),RO,KRPRIS(3),NKR)
 
    ELSEIF (IPRIS==1 .or. IPRIS==2 .or. IPRIS==3) THEN
-      micro_g(ngrid)%meltprist(k,i,j) = micro_g(ngrid)%meltprist(k,i,j) &
+      micro_g(ngrid)%meltpristhmt(k,i,j) = micro_g(ngrid)%meltpristhmt(k,i,j) &
               + SUM_MASS(FF2(:,IPRIS),XI(:,IPRIS),RO,1,KRPRIS(IPRIS)-1)
-      micro_g(ngrid)%meltsnowt(k,i,j) = micro_g(ngrid)%meltsnowt(k,i,j) &
+      micro_g(ngrid)%meltsnowthmt(k,i,j) = micro_g(ngrid)%meltsnowthmt(k,i,j) &
               + SUM_MASS(FF2(:,IPRIS),XI(:,IPRIS),RO,KRPRIS(IPRIS),NKR)
    ENDIF
-   micro_g(ngrid)%meltaggrt(k,i,j) = micro_g(ngrid)%meltaggrt(k,i,j) &
+   micro_g(ngrid)%meltaggrthmt(k,i,j) = micro_g(ngrid)%meltaggrthmt(k,i,j) &
            + SUM_MASS(FF3,XS,RO,1,NKR)
-   IF(IGRAUP>0) micro_g(ngrid)%meltgraut(k,i,j) = micro_g(ngrid)%meltgraut(k,i,j) &
+   IF(IGRAUP>0) micro_g(ngrid)%meltgrauthmt(k,i,j) = micro_g(ngrid)%meltgrauthmt(k,i,j) &
                         + SUM_MASS(FF4,XG,RO,1,NKR)
-   IF(IHAIL>0)  micro_g(ngrid)%melthailt(k,i,j) = micro_g(ngrid)%melthailt(k,i,j) &
+   IF(IHAIL>0)  micro_g(ngrid)%melthailthmt(k,i,j) = micro_g(ngrid)%melthailthmt(k,i,j) &
                         + SUM_MASS(FF5,XH,RO,1,NKR)
 ENDIF 
 
@@ -4796,14 +4794,14 @@ if (icol_drop.eq.1)then
   if (imbudget >= 1) then
      micro_g(ngrid)%rimecldt(kdir,idir,jdir) = micro_g(ngrid)%rimecldt(kdir,idir,jdir) &
           + totalcloud
-     micro_g(ngrid)%rain2icet(kdir,idir,jdir) = micro_g(ngrid)%rain2icet(kdir,idir,jdir) &
+     micro_g(ngrid)%rimeraint(kdir,idir,jdir) = micro_g(ngrid)%rimeraint(kdir,idir,jdir) &
           + totalrain
   endif
   if (icol_snow.eq.1)then 
      if (imbudget >= 2) then
         micro_g(ngrid)%rimecldaggrt(kdir,idir,jdir) = micro_g(ngrid)%rimecldaggrt(kdir,idir,jdir) &
             + totalcloud 
-        micro_g(ngrid)%rain2agt(kdir,idir,jdir) = micro_g(ngrid)%rain2agt(kdir,idir,jdir) &
+        micro_g(ngrid)%rimerainaggrt(kdir,idir,jdir) = micro_g(ngrid)%rimerainaggrt(kdir,idir,jdir) &
             + totalrain
      endif
      if(tt.lt.tcrit) then
@@ -4827,7 +4825,7 @@ if (icol_drop.eq.1)then
         micro_g(ngrid)%rimecldaggrt(kdir,idir,jdir) = micro_g(ngrid)%rimecldaggrt(kdir,idir,jdir) &
             - totalcloud 
         totalrain = sum(g1(krdrop:nkr))*col*1e-3/rho
-        micro_g(ngrid)%rain2agt(kdir,idir,jdir) = micro_g(ngrid)%rain2agt(kdir,idir,jdir) &
+        micro_g(ngrid)%rimerainaggrt(kdir,idir,jdir) = micro_g(ngrid)%rimerainaggrt(kdir,idir,jdir) &
             - totalrain
      endif
   end if
@@ -4840,7 +4838,7 @@ if (icol_drop.eq.1)then
      if (imbudget >= 2) then
         micro_g(ngrid)%rimecldgraut(kdir,idir,jdir) = micro_g(ngrid)%rimecldgraut(kdir,idir,jdir) &
             + totalcloud 
-        micro_g(ngrid)%rain2grt(kdir,idir,jdir) = micro_g(ngrid)%rain2grt(kdir,idir,jdir) &
+        micro_g(ngrid)%rimeraingraut(kdir,idir,jdir) = micro_g(ngrid)%rimeraingraut(kdir,idir,jdir) &
             + totalrain
      endif
      if (alwc.lt.alcr_hail) then
@@ -4869,7 +4867,7 @@ if (icol_drop.eq.1)then
          micro_g(ngrid)%rimecldgraut(kdir,idir,jdir) = micro_g(ngrid)%rimecldgraut(kdir,idir,jdir) &
              - totalcloud 
          totalrain = sum(g1(krdrop:nkr))*col*1e-3/rho
-         micro_g(ngrid)%rain2grt(kdir,idir,jdir) = micro_g(ngrid)%rain2grt(kdir,idir,jdir) &
+         micro_g(ngrid)%rimeraingraut(kdir,idir,jdir) = micro_g(ngrid)%rimeraingraut(kdir,idir,jdir) &
              - totalrain
      endif
 !----ICE-MULTIPLICATION : Hallet-Mossop processes (1 per 250 collisions)
@@ -4895,7 +4893,7 @@ if (icol_drop.eq.1)then
     if (imbudget >= 2) then
        micro_g(ngrid)%rimecldhailt(kdir,idir,jdir) = micro_g(ngrid)%rimecldhailt(kdir,idir,jdir) &
            + totalcloud 
-       micro_g(ngrid)%rain2hat(kdir,idir,jdir) = micro_g(ngrid)%rain2hat(kdir,idir,jdir) &
+       micro_g(ngrid)%rimerainhailt(kdir,idir,jdir) = micro_g(ngrid)%rimerainhailt(kdir,idir,jdir) &
            + totalrain
     endif
     CALL coll_xyy (g1,g5,cwlh,xl_mg,xh_mg, &
@@ -4907,7 +4905,7 @@ if (icol_drop.eq.1)then
        micro_g(ngrid)%rimecldhailt(kdir,idir,jdir) = micro_g(ngrid)%rimecldhailt(kdir,idir,jdir) &
            - totalcloud 
        totalrain = sum(g1(krdrop:nkr))*col*1e-3/rho
-       micro_g(ngrid)%rain2hat(kdir,idir,jdir) = micro_g(ngrid)%rain2hat(kdir,idir,jdir) &
+       micro_g(ngrid)%rimerainhailt(kdir,idir,jdir) = micro_g(ngrid)%rimerainhailt(kdir,idir,jdir) &
            - totalrain
     endif
   endif
@@ -4921,7 +4919,7 @@ if (icol_drop.eq.1)then
   if (imbudget >= 2 .and. ipris > 0) then
     micro_g(ngrid)%rimecldsnowt(kdir,idir,jdir) = micro_g(ngrid)%rimecldsnowt(kdir,idir,jdir) &
         + totalcloud
-    micro_g(ngrid)%rain2snt(kdir,idir,jdir) = micro_g(ngrid)%rain2snt(kdir,idir,jdir) &
+    micro_g(ngrid)%rimerainsnowt(kdir,idir,jdir) = micro_g(ngrid)%rimerainsnowt(kdir,idir,jdir) &
         + totalrain
   endif
   if(icol_column.eq.1) then
@@ -4975,13 +4973,13 @@ if (icol_drop.eq.1)then
      totalrain = sum(g1(krdrop:nkr))*col*1e-3/rho
      micro_g(ngrid)%rimecldt(kdir,idir,jdir) = micro_g(ngrid)%rimecldt(kdir,idir,jdir) &
          - totalcloud
-     micro_g(ngrid)%rain2icet(kdir,idir,jdir) = micro_g(ngrid)%rain2icet(kdir,idir,jdir) &
+     micro_g(ngrid)%rimeraint(kdir,idir,jdir) = micro_g(ngrid)%rimeraint(kdir,idir,jdir) &
          - totalrain
   endif
   if (imbudget >= 2 .and. ipris > 0) then
      micro_g(ngrid)%rimecldsnowt(kdir,idir,jdir) = micro_g(ngrid)%rimecldsnowt(kdir,idir,jdir) &
          - totalcloud
-     micro_g(ngrid)%rain2snt(kdir,idir,jdir) = micro_g(ngrid)%rain2snt(kdir,idir,jdir) &
+     micro_g(ngrid)%rimerainsnowt(kdir,idir,jdir) = micro_g(ngrid)%rimerainsnowt(kdir,idir,jdir) &
          - totalrain
   endif
  endif !endif ice present

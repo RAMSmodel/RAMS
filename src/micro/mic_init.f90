@@ -205,12 +205,12 @@ do j = 1,n3
     cifnp(k,i,j) = cifnp(k,i,j) * 1.e6 / dn0(k,i,j) ! convert #/cm3 to #/kg
     !Output initial sample profile
     if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
+     if(k==1) print*,' SPICULE Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
      print'(a9,i5,f11.1,3f12.3)',' IFN-init',k,zt(k) &
        ,cifnp(k,i,j)/1.e6*dn0(k,i,j),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
     endif
    !*************************************************************************** 
-   !Use MC3E INP profile if cin_maxt ~ 2.0
+   !Use MC3E INP profile if cin_maxt ~ -2.0
    !Profile from aircraft obs during the MC3E field project. (Marinescu et al. 2016)
    !To mimic the MC3E profile in magnitude, need to set the following parameters.
    !and use IIFN=2 for DeMott scheme, and IFN_FORMULA=1 for DeMott(2010) general formula.
@@ -227,7 +227,7 @@ do j = 1,n3
     cifnp(k,i,j) = cifnp(k,i,j) * 1.e6 ! convert #/mg to #/kg
     !Output initial sample profile
     if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
+     if(k==1) print*,' MC3E Ice Nuclei - init (k,zt,inp/cm3,inp/mg,inp/L) on Grid:',ifm
      print'(a9,i5,f11.1,3f12.3)',' IFN-init',k,zt(k) &
        ,cifnp(k,i,j)/1.e6*dn0(k,i,j),cifnp(k,i,j)/1.e6,cifnp(k,i,j)/1.e3*dn0(k,i,j)
     endif
@@ -273,9 +273,9 @@ do j = 1,n3
 
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' CCN-1-init (k,zt,ccn1/mg,ccn1/cc) on Grid:',ifm
-     print'(a11,i5,f11.1,2f17.7)',' CCN-1-init' &
-        ,k,zt(k),cn1np(k,i,j)/1.e6,cn1np(k,i,j)/1.e6*dn0(k,i,j)
+     if(k==1) print*,' CCN-1-init (k,zt,ccn1/mg,ccn1/cc,dn0) on Grid:',ifm
+     print'(a11,i5,f11.1,3f17.7)',' CCN-1-init' &
+        ,k,zt(k),cn1np(k,i,j)/1.e6,cn1np(k,i,j)/1.e6*dn0(k,i,j),dn0(k,i,j)
    endif
 
    !Set up Field of CCN-mode-1 mass mixing ratio (kg/kg)
@@ -321,9 +321,9 @@ do j = 1,n3
 
    !Output initial sample profile
    if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
-     if(k==1) print*,' CCN-2-init (k,zt,ccn2/mg,ccn2/cc) on Grid:',ifm
-     print'(a11,i5,f11.1,2f17.7)',' CCN-2-init' &
-        ,k,zt(k),cn2np(k,i,j)/1.e6,cn2np(k,i,j)/1.e6*dn0(k,i,j)
+     if(k==1) print*,' CCN-2-init (k,zt,ccn2/mg,ccn2/cc,dn0) on Grid:',ifm
+     print'(a11,i5,f11.1,3f17.7)',' CCN-2-init' &
+        ,k,zt(k),cn2np(k,i,j)/1.e6,cn2np(k,i,j)/1.e6*dn0(k,i,j),dn0(k,i,j)
    endif
 
    !Set up Field of CCN-mode-2 mass mixing ratio (kg/kg)
@@ -338,6 +338,54 @@ if(iaeroprnt==1 .and. print_msg) print*,' '
 
 return
 END SUBROUTINE init_ccn2
+
+!##############################################################################
+Subroutine init_ccn3 (n1,n2,n3,cn3np,cn3mp,dn0,ifm)
+
+use micphys
+use rconstants
+use mem_grid
+
+implicit none
+
+integer :: n1,n2,n3,i,j,k,ifm
+real, dimension(n1,n2,n3) :: cn3np,cn3mp,dn0
+real :: ccn3_maxt
+
+! Initialize CCN mode 3
+if(iaeroprnt==1 .and. print_msg) print*,'Start Initializing CCN mode 3 concen'
+
+!Convert RAMSIN #/mg to #/kg
+ ccn3_maxt = ccn3_max * 1.e6
+
+do j = 1,n3
+ do i = 1,n2
+  do k = 1,n1
+
+   !Set up Vertical profile
+   if(k<=2) cn3np(k,i,j)=ccn3_maxt
+   ! Exponential decrease that scales with pressure decrease
+   if(k>2)  cn3np(k,i,j)=ccn3_maxt*exp(-zt(k)/7000.)
+
+   !Output initial sample profile
+   if(iaeroprnt==1 .and. i==1 .and. j==1 .and. print_msg) then
+     if(k==1) print*,' CCN-3-init (k,zt,ccn3/mg,ccn3/cc,dn0) on Grid:',ifm
+     print'(a11,i5,f11.1,3f17.7)',' CCN-3-init' &
+        ,k,zt(k),cn3np(k,i,j)/1.e6,cn3np(k,i,j)/1.e6*dn0(k,i,j),dn0(k,i,j)
+   endif
+
+   !Set up Field of CCN-mode-3 mass mixing ratio (kg/kg)
+   cn3mp(k,i,j) = ((aero_medrad(3)*aero_rg2rm(3))**3.) &
+                *cn3np(k,i,j)/(0.23873/aero_rhosol(3))
+
+  enddo
+ enddo
+enddo
+
+if(iaeroprnt==1 .and. print_msg) print*,' '
+
+return
+END SUBROUTINE init_ccn3
 
 !##############################################################################
 Subroutine init_dust (n1,n2,n3,md1np,md2np,md1mp,md2mp,dn0,ifm)
@@ -376,11 +424,11 @@ do j = 1,n3
      if(k>2)  md2np(k,i,j)=dust2_maxt*exp(-zt(k)/7000.)
 
      !Set up Field of SMALL MODE DUST mass (kg/kg)
-     md1mp(k,i,j) = ((aero_medrad(3)*aero_rg2rm(3))**3.) &
-                    *md1np(k,i,j)/(0.23873/aero_rhosol(3))
+     md1mp(k,i,j) = ((aero_medrad(4)*aero_rg2rm(4))**3.) &
+                    *md1np(k,i,j)/(0.23873/aero_rhosol(4))
      !Set up Field of LARGE MODE DUST mass (kg/kg)
-     md2mp(k,i,j) = ((aero_medrad(4)*aero_rg2rm(4))**3.) &
-                    *md2np(k,i,j)/(0.23873/aero_rhosol(4))
+     md2mp(k,i,j) = ((aero_medrad(5)*aero_rg2rm(5))**3.) &
+                    *md2np(k,i,j)/(0.23873/aero_rhosol(5))
 
    !If using dust source model, do not initialize with background dust
    elseif(idust == 2) then
@@ -443,11 +491,11 @@ do j = 1,n3
      if(k>2)  abc2np(k,i,j)=abc2_maxt*exp(-zt(k)/7000.)
 
      !Set up Field of mode1 absorbing carbon mass (kg/kg)
-     abc1mp(k,i,j) = ((aero_medrad(8)*aero_rg2rm(8))**3.) &
-                    *abc1np(k,i,j)/(0.23873/aero_rhosol(8))
+     abc1mp(k,i,j) = ((aero_medrad(9)*aero_rg2rm(9))**3.) &
+                    *abc1np(k,i,j)/(0.23873/aero_rhosol(9))
      !Set up Field of mode2 absorbing carbon mass (kg/kg)
-     abc2mp(k,i,j) = ((aero_medrad(9)*aero_rg2rm(9))**3.) &
-                    *abc2np(k,i,j)/(0.23873/aero_rhosol(9))
+     abc2mp(k,i,j) = ((aero_medrad(10)*aero_rg2rm(10))**3.) &
+                    *abc2np(k,i,j)/(0.23873/aero_rhosol(10))
 
    !Leaving this section here in case we add an absorbing carbon / smoke 
    !source in the future
@@ -517,14 +565,14 @@ do j = 1,n3
      if(k>2)  salt_spum_np(k,i,j)=salts_maxt*exp(-zt(k)/7000.)
 
      !Set up 3D Field of FILM MODE SALT mass (kg/kg)
-     salt_film_mp(k,i,j) = ((aero_medrad(5)*aero_rg2rm(5))**3.) &
-                           *salt_film_np(k,i,j)/(0.23873/aero_rhosol(5))
+     salt_film_mp(k,i,j) = ((aero_medrad(6)*aero_rg2rm(6))**3.) &
+                           *salt_film_np(k,i,j)/(0.23873/aero_rhosol(6))
      !Set up 3D Field of JET MODE SALT mass (kg/kg)
-     salt_jet_mp(k,i,j)  = ((aero_medrad(6)*aero_rg2rm(6))**3.) &
-                           *salt_jet_np(k,i,j) /(0.23873/aero_rhosol(6))
+     salt_jet_mp(k,i,j)  = ((aero_medrad(7)*aero_rg2rm(7))**3.) &
+                           *salt_jet_np(k,i,j) /(0.23873/aero_rhosol(7))
      !Set up 3D Field of SPUME MODE SALT mass (kg/kg)
-     salt_spum_mp(k,i,j) = ((aero_medrad(7)*aero_rg2rm(7))**3.) &
-                           *salt_spum_np(k,i,j)/(0.23873/aero_rhosol(7))
+     salt_spum_mp(k,i,j) = ((aero_medrad(8)*aero_rg2rm(8))**3.) &
+                           *salt_spum_np(k,i,j)/(0.23873/aero_rhosol(8))
 
    !If using salt source model, do not initialize with background salt
    elseif(isalt == 2) then

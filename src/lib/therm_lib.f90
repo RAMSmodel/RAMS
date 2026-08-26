@@ -320,7 +320,7 @@ if (q .le. 0.) then
    tempc = q * r2093
 elseif (q .ge. 334000.) then
    fracliq = 1.
-   tempc = q * r4186 - 80.
+   tempc = q * r4186 - 79.79
 else
    fracliq = q * r334000
    tempc = 0.

@@ -652,7 +652,7 @@ elseif(ibubble==3) then
 
          !Default perturbations amplitude of 0.1K, largest at level 2,
          !decreased linearly over 500m.
-         R = R*0.1*(500.+zt(2)-zt(k))/500.
+         if(irce == 0) R = R*0.1*(500.+zt(2)-zt(k))/500.
 
          !RCE perturbations amplitude of "rce_bubl", largest at level 2,
          !decreased linearly over 500m. Override default.

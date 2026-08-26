@@ -212,8 +212,12 @@
                               !  the subsequent write. 
                               !  Intended to be a mutiple of and >= FRQSTATE
 !-----------------------------------------------------------------------
-   FRQLITE  = 0.,            ! Frequency for "lite" files
-                             !   = 0 : no lite files
+   FRQLITE  = 0.,0.,0.,       ! Frequency for "lite" files
+                              !   = 0 : no lite files
+
+   ITRUNCLITE = 0,            ! Truncate precision to save space (see utils_f.f90)
+                              ! 0 = no truncation, 1 = yes truncation
+
    NLITE_VARS=0,
 
    LITE_VARS= 'GLAT','GLON','TOPT','PATCH_AREA', !Keep these always
@@ -528,6 +532,9 @@
                              !            2-New Banded Plaws for sedimentation
    ISEDIM  = 1,              ! Sedimentation: 0-RelDisp, 1-True Hybrid-Bin
  
+   IKERNELA = 1,             ! Autoconversion/Accretion Collection Kernel
+                             ! 1 - Long kernel, 2 - Hall Kernel
+
    ICLOUD  = 5,              ! Microphysics flags
    IDRIZ   = 5,              !-------------------
    IRAIN   = 5,              !  1 - diagnostic concen.
@@ -599,10 +606,12 @@
                              ! ------------------------------------------
    IAEROPRNT  = 1,           ! Print aerosol init profiles (0=no,1=yes)
    IAEROHIST  = 0,           ! Re-initialize aerosols on hist restart:0,1 
+
    CIN_MAX    = 0.01,        ! Ice Nuclei (#/mg) for IIFN = 1-3
                              ! Quasi-constant ice concentration (#/L) for IIFN = 4
-   CCN1_MAX   = 1000.,       ! CCN-mode-1 (#/mg)
-   CCN2_MAX   = 0.01,        ! CCN-mode-2 (#/mg)
+   CCN1_MAX   = 200.,        ! CCN-mode-1 (#/mg)
+   CCN2_MAX   = 150.,        ! CCN-mode-2 (#/mg)
+   CCN3_MAX   = 90.,         ! CCN-mode-3 (#/mg)
    DUST1_MAX  = 100.,        ! Small Dust Mode (#/mg)
    DUST2_MAX  = 10.,         ! Large Dust Mode (#/mg)
    SALTF_MAX  = 100.,        ! Film Sea Salt (#/mg)
@@ -612,13 +621,13 @@
    ABC2_MAX   = 100.,          ! Absorbing carbon Mode-2 (#/mg)
 
    ! Aerosol 9 categories soluble chemistry type: 1=(NH4)2S04, 2=NaCl
-   IAERO_CHEM   = 1,1,1,1,2,2,2,1,1,1,1,
+   IAERO_CHEM   = 1,1,1,1,1,2,2,2,1,1,1,1,
 
    ! Aerosol 9 categories solubility fraction: (0->1)
-   AERO_EPSILON = 0.90,0.90,0.05,0.05,1.00,1.00,1.00,0.05,0.05,0.20,0.20, 
+   AERO_EPSILON = 0.90,0.90,0.90,0.05,0.05,1.00,1.00,1.00,0.05,0.05,0.20,0.20,
 
    ! Aerosol 9 categories initial median radius (meters)
-   AERO_MEDRAD  = 0.04e-6,3.00e-6,          !CCN-1,CCN-2
+   AERO_MEDRAD  = 0.04e-6,0.09e-6,0.15e-6,  !CCN-1,CCN-2,CCN-3
                   0.05e-6,0.50e-6,          !Dust1,Dust2
                   0.10e-6,1.00e-6,6.00e-6,  !SeaSalt: film,jet,spume
                   0.05e-6,0.05e-6,          !Absorbing carbon

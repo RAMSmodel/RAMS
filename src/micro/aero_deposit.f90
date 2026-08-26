@@ -91,15 +91,16 @@ do acat=1,aerocat
  rundep=0
 
  !Set up profile of aerosol properties if they exist
- if((acat==1 .and. iaerosol>0)  .or. &  ! CCN mode 1
-    (acat==2 .and. iaerosol>0)  .or. &  ! CCN mode 2
-    (acat==3 .and. idust>0)    .or. &  ! Small dust mode
-    (acat==4 .and. idust>0)    .or. &  ! Large dust mode
-    (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
-    (acat==6 .and. isalt>0)    .or. &  ! Salt jet mode
-    (acat==7 .and. isalt>0)    .or. &  ! Salt spume mode
-    (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
-    (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+ if((acat==1 .and. iaerosol>=1)  .or. &  ! CCN mode 1
+    (acat==2 .and. iaerosol>=2)  .or. &  ! CCN mode 2
+    (acat==3 .and. iaerosol>=3)  .or. &  ! CCN mode 3
+    (acat==4 .and. idust>0)    .or. &  ! Small dust mode
+    (acat==5 .and. idust>0)    .or. &  ! Large dust mode
+    (acat==6 .and. isalt>0)    .or. &  ! Salt film mode
+    (acat==7 .and. isalt>0)    .or. &  ! Salt jet mode
+    (acat==8 .and. isalt>0)    .or. &  ! Salt spume mode
+    (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+    (acat==10.and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
     (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
     (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
     rundep=1
@@ -301,7 +302,7 @@ do acat=1,aerocat
           if(acat==aerocat-1.or.acat==aerocat) &
             regenmas(k,acat-(aerocat-2))=regenmas(k,acat-(aerocat-2))-amas_remove(lcat)*epsilonsol
          endif
-         if(itrkdust==1 .and. (acat==3.or.acat==4)) &
+         if(itrkdust==1 .and. (acat==4.or.acat==5)) &
           dnmhx(k,lcat) = dnmhx(k,lcat) + (amas_remove(lcat) / dn0(k))
        endif
      enddo

@@ -1291,17 +1291,17 @@ END SUBROUTINE sxyice
 !##############################################################################
 Subroutine data (x,diam,akbar,ibins)
 
+use micphys, only:ikernela
+
 implicit none
 
-integer :: l,i,j,ibins,n,kernel
+integer :: l,i,j,ibins,n
 real :: pi
 real, dimension(ibins+1) :: x,diam
 real, dimension(ibins,ibins) :: akbar
 real, dimension(36,36) :: aabar,ahbar
 
-kernel=1
-
-if(kernel==1) then  !Long's collection kernel
+if(ikernela==1) then  !Long's collection kernel
 data (aabar( 1,n),n=1, 1) /-.47757E-01  /
 data (aabar( 2,n),n=1, 2) /-.26460E+00,-.47965E-01 /
 data (aabar( 3,n),n=1, 3) /-.82258E+00,-.26760E+00,-.20453E-01 /
@@ -1442,7 +1442,7 @@ data (aabar(36,n),n=1,36) / .11936E+04, .11938E+04, .11940E+04, .11942E+04  &
    ,.00000E+00, .00000E+00 /
 endif
 
-if(kernel==2) then  !Hall's collection kernel
+if(ikernela==2) then  !Hall's collection kernel
 data (ahbar( 1,n),n=1, 1)/ &
 0.19826E+00/
 data (ahbar( 2,n),n=1, 2)/ &
@@ -1622,8 +1622,8 @@ enddo
 !by Walko or Saleeby (1-36) with (1-36) weighted for (x+y)
 do i=1,ibins
    do j=1,i
-      if(kernel==1) akbar(i,j)=aabar(i,j)
-      if(kernel==2) akbar(i,j)=ahbar(i,j)
+      if(ikernela==1) akbar(i,j)=aabar(i,j)
+      if(ikernela==2) akbar(i,j)=ahbar(i,j)
       if(akbar(i,j).lt.0.) akbar(i,j)=0.
       akbar(36,i)=0.
    enddo

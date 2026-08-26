@@ -10,6 +10,7 @@ Subroutine opspec1 ()
 !   run to stop immediately and warning errors and informative
 !   messages will be listed.
 
+use io_params
 use mem_grid
 use mem_radiate
 use mem_leaf
@@ -66,6 +67,14 @@ IF(NGRIDS.LT.1) THEN
 ENDIF
 
 DO IFM=1,NGRIDS
+
+  IF(FRQLITE(IFM) > 0.0)then
+    IF(mod(FRQSTATE(IFM),FRQLITE(IFM)) /= 0.)then
+      PRINT*,' FATAL - Lite file freq must be int multiple of State file Freq'
+      IFATERR=IFATERR+1
+    ENDIF
+  ENDIF
+
   icm = nxtnest(ifm)
   IF(NNXP(IFM).LT.4) THEN
     PRINT*,' FATAL - NNXP must be at least 4.'
@@ -204,6 +213,11 @@ if (iscm > 0 .and. npatch > 2) then
   IFATERR=IFATERR+1
 endif
 
+if (itrunclite .lt. 0 .or. itrunclite .gt. 1) THEN
+   print*,'FATAL - ITRUNCLITE OUT OF RANGE: MUST BE 0-1'
+   IFATERR = IFATERR + 1
+endif
+
 !********************************************************************
 ! MICROPHYSICS AND AEROSOL FLAG CHECKING SECTION
 !********************************************************************
@@ -211,8 +225,8 @@ endif
 !********************************************************************
 ! CHECK FOR AEROSOL SOURCE AND AEROSOL RADIATION FLAGS
 !********************************************************************
- if (iaerosol .lt. 0 .or. iaerosol .gt. 1) THEN
-    print*,'FATAL - IAEROSOL OUT OF RANGE: MUST BE 0-1'
+ if (iaerosol .lt. 0 .or. iaerosol .gt. 3) THEN
+    print*,'FATAL - IAEROSOL OUT OF RANGE: MUST BE 0-3'
     IFATERR = IFATERR + 1
  endif
  if (idust .lt. 0 .or. idust .gt. 2) THEN
@@ -331,6 +345,11 @@ elseif (level .eq. 3) then
   print*,'FATAL - ISEDIM OUT OF RANGE: MUST BE 0-1'
   IFATERR = IFATERR + 1
  endif
+ if (ikernela .lt. 1 .or. ikernela .gt. 2) THEN
+  print*,'FATAL - IKERNELA OUT OF RANGE: MUST BE 1-2'
+  IFATERR = IFATERR + 1
+ endif
+
  if (itrkepsilon .lt. 0 .or. itrkepsilon .gt. 1 .or. &
      itrkdust    .lt. 0 .or. itrkdust    .gt. 1 .or. &
      itrkdustifn .lt. 0 .or. itrkdustifn .gt. 1) THEN
@@ -447,7 +466,7 @@ elseif (level .eq. 4) then
     print*,'CCN and INP are specified in CCN_MAX and CIN_MAX for HUCM.'
     IFATERR = IFATERR + 1
    endif
-   if (imbudget==3)then
+   if(imbudget==3)then
     print*,'FATAL - No dust nucleation tracking because there is'
     print*,'no dust in HUCM-SBM. Set IMBUDGET < 3.'
     IFATERR = IFATERR + 1
@@ -795,12 +814,14 @@ ENDDO
 
 ! Check that diffusion flags are compatible if using ihorgrad=1
 
-if(ihorgrad.eq.2)then
+DO NGR=1,NGRIDS
+ if(ihorgrad.eq.2)then
   if(IDIFFK(NGR) >= 3)then
     print*,' FATAL - Cant use IHORGRAD=2 if IDIFFK >= 3'
     IFATERR=IFATERR+1
   endif
-endif
+ endif
+ENDDO
 
 ! Check that diffusion of perturbations relative to varfile
 ! state only runs if varfiles are used for nudging.
