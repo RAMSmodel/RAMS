@@ -98,7 +98,8 @@ ngr = ngrid
 
 !Zero out the radiative heating rate "fthrd" if this this a radiation timestep
 !and if running Harrington Radiation as called below with microphysics loop.
-! GRL 2024-08-28 Note that we are not zeroing out fthrd, fthrdlw, fthrdsw for SW/LWtype=5 (RTE), but this should be okay because these are zeroed 
+! GRL 2024-08-28 Note that we are not zeroing out fthrd, fthrdlw, fthrdsw for
+! SW/LWtype=5 (RTE), but this should be okay because these are zeroed 
 ! out and calculated different in radcalc5
 if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3 .or. iswrtyp .eq. 4 .or. ilwrtyp .eq. 4) then
   if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. .001) then
@@ -347,7 +348,7 @@ do icv = 1,8
 enddo
 
 ! Pristine ice to snow transfer
-if (jnmb(3).ge.1) then
+if (jnmb(4) .ge. 1) then
    CALL psxfer (k1(3),k2(3),k1(4),k2(4),i,j)
 endif
 
@@ -451,13 +452,12 @@ enddo
 rx_lhr = rx
 qx_lhr = qx
 
-
 ! Make hydrometeor transfers due to collision-coalescence
  CALL colxfers (m1,k1,k2,scrmic1,scrmic2)
 
 ! Pristine ice to snow transfer done after collision-coalescence to
 ! avoid any mass/number adjustments that impact cloud-ice number
-if (jnmb(3) .ge. 1) then
+if (jnmb(4) .ge. 1) then
    CALL psxfer (k1(3),k2(3),k1(4),k2(4),i,j)
 endif
 

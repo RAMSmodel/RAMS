@@ -7,11 +7,7 @@ include ../include.mk
 ###############################################################################
 # Compiler commands
 ###############################################################################
-LIBS += -L$(NETCDF_FORTRAN_ROOT)/lib -lnetcdff
-LIBS += -L$(NETCDF_C_ROOT)/lib -lnetcdf
-
-INCLUDES  = $(UTILS_INCS) $(PAR_INCS) $(HDF5_INCS)
-INCLUDES += -I$(NETCDF_FORTRAN_ROOT)/include 
+INCLUDES = $(UTILS_INCS) $(PAR_INCS) $(HDF5_INCS) $(NETCDF_FORTRAN_INCS) $(NETCDF_C_INCS)
 
 F_CD1 = $(F_COMP) -c $(F_OPTS1) $(INCLUDES)
 F_CD2 = $(F_COMP) -c $(F_OPTS2) $(INCLUDES)
@@ -271,7 +267,7 @@ all: $(EXE)
 $(EXE): $(ARC) $(MAIN) FORCE
 	@echo ""
 	$(F_COMP) -o $(EXE) $(MAIN_OBJ) $(LOADER_OPTS) $(ARC) \
-	$(HDF5_LIBS) $(LIBS) $(PAR_LIBS)
+	$(HDF5_LIBS) $(NETCDF_FORTRAN_LIBS) $(NETCDF_C_LIBS) $(LIBS) $(PAR_LIBS)
 	rm -f *.o $(BASE)
 	ln -s $(EXE) $(BASE)
 	@echo ""

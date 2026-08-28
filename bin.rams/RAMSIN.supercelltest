@@ -32,7 +32,7 @@
  
    NNXP     = 25,30,        ! Number of x gridpoints
    NNYP     = 35,50,        ! Number of y gridpoints
-   NNZP     = 60,40,        ! Number of z gridpoints
+   NNZP     = 40,40,        ! Number of z gridpoints
    NZG      = 11,           ! Number of soil layers
    NZS      = 1,            ! Maximum number of snow layers
  
@@ -44,10 +44,10 @@
 
    IHTRAN   = 0,              ! 0-Cartesian, 1-Polar stereo
    DELTAX   = 2000.,          ! X-Y grid spacing (meters)
-   DELTAZ   = 30.,            ! Z grid spacing (set to 0. to use ZZ)
-   DZRAT    = 1.08,           ! Vertical grid stretch ratio
+   DELTAZ   = 100.,           ! Z grid spacing (set to 0. to use ZZ)
+   DZRAT    = 1.10,           ! Vertical grid stretch ratio
    ZDELAY   = 0.,             ! Height at which to begin the stretching
-   DZMAX    = 400.,           ! Maximum delta Z for vertical stretch
+   DZMAX    = 1000.,          ! Maximum delta Z for vertical stretch
  
    ZZ       = 0.0,            ! Vertical levels if DELTAZ = 0
      20.0,      46.0,      80.0,     120.0,     165.0,
@@ -59,7 +59,7 @@
   10700., 11700., 12700., 13700., 14700., 15700., 16700.,
   17700., 18700., 19700.,
  
-   DTLONG   = 1.,          ! Coarse grid long timestep
+   DTLONG   = 10.,          ! Coarse grid long timestep
    NACOUST  = 5,           ! Small timestep ratio
 
    ! Nest ratios between this grid and the next coarser grid.
@@ -185,7 +185,7 @@
 
 ! History start (if RUNTYPE='HISTORY')
 
-   HFILIN   = './testrun.output/a-A-1991-04-26-210006-head.txt',
+   HFILIN   = './testsupercell.output/a-A-1991-04-26-213000-head.txt',
                              ! Input state file name
 
 ! Analysis file input for assimilation: 1=yes, 0=no
@@ -199,12 +199,12 @@
 !  Analysis file output
  
    IOUTPUT  =  1,             ! 0-no files, 1-write files
-   AFILEPREF  = './testrun.output/a',  
+   AFILEPREF  = './testsupercell.output/a',  
                               ! File prefix for all analysis files
                               !   state,mean,lite,both
                               
 !------------------------------------------------------------------------
-   FRQSTATE   = 60.,600.,3600.,1800., ! "state" file write frequency
+   FRQSTATE   = 600.,600.,3600.,1800., ! "state" file write frequency
                               !  can be different for each grid
                               !  works best if grids are multiples of each other
    FRQST_KEEP   =    0.,      ! If > 0., frequency at which "state" files will be 
@@ -223,6 +223,16 @@
    LITE_VARS= 'GLAT','GLON','TOPT','PATCH_AREA', !Keep these always
               'UP','VP','WP', !This would be useful for hi-frequency trajectories
 
+   ! Accuracy of the lite vars if using ZFP/lossy compression
+   ! Use 0 for lossless compression
+   ! Using nonzero values requires compiling with -DENABLE_ZFP_COMPRESSION
+   ! on the C compiler.
+   ! The values here MUST be listed in the same order as the variables
+   ! in flag LITE_VARS.
+
+   ACC_LT_VAR= 0.0, 0.0, 0.1, 0.01,
+               0.001, 0.001, 0.001,
+
 !-----------------------------------------------------------------------
    AVGTIM   = 0.,            ! Averaging time for analysis variables
                              !   must be abs(AVGTIM) <= FRQANL
@@ -234,10 +244,10 @@
 
 ! Input topography variables
 
-   TOPFILES = './testrun.output/toph', ! Path and prefix for topo files. 
-   SFCFILES = './testrun.output/sfch', ! Path and prefix for surface files. 
-   SSTFPFX  = './testrun.output/ssth', ! Path and prefix for sst files
-   NDVIFPFX = './testrun.output/ndh',  ! Path and prefix for ndni files
+   TOPFILES = './testsupercell.output/toph', ! Path and prefix for topo files. 
+   SFCFILES = './testsupercell.output/sfch', ! Path and prefix for surface files. 
+   SSTFPFX  = './testsupercell.output/ssth', ! Path and prefix for sst files
+   NDVIFPFX = './testsupercell.output/ndh',  ! Path and prefix for ndni files
 
    ITOPTFLG = 2,0,0,0,           ! 2 - Fill data in "leaf3_init"
    ISSTFLG  = 2,2,0,0,           ! 0 - Interpolate from coarser grid
@@ -320,10 +330,11 @@
  
 ! Radiation parameters
  
-   ISWRTYP  = 4,             ! Shortwave radiation type
-   ILWRTYP  = 4,             ! Longwave radiation type
-                             !    0-none, 2-Mahrer/Pielke, 1-Chen, 3-Harrington
-   RADFRQ   = 60.,          ! Freq. of radiation tendency update (s)
+   ISWRTYP  = 5,             ! Shortwave radiation type
+   ILWRTYP  = 5,             ! Longwave radiation type
+                             !    0-none, 1-Chen/Cotton, 2-Mahrer/Pielke, 3-Harrington
+                             !    4-BUGSRAD, 5-RTE+RRTMGP
+   RADFRQ   = 300.,          ! Freq. of radiation tendency update (s)
    LONRAD   = 1,             ! Longitudinal variation of shortwave  
                              !    (0-no, 1-yes)
  
@@ -357,7 +368,7 @@
                              ! vegetation files 
                              !    (min of 1, max of NPATCH-1)
                        
-   ISFCL    = 3,             ! Surface layer/soil/veg model
+   ISFCL    = 1,             ! Surface layer/soil/veg model
                              !  0-specified surface layer gradients
                              !  1-LEAF3 model, 2-SiB model
                              !  3-specified fluxes, albedo, and surf. T
@@ -407,8 +418,8 @@
    ALBEDO   = .2,            ! Constant albedo if not running soil model
    SEATMP   = 300.,          ! Constant water surface temperature
 
-   DTHCON   = 10.,            ! Constant sfc layer  temp grad for no soil
-   DRTCON   = 10.,            ! Constant sfc layer moist grad for no soil
+   DTHCON   = 0.,            ! Constant sfc layer  temp grad for no soil
+   DRTCON   = 0.,            ! Constant sfc layer moist grad for no soil
                               ! OR constant surface fluxes (W/m2) for ISFCL = 3
    
    SLZ      = -.50,-.40,-.30,-.25,-.20,-.16,-.12,-.09,-.06,-.03,-.01,
@@ -464,7 +475,7 @@
    IBDYJA  = 5,              ! DY start grid point
    IBDYJZ  = 13,             ! DY end grid point
    IBDZK1  = 2,              ! Lower k level
-   IBDZK2  = 10,             ! Upper k level
+   IBDZK2  = 16,             ! Upper k level
    BTHP    = 3.0,            ! Theta-il perturbation(K) (THP + BTHP)
    BRTP    = 0.2,            ! Mixing ratio perturbation (RTP * (1 + BRTP)
 
@@ -569,7 +580,7 @@
    IAEROSOL = 1,             ! CCN-1,CCN-2: 0=off, 1=userset
    ISALT    = 1,             ! Sea Salt: 0=off, 1=userset, 2=saltmodel
    IDUST    = 1,             ! Dust: 0=off, 1=userset 2=dustmodel
-   IABCARB = 1,              ! Absorbing carbon: 0=off, 1=userset
+   IABCARB  = 1,             ! Absorbing carbon: 0=off, 1=userset
 
    IDUSTLOFT = 0,            ! 0 = idealized lofting
                              ! 1 = Ginoux(2001) erodible fraction data
@@ -594,9 +605,9 @@
                              ! 1 = DeMott(2010) (composite aerosol types)
                              ! 2 = DeMott(2014) (dust formula)
 
-   IAERORAD  = 0,            ! Aerosol-Radiation Model: 0 = Off, 1 = On
+   IAERORAD  = 1,            ! Aerosol-Radiation Model: 0 = Off, 1 = On
 
-   IAERODEP  = 0,            ! Aerosol wet and dry deposition
+   IAERODEP  = 1,            ! Aerosol wet and dry deposition
                              ! (track scavenged aerosols if iccnlev>=2)
                              ! 0 = Off, 1 = On
 
@@ -607,7 +618,7 @@
    IAEROPRNT  = 1,           ! Print aerosol init profiles (0=no,1=yes)
    IAEROHIST  = 0,           ! Re-initialize aerosols on hist restart:0,1 
 
-   CIN_MAX    = 0.01,        ! Ice Nuclei (#/mg) for IIFN = 1-3
+   CIN_MAX    = 2.5,         ! Ice Nuclei (#/mg) for IIFN = 1-3
                              ! Quasi-constant ice concentration (#/L) for IIFN = 4
    CCN1_MAX   = 200.,        ! CCN-mode-1 (#/mg)
    CCN2_MAX   = 150.,        ! CCN-mode-2 (#/mg)
@@ -617,8 +628,8 @@
    SALTF_MAX  = 100.,        ! Film Sea Salt (#/mg)
    SALTJ_MAX  = 0.1,         ! Jet Sea Salt (#/mg)
    SALTS_MAX  = 1.e-3,       ! Spume Sea Salt (#/mg)
-   ABC1_MAX   = 10.,          ! Absorbing carbon Mode-1 (#/mg)
-   ABC2_MAX   = 100.,          ! Absorbing carbon Mode-2 (#/mg)
+   ABC1_MAX   = 50.,         ! Absorbing carbon Mode-1 (#/mg)
+   ABC2_MAX   = 10.,         ! Absorbing carbon Mode-2 (#/mg)
 
    ! Aerosol 9 categories soluble chemistry type: 1=(NH4)2S04, 2=NaCl
    IAERO_CHEM   = 1,1,1,1,1,2,2,2,1,1,1,1,

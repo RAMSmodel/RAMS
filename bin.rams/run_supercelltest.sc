@@ -8,7 +8,7 @@
 # this script in parallel or serial.
 #
 # A couple of important items here for this test simulation.
-# 1. RAMSIN.testrunonly - produces a 3D 1-grid supercell simulation with
+# 1. RAMSIN.supercelltest - produces a 3D 1-grid supercell simulation with
 #  LEVEL=3 microphysics
 # 2. This idealized simulation does not require geographical data (sfctypehdf5)
 #  for running since geography does not matter. Also, we do not need gridded
@@ -19,7 +19,7 @@
 #  but NOT on a supercomputer using a PBS QSUB queuing system. Consult their
 #  userguides for running parallel jobs on their systems. Each system is unique.
 # /home/smsaleeb/software/mpich-3.3.2/bin/mpiexec -machinefile machs -np 8 \
-# ./bin.rams/rams-6.3.01 -f RAMSIN.testrunonly
+# ./bin.rams/rams-6.3.01 -f RAMSIN.supercelltest
 # Note: might have to add (-iface eth0) to this executable statement or
 #  something similar depending on how your compute nodes communicate. Use
 #  utility (ifconfig) to find out how your nodes communicate (ie. eth0 or eth1).
@@ -35,9 +35,9 @@
 # Set your path to RAMS executable, RAMSIN namelist file, and machs file
 rd=`pwd`
 # RAMSIN name
-ramsin="RAMSIN.testrunonly"
+ramsin="RAMSIN.supercelltest"
 # RAMS version (ie. 6.3.02)
-vs=6.3.04
+vs=6.3.05
 # Set flag for type of test (0=sequential, 1=parallel)
 runtype=1
 # Set number of nodes for parallel run.
@@ -51,7 +51,7 @@ del=1
 machsmake=1
 
 # Set your parallel executable here
-a1=/home/smsaleeb/software/mpich-3.3.2/bin/mpiexec
+a1=/home/smsaleeb/software/mpich-4.3.2/bin/mpiexec
 # Set you machines file path here
 a2=$rd/machs
 # Set RAMS executable path and name
@@ -59,7 +59,7 @@ a3=$rd/rams-$vs
 
 #Check to see that RAMSIN namelist exists
 if [ ! -f $rd/$ramsin ]; then
- echo "Input paths for this file is incorrect: RAMSIN.testrunonly"
+ echo "Input paths for this file is incorrect: RAMSIN.supercelltest"
  exit
 fi
 
@@ -94,7 +94,7 @@ fi
 # DONE WITH NECESSARY USER CHANGES
 ###############################################################################
 
-for dirname in $rd/testrun.output
+for dirname in $rd/testsupercell.output
 do
   if [ -d $dirname -a $del -eq 1 ]; then
    rm -f $dirname/*.h5 $dirname/*.txt

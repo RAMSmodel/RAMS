@@ -20,24 +20,25 @@ MAKE=/usr/bin/make
 #############################################################################
 # Set your RAMS root path and version number.
 #############################################################################
-RAMS_ROOT=/home/smsaleeb/rams_steve/RAMS
-RAMS_VERSION=6.3.04
+RAMS_ROOT=/home/smsaleeb/rams_git_main/RAMS
+RAMS_VERSION=6.3.05
 
 #############################################################################
-# Set root locations for HDF5 I/O software.
+# Set root locations for HDF5 and NETCDF I/O software.
 # Choose parallel or serial processing option for your compile type.
 # Typically can use "parallel" for either, but some supercomputers require
 # use of the serial executable.
 #############################################################################
-HDF5_ROOT=#/share/apps/hdf5-1.10.1/intel
-#ZFP Compression requites ZFP
-HDZ_ZFP_ROOT=
+HDF5_ROOT=/home/smsaleeb/software/hdf5-1.14.3
+
+NETCDF_FORTRAN_ROOT=/home/smsaleeb/software/netcdf-fortran-4.6.4
+NETCDF_C_ROOT=/home/smsaleeb/software/netcdf-c-4.10.1
 
 #############################################################################
 # Set root locations for parallel processing MPI software.
 # You can comment out MPI_ROOT for serial processing compile.
 #############################################################################
-MPI_ROOT=/home/smsaleeb/software/mpich-3.3.2
+MPI_ROOT=/home/smsaleeb/software/mpich-4.3.2
 
 #############################################################################
 # Do not change these 2. They point from RAMS_ROOT to the source code.
@@ -50,18 +51,20 @@ UTILS_INCS=-I$(MODEL)/include
 # Note that linking libraries below are in a particular order to work!
 # You may not need to modify these 3 variables. Try this default.
 # Everything after the "-Wl" identifies library location for shared objects.
-# HDF5 requires libz (zip) and libsz (szip). These can be linked in LIBS
+# HDF5 may require libz (zip) and libsz (szip). These can be linked in LIBS
 # in the compiler instead, but need to be on your computer system.
 #############################################################################
 #HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5 \
 #  -Wl,-rpath,/home/smsaleeb/software/szip-2.1/lib \
 #  -Wl,-rpath,/home/smsaleeb/software/zlib-1.2.5/lib
-#HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5
-#HDF5_INCS=-I$(HDF5_ROOT)/include
-#HDF5_DEFS=
-HDF5_LIBS= -lhdf5_hl -lhdf5 #
-HDF5_INCS=-I$(HDF5_ROOT)/include #-I$(H5Z_ZFP_ROOT)/include 
+HDF5_LIBS=-L$(HDF5_ROOT)/lib -lhdf5_hl -lhdf5
+HDF5_INCS=-I$(HDF5_ROOT)/include
 HDF5_DEFS=
+
+NETCDF_FORTRAN_LIBS=-L$(NETCDF_FORTRAN_ROOT)/lib -lnetcdff
+NETCDF_FORTRAN_INCS=-I$(NETCDF_FORTRAN_ROOT)/include
+NETCDF_C_LIBS=-L$(NETCDF_C_ROOT)/lib -lnetcdf
+NETCDF_C_INCS=-I$(NETCDF_C_ROOT)/include
 
 #############################################################################
 # TYPE OF COMPUTER SYSTEM (used for DEFINE statements for intrinsic calls).
@@ -97,14 +100,12 @@ CMACH=PC_LINUX1  #Standard Linux (only option available now)
 # (-g) for debugging, (-traceback) for more compiler error info
 # (-check bounds) for array bounds checking, (-fp-model precise) for IEEE
 # (-check uninit) for finding uninitialized variables, (-free) for free format
-#F_COMP=/home/smsaleeb/intel/composer_xe_2011_sp1.8.273/bin/intel64/ifort
-F_COMP=/home/smsaleeb/software/mpich-3.3.2/bin/mpif90
+# (-diag-disable=10448) to stop a deprecations message at compile time
+F_COMP=/home/smsaleeb/software/mpich-4.3.2/bin/mpif90
 F_OPTS1=-free -O1 -fp-model precise -diag-disable=10448
 F_OPTS2=-free -O2 -fp-model precise -diag-disable=10448
-LOADER_OPTS= -free -O2 -fp-model precise
-#F_OPTS1=-free -O1 -fp-model precise -real-size 64 -diag-disable=10448
-#F_OPTS2=-free -O2 -fp-model precise -real-size 64 -diag-disable=10448
-#LOADER_OPTS= -free -O2 -fp-model precise -real-size 64
+F_OPTS3=-free -O2 -fp-model precise -diag-disable=10448
+LOADER_OPTS= -free -O2 -fp-model precise -diag-disable=10448
 #LIBS=-L/usr/lib/x86_64-linux-gnu -lrt -lpthread -lsz -lz
 LIBS=
 
@@ -166,7 +167,7 @@ LIBS=
 # removing the "-w" if you wish to alter code to eliminate warnings.
 #############################################################################
 #C_COMP=gcc
-C_COMP=/home/smsaleeb/software/mpich-3.3.2/bin/mpicc
+C_COMP=/home/smsaleeb/software/mpich-4.3.2/bin/mpicc
 C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DENABLE_PARALLEL_COMPRESSION -w
 #-DENABLE_ZFP_COMPRESSION
 #C_OPTS=-O3 -DUNDERSCORE -DLITTLE -std=gnu99 -DRAMS_DOUBLE_PREC \

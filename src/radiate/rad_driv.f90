@@ -951,6 +951,22 @@ endif
  CALL path_lengths (nrad,u,rl,dzl,dl,o3l,vp,pl,eps)
 
 do k = 1,nrad
+   if (rl(k) <   0. .or.  &
+       dl(k) <   0. .or.  &
+       pl(k) <   0. .or.  &
+      o3l(k) <   0.) then
+      print*, 'Negative value of density, vapor, pressure, or ozone'
+      print*, 'when calling Harrington radiation'
+      print*, 'at k,i,j = ',k,i+mi0(ngrid),j+mj0(ngrid)
+      print*, 'ngrid=',ngrid
+      print*, 'stopping model'
+      print*, 'rad: rl(k), dl(k), pl(k), o3l(k)'
+      print*, rv(k), dl(k), pl(k), o3l(k)
+      stop
+   endif
+enddo
+
+do k = 1,nrad
    if (tl(k) < 160.) then
       print*, 'Temperature too low when calling Harrington radiation' 
       print*, 'at k,i,j = ',k,i+mi0(ngrid),j+mj0(ngrid)
@@ -1629,29 +1645,42 @@ integer, parameter :: kradcat(16) = (/1,3,6,6,5,4,4,2,8, 8, 7, 9, 8, 8, 7, 9/)
    allocate(amass(nradmax,aerocat),acon(nradmax,aerocat), &
                             arad(nradmax,aerocat),relh(nradmax))
 
+! Initializing aerotype:
+! Although there are multiple aerosol variables, there are currently only
+! three types that are coded. Aerotype indicies are as follows:
+! 1 - Ammonium sulfate
+! 2 - Sea Salt
+! 3 - Mineral Dust
+! 4 - Absorbing Carbon 1
+! 5 - Absorbing Carbon 2
    atype(:) = 0
-   if(iaerosol>0) then
-     atype(1)=1
-     atype(2)=1
+   if(iaerosol>=1) then
+     atype(1)=1   ! CCN-mode-1
+   endif
+   if(iaerosol>=2) then
+     atype(2)=1   ! CCN-mode-2
+   endif
+   if(iaerosol>=3) then
+     atype(3)=1   ! CCN-mode-3
    endif
    if(idust>0) then
   !Adele - using aerosol type to additionally include the 
   !R(Im) index
-     atype(3)=30+dust_ref_im
-     atype(4)=30+dust_ref_im
+     atype(4)=30+dust_ref_im   ! Small dust mode
+     atype(5)=30+dust_ref_im   ! Large dust mode
    endif
    if(isalt>0) then
-     atype(5)=2
-     atype(6)=2
-     atype(7)=2
+     atype(6)=2   ! Salt film mode
+     atype(7)=2   ! Salt jet mode
+     atype(8)=2   ! Salt spume mode
    endif
    if(iabcarb>0) then
-     atype(8)=4
-     atype(9)=5
+     atype(9) =4   ! Absorbing carbon mode-1 (1% BC, 99% OC)
+     atype(10)=5   ! Absorbing carbon mode-2 (2% BC, 98% OC)
    endif
    if(iccnlev>=2) then
-     atype(aerocat-1) = 1
-     atype(aerocat)   = 1
+     atype(aerocat-1) = 1   ! Small regenerated aerosol
+     atype(aerocat)   = 1   ! Large regenerated aerosol
    endif
 
    call rte_rrtmgp_init()

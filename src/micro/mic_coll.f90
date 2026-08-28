@@ -829,9 +829,9 @@ if(rx(k,mx) .ge. rxmin) then
    c1 = eff(k,mc1) * cx(k,mx) ** 2
 
    tabvalx  &
-    = wct1(k,mx) ** 2             * coltabr(ict1(k,mx),ict1(k,mx),ip)  &
+    = wct1(k,mx) ** 2               * coltabr(ict1(k,mx),ict1(k,mx),ip)  &
     + 2. * wct1(k,mx) * wct2(k,mx) * coltabr(ict1(k,mx),ict2(k,mx),ip)  &
-    + wct2(k,mx) ** 2             * coltabr(ict2(k,mx),ict2(k,mx),ip)
+    + wct2(k,mx) ** 2               * coltabr(ict2(k,mx),ict2(k,mx),ip)
 
    colamt = min(rx(k,mx),colfacr2(k) * c1 * 10. ** (-tabvalx))
    rxfer(k,mx,mz) = rxfer(k,mx,mz) + colamt
