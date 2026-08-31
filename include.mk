@@ -84,6 +84,7 @@ CMACH=PC_LINUX1  #Standard Linux (only option available now)
 # files. The F_OPTS1 and F_OPTS2 variables below can hold different compiler
 # flags as needed. Further, for duplication of results you may need to force
 # IEEE standard which is done in examples below.
+# To debug do something like: "ifx -g -traceback -check all -fpe0"
 # Please coordinate variables below with the commands in the Makefile.
 # Definitions of compiler flags below
 # F_COMP      = path to compiler executable
