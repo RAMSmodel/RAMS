@@ -111,6 +111,13 @@
 ! AJD - extrapolate to the top-layer pressure:
       pl2(1,nlm+1)=pl2(1,nlm)-abs(pl2(1,nlm-1)-pl2(1,nlm))
 
+      !Saleeby: This can become less than zero in some cases and
+      ! crashes the model. Set some default minimum here. This could
+      ! be done better.
+      if(pl2(1,nlm+1) < 0.0)then
+         pl2(1,nlm+1) = pl2(1,nlm) / 2.0
+      endif
+
       pl = pl/100. !convert from Pascals to millibars
       pl2 = pl2/100. 
 

@@ -37,7 +37,7 @@ rd=`pwd`
 # RAMSIN name
 ramsin="RAMSIN.supercelltest"
 # RAMS version (ie. 6.3.02)
-vs=6.3.05
+vs=6.4.00
 # Set flag for type of test (0=sequential, 1=parallel)
 runtype=1
 # Set number of nodes for parallel run.

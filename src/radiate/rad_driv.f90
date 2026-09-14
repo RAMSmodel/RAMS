@@ -540,7 +540,7 @@ do j = ja,jz
    do i = ia,iz
 
       ! To be used in mclatchy call
-      do k = 1,m1-1
+      do k = 1,m1
          picpi = (pi0(k,i,j) + pp(k,i,j)) * cpi
          press(k) = p00 * picpi ** cpor
          tair(k) = theta(k,i,j) * picpi
@@ -597,7 +597,7 @@ do j = ja,jz
             ,dn0(1,i,j)           &
             )
       else
-         print*,'iswrtyp and/or ilwrtyp = 4 and level /=3'
+         print*,'iswrtyp and/or ilwrtyp = 4 or 5 and level /=3'
          print*,'this is not currently a compatible combination,'
          print*,'but feel free to make the code change yourself.'
          print*,'It shouldnt be too hard. See rad_driv line 569'
@@ -917,6 +917,11 @@ CALL prep_atm_profiles(nrad,zml,ztl,pl,tl,dl,rl,o3l,dzl, &
                        m1,zm,zt,dn0,rv, &
                        glat,rtgt,topt,rlongup) 
 
+! calculate non-dimensional pressure
+do k=1,m1
+  exner(k) = (press(k)*p00i)**rocp
+enddo
+
 ! zero out scratch arrays
  CALL azero (nrad*mg,u)
  CALL azero (nrad*6,fu)
@@ -951,22 +956,6 @@ endif
  CALL path_lengths (nrad,u,rl,dzl,dl,o3l,vp,pl,eps)
 
 do k = 1,nrad
-   if (rl(k) <   0. .or.  &
-       dl(k) <   0. .or.  &
-       pl(k) <   0. .or.  &
-      o3l(k) <   0.) then
-      print*, 'Negative value of density, vapor, pressure, or ozone'
-      print*, 'when calling Harrington radiation'
-      print*, 'at k,i,j = ',k,i+mi0(ngrid),j+mj0(ngrid)
-      print*, 'ngrid=',ngrid
-      print*, 'stopping model'
-      print*, 'rad: rl(k), dl(k), pl(k), o3l(k)'
-      print*, rv(k), dl(k), pl(k), o3l(k)
-      stop
-   endif
-enddo
-
-do k = 1,nrad
    if (tl(k) < 160.) then
       print*, 'Temperature too low when calling Harrington radiation' 
       print*, 'at k,i,j = ',k,i+mi0(ngrid),j+mj0(ngrid)
@@ -991,7 +980,6 @@ if (iswrtyp == 3 .and. cosz > 0.03) then
    rshort = flxds(1)
 
    do k = 2,m1-1
-      exner(k) = (press(k)*p00i)**rocp
       !divide by exner to get potential temp heating rate
       fthrdsw(k) = (flxds(k) - flxds(k-1) + flxus(k-1) - flxus(k)) &
             / (dl(k) * dzl(k) * cp * exner(k))

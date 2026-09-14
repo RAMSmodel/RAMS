@@ -13,7 +13,7 @@ end subroutine stop_on_err
 subroutine rte_rrtmgp_init()
 
   use rte_rrtmgp_rams
-  use micro_prm, only:hucmfile
+  use mem_radiate, only:rrtmfile
   use micphys, only:iaerorad
   use mo_load_cloud_coefficients, &
                              only: load_cld_lutcoeff
@@ -37,20 +37,20 @@ subroutine rte_rrtmgp_init()
   call stop_on_err(gas_concs%set_vmr('o2 ', 0.209))
   call stop_on_err(gas_concs%set_vmr('co2', 420.e-6))
 
-  filename = trim(hucmfile)//'/../RTE/rrtmgp-data-lw-g128-210809.nc'
+  filename = trim(rrtmfile)//'/rrtmgp-data-lw-g128-210809.nc'
   call load_and_init(k_dist_lw, filename, gas_concs)
-  filename = trim(hucmfile)//'/../RTE/rrtmgp-data-sw-g112-210809.nc'
+  filename = trim(rrtmfile)//'/rrtmgp-data-sw-g112-210809.nc'
   call load_and_init(k_dist_sw, filename, gas_concs)
 
-  filename = trim(hucmfile)//'/../RTE/mic2rrtmgp_lw.nc'
+  filename = trim(rrtmfile)//'/mic2rrtmgp_lw.nc'
   call load_cld_lutcoeff (cloud_optics_lw, filename)
-  filename = trim(hucmfile)//'/../RTE/mic2rrtmgp_sw.nc'
+  filename = trim(rrtmfile)//'/mic2rrtmgp_sw.nc'
   call load_cld_lutcoeff (cloud_optics_sw, filename)
 
   if (iaerorad == 1) then
-    filename = trim(hucmfile)//'/../RTE/aero2rrtmgp_lw.nc'
+    filename = trim(rrtmfile)//'/aero2rrtmgp_lw.nc'
     call load_aero_lutcoeff (aerosol_optics_lw, filename)
-    filename = trim(hucmfile)//'/../RTE/aero2rrtmgp_sw.nc'
+    filename = trim(rrtmfile)//'/aero2rrtmgp_sw.nc'
     call load_aero_lutcoeff (aerosol_optics_sw, filename)
   endif
 

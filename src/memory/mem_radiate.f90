@@ -1,6 +1,8 @@
 !##############################################################################
 Module mem_radiate
 
+use grid_dims, only:strl1
+
 implicit none
 
    Type radiate_vars
@@ -21,6 +23,7 @@ implicit none
    
    integer :: lonrad,ilwrtyp,iswrtyp,irce
    real    :: radfrq,rce_ubmn,rce_bubl,rce_solc,rce_szen
+   character(len=strl1)      :: rrtmfile
   
 Contains
 

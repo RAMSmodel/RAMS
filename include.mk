@@ -21,7 +21,7 @@ MAKE=/usr/bin/make
 # Set your RAMS root path and version number.
 #############################################################################
 RAMS_ROOT=/home/smsaleeb/rams_git_main/RAMS
-RAMS_VERSION=6.3.05
+RAMS_VERSION=6.4.00
 
 #############################################################################
 # Set root locations for HDF5 and NETCDF I/O software.

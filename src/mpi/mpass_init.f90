@@ -40,7 +40,7 @@ implicit none
          +   7 * maxsndg           & !max input sounding levels
          +   2 * 32                & !32 character length strings
          +   1 * maxlite * 32      & !lite variables 32 char length strings
-         +  18 *       1 * strl1   & !individual input strings
+         +  19 *       1 * strl1   & !individual input strings
          +   1 *      50 * strl1   & !array of input strings
          +   5 * maxgrds * strl1   & !grid-dependent array of input strings
          + 100                       !extras so we have enough buffer
@@ -201,6 +201,7 @@ implicit none
     CALL par_put_int   (LSFLG,1)
     CALL par_put_int   (NFPT,1)
     CALL par_put_float (DISTIM,1)
+    CALL par_put_char  (RRTMFILE,strl1)
     CALL par_put_int   (ILWRTYP,1)
     CALL par_put_int   (ISWRTYP,1)
     CALL par_put_float (RADFRQ,1)
@@ -547,6 +548,7 @@ implicit none
     CALL par_get_int   (LSFLG,1)
     CALL par_get_int   (NFPT,1)
     CALL par_get_float (DISTIM,1)
+    CALL par_get_char  (RRTMFILE,strl1)
     CALL par_get_int   (ILWRTYP,1)
     CALL par_get_int   (ISWRTYP,1)
     CALL par_get_float (RADFRQ,1)

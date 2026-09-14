@@ -25,7 +25,7 @@ character(len=*) :: group,vr,cc
 real :: ff
 integer :: ii,nv
 integer :: inrflg
-integer, parameter ::nvgrid=38,nvstrt=79,nvindat=154,nvsound=13
+integer, parameter ::nvgrid=38,nvstrt=79,nvindat=155,nvsound=13
 integer ::  igrids(nvgrid),istart(nvstrt),iindat(nvindat),isound(nvsound)
 character(len=16) :: grids(nvgrid),start(nvstrt),indat(nvindat),sound(nvsound)
 data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
@@ -55,7 +55,7 @@ DATA START/  &
      ,'TOPTWVL','IZ0FLG','Z0MAX','Z0FACT'/
 DATA INDAT/  &
       'ICORFLG','IUGFORCE','FORCINGFILE','DIVLS','IBND','JBND','ISPONGE_PTS' &
-     ,'SPONGE_TAU','CPHAS','LSFLG','NFPT','DISTIM','ISWRTYP'             &
+     ,'SPONGE_TAU','CPHAS','LSFLG','NFPT','DISTIM','RRTMFILE','ISWRTYP'  &
      ,'ILWRTYP','RADFRQ','LONRAD','NNQPARM','CONFRQ','WCLDBS','IKPP'     &
      ,'NKPPZ','FRQKPP','RELAX_SST','RELAX_OCNT','RELAX_SAL','DMAXKPP'    &
      ,'DSCALEKPP','KPPITERMAX','KPPRNT','UBMN_KPP','NPATCH','NVEGPAT'    &
@@ -252,6 +252,7 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'LSFLG')        CALL varseti (VR,LSFLG,NV,1,II,0,3)
  IF(VR.EQ.'NFPT')         CALL varseti (VR,NFPT,NV,1,II,0,10000)
  IF(VR.EQ.'DISTIM')       CALL varsetf (VR,DISTIM,NV,1,FF,0.,10000.)
+ IF(VR.EQ.'RRTMFILE')     CALL varsetc (VR,RRTMFILE,NV,1,CC,1,strl1)
  IF(VR.EQ.'ISWRTYP')      CALL varseti (VR,ISWRTYP,NV,1,II,0,5)
  IF(VR.EQ.'ILWRTYP')      CALL varseti (VR,ILWRTYP,NV,1,II,0,5)
  IF(VR.EQ.'RADFRQ')       CALL varsetf (VR,RADFRQ,NV,1,FF,.001,100000.)
@@ -669,6 +670,7 @@ WRITE(6,609) ' ',trim(NDVIFPFX)
 WRITE(6,610) ' ',trim(DUSTFILE)
 WRITE(6,611) ' ',trim(SIBFILE)
 WRITE(6,612) ' ',trim(HUCMFILE)
+WRITE(6,613) ' ',trim(RRTMFILE)
 601  FORMAT(A1,'  ITOPTFN=',A40,999(A1,/,11X,A40))
 602  FORMAT(A1,'   ISSTFN=',A40,999(A1,/,11X,A40))
 603  FORMAT(A1,'  IVEGTFN=',A40,999(A1,/,11X,A40))
@@ -680,6 +682,7 @@ WRITE(6,612) ' ',trim(HUCMFILE)
 610  FORMAT(A1,' DUSTFILE=',A)
 611  FORMAT(A1,'  SIBFILE=',A)
 612  FORMAT(A1,' HUCMFILE=',A)
+613  FORMAT(A1,' RRTMFILE=',A)
 
 PRINT*, ' '
 WRITE(6,701)EXPNME
