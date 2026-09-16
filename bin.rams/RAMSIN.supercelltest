@@ -330,6 +330,8 @@
    DISTIM   = 60.,           !                   - dissipation time scale
 
 ! Radiation parameters
+   ISNDRAD  = 0,             ! 0=Use Mclatchy, 1=Use sounding to fill in levels above
+                             !  model top, but more sounding levels runs slower.
 
    ISWRTYP  = 5,             ! Shortwave radiation type
    ILWRTYP  = 5,             ! Longwave radiation type
@@ -338,7 +340,7 @@
    RADFRQ   = 300.,          ! Freq. of radiation tendency update (s)
    LONRAD   = 1,             ! Longitudinal variation of shortwave
                              !    (0-no, 1-yes)
-   RRTMFILE = '../etc/RTE',      ! Base directory for RTE-RRTMGP data files
+   RRTMFILE = '../etc/RTE', ! Path to RTE .nc files
 
 ! Cumulus parameterization parameters
 

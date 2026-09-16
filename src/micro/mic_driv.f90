@@ -283,7 +283,7 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. .001) then
    if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3) then
       !Saleeby(2008): Change passing of 7 to 8 if adding drizzle mode
       ! and modify locations in radcalc3 and radcomp3 to match
-      CALL radcalc3 (m1,i,j,ngr,maxnzp,7,iswrtyp,ilwrtyp,zm,zt &
+      CALL radcalc3 (m1,i,j,ngr,maxnzp,7,isndrad,iswrtyp,ilwrtyp,zm,zt &
          ,glat,rtgt,topt,rv(1)    &
          ,radiate%albedt (i,j)    &
          ,radiate%cosz   (i,j)    &
@@ -303,7 +303,7 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. .001) then
          ,dn0(1)                  &
          )
    elseif (iswrtyp .eq. 4 .or. ilwrtyp .eq. 4) then
-      CALL radcalc4 (m1,maxnzp,7,iswrtyp,ilwrtyp  &
+      CALL radcalc4 (m1,maxnzp,7,isndrad,iswrtyp,ilwrtyp  &
          ,glat,rtgt,topt  &
          ,radiate%albedt  (i,j) ,radiate%cosz  (i,j)  &
          ,radiate%rlongup (i,j), radiate%rlontop(i,j) &
@@ -312,7 +312,7 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. .001) then
          ,radiate%bext(1,i,j),radiate%swup(1,i,j),radiate%swdn(1,i,j) &
          ,radiate%lwup(1,i,j),radiate%lwdn(1,i,j))
    elseif (iswrtyp .eq. 5 .or. ilwrtyp .eq. 5) then
-      CALL radcalc5 (m1,maxnzp,iswrtyp,ilwrtyp  &
+      CALL radcalc5 (m1,maxnzp,isndrad,iswrtyp,ilwrtyp  &
          ,glat,rtgt,topt  &
          ,radiate%albedt  (i,j) ,radiate%cosz  (i,j)  &
          ,radiate%rlongup (i,j) ,radiate%rlontop(i,j)    &

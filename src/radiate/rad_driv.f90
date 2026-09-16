@@ -113,8 +113,9 @@ if (mod(time + .001,radfrq) .lt. dtlt .or. time .lt. 0.001) then
          !well beyond the model top. In this case, use the input sounding for 
          !radiation calculations. Even in this case, more radiation levels may be
          !necessary. This call to mclatchy will determine how many additional levels
-         !are needed.
-         if ((initial == 1 .or. initorig == 1) .and. hs(nsndg)>zt(mzp)) then
+         !are needed. hs(nsndg) always has to be greater than zt(mzp), so no need to
+         !require that in the "if" statment that follows.
+         if (isndrad==1 .and. (initial==1.or.initorig==1)) then
             CALL mclatchy (1,nsndg  &
                ,grid_g(ngrid)%glat       (1,1)  &
                ,grid_g(ngrid)%rtgt       (1,1)  &
@@ -577,7 +578,7 @@ do j = ja,jz
       endif
 
       if (iswrtyp .eq. 3 .or. ilwrtyp .eq. 3) then
-         CALL radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
+         CALL radcalc3 (m1,i,j,ngrid,maxnzp,mcat,isndrad,iswrtyp,ilwrtyp,zm,zt &
             ,glat(i,j),rtgt(i,j),topt(i,j),rv(1,i,j) &
             ,albedt(i,j)          &
             ,cosz(i,j)            &
@@ -600,7 +601,7 @@ do j = ja,jz
          print*,'iswrtyp and/or ilwrtyp = 4 or 5 and level /=3'
          print*,'this is not currently a compatible combination,'
          print*,'but feel free to make the code change yourself.'
-         print*,'It shouldnt be too hard. See rad_driv line 569'
+         stop
       endif
 
    enddo
@@ -691,7 +692,7 @@ return
 END SUBROUTINE zen
 
 !##############################################################################
-Subroutine radcalc3 (m1,i,j,ngrid,maxnzp,mcat,iswrtyp,ilwrtyp,zm,zt &
+Subroutine radcalc3 (m1,i,j,ngrid,maxnzp,mcat,isndrad,iswrtyp,ilwrtyp,zm,zt &
    ,glat,rtgt,topt,rv,albedt,cosz,rlongup,rlontop,rshort,rlong,aodt &
    ,fthrd,fthrdlw,fthrdsw,bext,swup,swdn,lwup,lwdn &
    ,dn0 &
@@ -864,7 +865,7 @@ use mem_grid, only:initial, initorig
 implicit none
 
 integer m1,maxnzp,mcat,ngrid
-integer :: iswrtyp,ilwrtyp
+integer :: isndrad,iswrtyp,ilwrtyp
 integer i,j,k,kk,k0,nzr
 integer, save :: ncall = 0,nradmax
 integer, save :: ngass(mg)=(/1, 1, 1/),ngast(mg)=(/1, 1, 1/)
@@ -895,7 +896,7 @@ real, external :: rslf
 
 if (ncall == 0) then
    ncall = 1
-   if (initial == 1 .or. initorig == 1) then
+   if (isndrad==1 .and. (initial==1.or.initorig==1)) then
       nrad = nzref - 1 + narad
    else
       nrad = m1 - 1 + narad
@@ -1438,7 +1439,7 @@ endif !if Iceprocs
 return
 END SUBROUTINE cloud_prep_lev4
 !##############################################################################
-Subroutine radcalc4 (m1,maxnzp,mcat,iswrtyp,ilwrtyp  &
+Subroutine radcalc4 (m1,maxnzp,mcat,isndrad,iswrtyp,ilwrtyp  &
    ,glat,rtgt,topt,albedt,cosz,rlongup,rlontop,rshort,rlong  &
    ,zm,zt,rv,dn0,pi0,pp,fthrd,i,j,ngrid &
    ,bext,swup,swdn,lwup,lwdn)
@@ -1455,7 +1456,7 @@ use mem_grid, only:initial, initorig
 implicit none
 
 integer m1,maxnzp,mcat,ngrid
-integer :: iswrtyp,ilwrtyp
+integer :: isndrad,iswrtyp,ilwrtyp
 integer i,j,k,ii,printsound
 integer, save :: ncall = 0,nradmax
 integer, save :: ngass(mg)=(/1, 1, 1/),ngast(mg)=(/1, 1, 1/)
@@ -1487,7 +1488,7 @@ real, external :: rslf
 
 if (ncall == 0) then
    ncall = 1
-   if (initial == 1 .or. initorig == 1) then
+   if (isndrad==1 .and. (initial==1.or.initorig==1)) then
       nrad = nzref - 1 + narad
    else
       nrad = m1 - 1 + narad
@@ -1554,7 +1555,7 @@ bext(:)=0.
 return
 END SUBROUTINE radcalc4
 !##############################################################################
-Subroutine radcalc5 (m1,maxnzp,iswrtyp,ilwrtyp  &
+Subroutine radcalc5 (m1,maxnzp,isndrad,iswrtyp,ilwrtyp  &
    ,glat,rtgt,topt,albedt,cosz,rlongup,rlontop,rshort,rlong,aodt  &
    ,zm,zt,rv,dn0,pi0,pp,fthrd,fthrdlw,fthrdsw,i,j,ngrid &
    ,bext,swup,swdn,lwup,lwdn)
@@ -1571,7 +1572,7 @@ use mem_grid, only:initial, initorig
 implicit none
 
 integer m1,maxnzp,icat,ihcat,ngrid
-integer :: iswrtyp,ilwrtyp
+integer :: isndrad,iswrtyp,ilwrtyp
 integer i,j,k,ii,printsound
 integer, save :: ncall = 0,nradmax
 
@@ -1619,7 +1620,7 @@ integer, parameter :: kradcat(16) = (/1,3,6,6,5,4,4,2,8, 8, 7, 9, 8, 8, 7, 9/)
 ! FIRST CALL INITIALIZATIONS
  if (ncall == 0) then
    ncall = 1
-   if (initial == 1 .or. initorig == 1) then
+   if (isndrad==1 .and. (initial==1.or.initorig==1)) then
       nrad = nzref - 1 + narad
    else
       nrad = m1 - 1 + narad
@@ -1793,7 +1794,8 @@ bext(:)=0.
 
 return
 END SUBROUTINE radcalc5
-! --------------------------------------------------------------------
+
+!##############################################################################
 Subroutine prep_atm_profiles(nrad,zml,ztl,pl,tl,dl,rl,o3l,dzl, &
                              m1,zm,zt,dn0,rv, & 
                              glat,rtgt,topt,rlongup) 
@@ -1802,6 +1804,7 @@ use ref_sounding
 use micphys, only: press, tair
 use mem_grid, only:zmn, ztn, ngrid, initial, initorig
 use rconstants, only:rgas
+use mem_radiate, only:isndrad
 
 integer :: k,kk,k0,nzr,nrad,m1
 real :: dzr
@@ -1814,7 +1817,7 @@ real,allocatable, dimension(:) :: zmt, ztt, dn0t, rvt
 !before the call to mclatchy
 
 nzr = m1
-if ((initial == 1 .or. initorig == 1).and.hs(nsndg)>zm(m1)) then
+if (isndrad==1 .and. (initial==1.or.initorig==1)) then
    k0 = 0
    do k = 1, nsndg
       !If we are above the prognostic model top

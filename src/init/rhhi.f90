@@ -217,7 +217,7 @@ do k=2,nsndg
       *(log(ps(k))-log(ps(k-1)))/g
 enddo
 
-if(hs(nsndg).lt.zt(mzp)) then
+if(hs(nsndg).le.zt(mzp)) then
    write(6,1) hs(nsndg),zt(mzp)
 1    format('    Input sounding needs to go higher ! !', /,  &
     '      Sounding top (m) = ',F12.2,'  Model top (m) = ',F12.2)

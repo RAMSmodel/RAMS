@@ -21,7 +21,7 @@ implicit none
    
    type (radiate_vars), allocatable :: radiate_g(:), radiatem_g(:)
    
-   integer :: lonrad,ilwrtyp,iswrtyp,irce
+   integer :: lonrad,ilwrtyp,iswrtyp,irce,isndrad
    real    :: radfrq,rce_ubmn,rce_bubl,rce_solc,rce_szen
    character(len=strl1)      :: rrtmfile
   

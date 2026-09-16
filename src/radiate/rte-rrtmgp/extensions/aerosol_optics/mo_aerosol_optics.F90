@@ -297,6 +297,18 @@ contains
                 optical_props%g  (icol,ilay,ibnd) = taussag(icol,ilay,ibnd) / &
                                                       max(epsilon(tau_temp), taussa_temp)
                 optical_props%ssa(icol,ilay,ibnd) = taussa_temp/max(epsilon(tau_temp), tau_temp)
+
+                !Saleeby(2026):Sometimes perhaps machine rounding can lead to SSA > 1.0.
+                !Check for truly bad computations, and if not bad, then set to max of 1.0.
+                if(optical_props%ssa(icol,ilay,ibnd) >= 1.001)then
+                 print*,'SSA too large. Stopping.'
+                 stop
+                endif
+                if(optical_props%ssa(icol,ilay,ibnd) > 1.0 .and. &
+                   optical_props%ssa(icol,ilay,ibnd) < 1.001) then 
+                     optical_props%ssa(icol,ilay,ibnd)=1.000
+                endif
+
                 optical_props%tau(icol,ilay,ibnd) = tau_temp
               !AOD typically reported at ~550nm (MODIS). This is 19,000 cm^-1
                 if (present(aodt)) then

@@ -25,7 +25,7 @@ character(len=*) :: group,vr,cc
 real :: ff
 integer :: ii,nv
 integer :: inrflg
-integer, parameter ::nvgrid=38,nvstrt=79,nvindat=155,nvsound=13
+integer, parameter ::nvgrid=38,nvstrt=79,nvindat=156,nvsound=13
 integer ::  igrids(nvgrid),istart(nvstrt),iindat(nvindat),isound(nvsound)
 character(len=16) :: grids(nvgrid),start(nvstrt),indat(nvindat),sound(nvsound)
 data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
@@ -55,7 +55,7 @@ DATA START/  &
      ,'TOPTWVL','IZ0FLG','Z0MAX','Z0FACT'/
 DATA INDAT/  &
       'ICORFLG','IUGFORCE','FORCINGFILE','DIVLS','IBND','JBND','ISPONGE_PTS' &
-     ,'SPONGE_TAU','CPHAS','LSFLG','NFPT','DISTIM','RRTMFILE','ISWRTYP'  &
+     ,'SPONGE_TAU','CPHAS','LSFLG','NFPT','DISTIM','RRTMFILE','ISNDRAD','ISWRTYP' &
      ,'ILWRTYP','RADFRQ','LONRAD','NNQPARM','CONFRQ','WCLDBS','IKPP'     &
      ,'NKPPZ','FRQKPP','RELAX_SST','RELAX_OCNT','RELAX_SAL','DMAXKPP'    &
      ,'DSCALEKPP','KPPITERMAX','KPPRNT','UBMN_KPP','NPATCH','NVEGPAT'    &
@@ -253,6 +253,7 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'NFPT')         CALL varseti (VR,NFPT,NV,1,II,0,10000)
  IF(VR.EQ.'DISTIM')       CALL varsetf (VR,DISTIM,NV,1,FF,0.,10000.)
  IF(VR.EQ.'RRTMFILE')     CALL varsetc (VR,RRTMFILE,NV,1,CC,1,strl1)
+ IF(VR.EQ.'ISNDRAD')      CALL varseti (VR,ISNDRAD,NV,1,II,0,1)
  IF(VR.EQ.'ISWRTYP')      CALL varseti (VR,ISWRTYP,NV,1,II,0,5)
  IF(VR.EQ.'ILWRTYP')      CALL varseti (VR,ILWRTYP,NV,1,II,0,5)
  IF(VR.EQ.'RADFRQ')       CALL varsetf (VR,RADFRQ,NV,1,FF,.001,100000.)
@@ -492,6 +493,7 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'JBND=',JBND                       &
  ,'LSFLG=',LSFLG                     &
  ,'NFPT=',NFPT                       &
+ ,'ISNDRAD=',ISNDRAD                 &
  ,'ISWRTYP=',ISWRTYP                 &
  ,'ILWRTYP=',ILWRTYP                 &
  ,'LONRAD=',LONRAD                   &

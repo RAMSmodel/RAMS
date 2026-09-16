@@ -29,7 +29,7 @@ implicit none
   !Saleeby(2016)
   !Increment memory buffer size here if you add RAMSIN Namelist variables.
   !Add to the appropriate section below as (#-of-them * arraysize).
-  nwords = 225 * 1                 & !single values
+  nwords = 226 * 1                 & !single values
          +   1 * 8                 & !micro (8-hydromet types for gnu)
          +   3 * aerocat           & !micro (number aerosol species)
          +  45 * maxgrds           & !grid-dependent (max grids)
@@ -202,6 +202,7 @@ implicit none
     CALL par_put_int   (NFPT,1)
     CALL par_put_float (DISTIM,1)
     CALL par_put_char  (RRTMFILE,strl1)
+    CALL par_put_int   (ISNDRAD,1)
     CALL par_put_int   (ILWRTYP,1)
     CALL par_put_int   (ISWRTYP,1)
     CALL par_put_float (RADFRQ,1)
@@ -549,6 +550,7 @@ implicit none
     CALL par_get_int   (NFPT,1)
     CALL par_get_float (DISTIM,1)
     CALL par_get_char  (RRTMFILE,strl1)
+    CALL par_get_int   (ISNDRAD,1)
     CALL par_get_int   (ILWRTYP,1)
     CALL par_get_int   (ISWRTYP,1)
     CALL par_get_float (RADFRQ,1)
