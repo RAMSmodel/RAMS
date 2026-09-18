@@ -14,15 +14,16 @@ do acat=1,aerocat
   !Set default values to override if aerosol type exists
   aero_rg(acat) = aero_medrad(acat) ! Default median radius 
       
-  if((acat==1)                  .or. &  ! CCN-1
-     (acat==2)                  .or. &  ! CCN-2
-     (acat==3 .and. idust>0)    .or. &  ! Small dust mode
-     (acat==4 .and. idust>0)    .or. &  ! Large dust mode
-     (acat==5 .and. isalt>0)    .or. &  ! Salt film mode
-     (acat==6 .and. isalt>0)    .or. &  ! Salt jet mode
-     (acat==7 .and. isalt>0)    .or. &  ! Salt spume mode
-     (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
-     (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+  if((acat==1 .and. iaerosol>=1) .or. &  ! CCN-1
+     (acat==2 .and. iaerosol>=2) .or. &  ! CCN-2
+     (acat==3 .and. iaerosol>=3) .or. &  ! CCN-3
+     (acat==4 .and. idust>0)    .or. &  ! Small dust mode
+     (acat==5 .and. idust>0)    .or. &  ! Large dust mode
+     (acat==6 .and. isalt>0)    .or. &  ! Salt film mode
+     (acat==7 .and. isalt>0)    .or. &  ! Salt jet mode
+     (acat==8 .and. isalt>0)    .or. &  ! Salt spume mode
+     (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+     (acat==10.and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
      (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
      (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
 
@@ -36,9 +37,7 @@ do acat=1,aerocat
        aero_rg(acat)=((0.23873/rhosol*aeromas(k,acat)/aerocon(k,acat)) &
                     **(1./3.))/aero_rg2rm(acat)
 
-       !Saleeby(2023-06-06):Do not limit minimum rg (median radius)
-       !if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
-
+       !Set an upper aerosol size limit. There is no lower limit.
        if(aero_rg(acat) > 6.50e-6) aero_rg(acat) = 6.50e-6
 
        aeromas(k,acat) = ((aero_rg(acat)*aero_rg2rm(acat))**3.) &
@@ -77,20 +76,20 @@ real, dimension(m1) :: dn0,rv
  tot_in = 0.0
  total_in(k) = 0.0
 
- !Loop over CCN-1, CCN-2, SMALL DUST, LARGE DUST, REGEN 1&2 (1,2,3,4,8,9)
- !Not looping over salt species since these cannot act is ice nuclei
+ !Not looping over salt species since these are not allowed to act as ice nuclei
  do acat=1,aerocat
 
    in_thresh = 1
    totifnn(k,acat) = 0.0
    totifnm(k,acat) = 0.0
 
-   if((acat==1)                  .or. &  ! CCN-1
-      (acat==2)                  .or. &  ! CCN-2
-      (acat==3 .and. idust>0)    .or. &  ! Small dust mode
-      (acat==4 .and. idust>0)    .or. &  ! Large dust mode
-      (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
-      (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+   if((acat==1 .and. iaerosol>=1) .or. &  ! CCN-1
+      (acat==2 .and. iaerosol>=2) .or. &  ! CCN-2
+      (acat==3 .and. iaerosol>=3) .or. &  ! CCN-3
+      (acat==4 .and. idust>0)    .or. &  ! Small dust mode
+      (acat==5 .and. idust>0)    .or. &  ! Large dust mode
+      (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+      (acat==10.and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
       (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
       (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
 
@@ -147,10 +146,6 @@ real, dimension(m1) :: dn0,rv
        rmlar = 2.0e-08
      endif
 
-     !Convert units for setting up lognormal distribution
-     concen_nuc = concen_nuc * dn0(k) !Convert #/kg to #/m3
-     aeromass   = aeromass   * dn0(k) !Convert kg/kg to kg/m3
-
      !Set up binned distribution concentration (#/m3)
      power = alog10(rmsma/rmlar) / float(itbin-1)
      do ic=1,itbin
@@ -173,9 +168,9 @@ real, dimension(m1) :: dn0,rv
       endif
      enddo
 101  continue
-     totifnn(k,acat) = ccncon(in_thresh) / dn0(k) !store in #/kg
-     totifnm(k,acat) = ccnmas(in_thresh) / dn0(k) !store in kg/kg
-     total_in(k) = total_in(k) + ccncon(in_thresh) / dn0(k) !store #/kg
+     totifnn(k,acat) = ccncon(in_thresh)
+     totifnm(k,acat) = ccnmas(in_thresh)
+     total_in(k) = total_in(k) + ccncon(in_thresh)
     endif !if concen_nuc > 0
 
    endif !if aerosol species turned on
@@ -256,12 +251,13 @@ real, dimension(m1) :: dn0,rv
    totifnn(k,acat) = totifnn(k,acat) * ifnfrac
    totifnm(k,acat) = totifnm(k,acat) * ifnfrac
    if(iccnlev>=1 .and. ifnfrac>0.0) then
-    if((acat==1)                  .or. &  ! CCN-1
-       (acat==2)                  .or. &  ! CCN-2
-       (acat==3 .and. idust>0)    .or. &  ! Small dust mode
-       (acat==4 .and. idust>0)    .or. &  ! Large dust mode
-       (acat==8 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
-       (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
+    if((acat==1 .and. iaerosol>=1) .or. &  ! CCN-1
+       (acat==2 .and. iaerosol>=2) .or. &  ! CCN-2
+       (acat==3 .and. iaerosol>=3) .or. &  ! CCN-3
+       (acat==4 .and. idust>0)    .or. &  ! Small dust mode
+       (acat==5 .and. idust>0)    .or. &  ! Large dust mode
+       (acat==9 .and. iabcarb>0)  .or. &  ! Absorbing carbon 1 mode
+       (acat==10.and. iabcarb>0)  .or. &  ! Absorbing carbon 2 mode
        (acat==aerocat-1 .and. iccnlev>=2) .or. &  ! Small regenerated aerosol
        (acat==aerocat   .and. iccnlev>=2)) then   ! Large regenerated aerosol
       !Assign aerosol specs to local arrays
@@ -287,9 +283,9 @@ real, dimension(m1) :: dn0,rv
          if(acat==aerocat-1.or.acat==aerocat) &
           regenmas(k,acat-(aerocat-2)) = regenmas(k,acat-(aerocat-2)) - totifnm(k,acat) * epsil         
        endif
-       if(itrkdust==1 .and. (acat==3 .or. acat==4)) &
+       if(itrkdust==1 .and. (acat==4 .or. acat==5)) &
          dnmhx(k,3) = dnmhx(k,3) + totifnm(k,acat)
-       if(itrkdustifn==1 .and. (acat==3 .or. acat==4)) &
+       if(itrkdustifn==1 .and. (acat==4 .or. acat==5)) &
          dinhx(k,3) = dinhx(k,3) + totifnm(k,acat)
       endif
 
@@ -299,10 +295,9 @@ real, dimension(m1) :: dn0,rv
        aero_rg(acat)=((0.23873/rhosol*aeromas(k,acat)/aerocon(k,acat)) &
              **(1./3.))/aero_rg2rm(acat)
 
-       !Saleeby(2023-06-06):Do not limit minimum rg (median radius)
-       !if(aero_rg(acat) < 0.01e-6) aero_rg(acat) = 0.01e-6
-
+       !Set an upper aerosol size limit. There is no lower limit.
        if(aero_rg(acat) > 6.50e-6) aero_rg(acat) = 6.50e-6
+
        aeromas(k,acat) = ((aero_rg(acat)*aero_rg2rm(acat))**3.) &
              *aerocon(k,acat)/(0.23873/rhosol)
       endif
@@ -313,4 +308,3 @@ real, dimension(m1) :: dn0,rv
 
 return
 END SUBROUTINE prenuc_ifn
-

@@ -54,22 +54,27 @@ do acat=1,aerocat
   aerotype(acat) = 0
 enddo
 
-if(iaerosol>0) then
+if(iaerosol>=1) then
    aerotype(1) = 1   ! CCN-mode-1
+endif
+if(iaerosol>=2) then
    aerotype(2) = 1   ! CCN-mode-2
 endif
+if(iaerosol>=3) then
+   aerotype(3) = 1   ! CCN-mode-3
+endif
 if(idust>0) then
-   aerotype(3) = 3   ! Small dust mode
-   aerotype(4) = 3   ! Large dust mode
+   aerotype(4) = 3   ! Small dust mode
+   aerotype(5) = 3   ! Large dust mode
 endif
 if(isalt>0) then
-   aerotype(5) = 2   ! Salt film mode
-   aerotype(6) = 2   ! Salt jet mode
-   aerotype(7) = 2   ! Salt spume mode
+   aerotype(6) = 2   ! Salt film mode
+   aerotype(7) = 2   ! Salt jet mode
+   aerotype(8) = 2   ! Salt spume mode
 endif
 if(iabcarb>0) then
-   aerotype(8) = 4   ! Absorbing carbon mode-1 (1% BC, 99% OC)
-   aerotype(9) = 5   ! Absorbing carbon mode-2 (2% BC, 98% OC)
+   aerotype(9) = 4   ! Absorbing carbon mode-1 (1% BC, 99% OC)
+   aerotype(10)= 5   ! Absorbing carbon mode-2 (2% BC, 98% OC)
 endif
 if(iccnlev>=2) then
    aerotype(aerocat-1) = 1   ! Small regenerated aerosol
@@ -151,7 +156,7 @@ DO acat=1,aerocat
       ! asymmetry parameter (gp) in a form to interact with cloud_opt.
       ! Some values of dzl may be <0; in this case set tp to 0.
       ! Factor in layer depth for optical depth extinction
-      aodt       = aodt        + ext
+      if(ib==3) aodt       = aodt        + ext
       tp(k,ib)   = tp(k,ib)    + ext
       omgp(k,ib) = omgp(k,ib)  + om * ext
       gp(k,ib)   = gp(k,ib)    + gg * om * ext

@@ -9,6 +9,7 @@
   #define MPI_Request int
 #endif
 
+
 int flag_msgtag=0;
 MPI_Request mpi_msgtags[MAX_MSGTAG];
 

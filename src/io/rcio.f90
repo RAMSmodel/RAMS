@@ -53,8 +53,10 @@ ie=cio_f(iun,irw,'us',us,nsndg)
 ie=cio_f(iun,irw,'vs',vs,nsndg)
 ie=cio_f(iun,irw,'ts',ts,nsndg)
 ie=cio_f(iun,irw,'thds',thds,nsndg)
+ie=cio_f(iun,irw,'rts',rts,nsndg)
 ie=cio_f(iun,irw,'ps',ps,nsndg)
 ie=cio_f(iun,irw,'hs',hs,nsndg)
+if(io3flg==1)ie=cio_f(iun,irw,'o3s',o3s,nsndg)
 
 !Grid navigation and structures
 ie=cio_i1(iun,irw,'ihtran',ihtran,1)

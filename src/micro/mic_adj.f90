@@ -27,7 +27,8 @@ Subroutine adj1 (m1,m2,m3,rtp,micro,ngr)
 
 use mem_micro
 use micphys
-use node_mod, only:mi0,mj0
+use node_mod, only:mi0,mj0,my_rams_num
+use mem_grid, only:ibnd,jbnd,nnxp,nnyp
 
 implicit none
 
@@ -136,6 +137,22 @@ do j = 1,m3
    do lcat = 1,ncat
      do k = 1,m1
 
+       !Do not allow stored aerosol mass in hydrometeors along the lateral
+       !boundary (LB) zone of Grid-1 due to issues with advection/diffusion
+       !and LB conditions (LBCs). The hydrometeor masses themselves have more
+       !built in constraints and thus less of a potential problem along LBs.
+       !Only do this for open boundaries since periodic boundaries do not suffer
+       !from the same advection and diffusion issues that open boundaries do.
+       if (ngr==1 .and. iccnlev>=2 .and. jnmb(lcat)>=5) then
+        if( ibnd == 1 .and. (i+mi0(ngr) <= 2 .or. i+mi0(ngr) >= (nnxp(ngr)-1)) ) then
+            cnmhx(k,lcat) = 0.0
+        endif
+        if( jbnd == 1 .and. (j+mj0(ngr) <= 2 .or. j+mj0(ngr) >= (nnyp(ngr)-1)) ) then
+            cnmhx(k,lcat) = 0.0
+        endif
+       endif
+
+       !Zero out initial checking flags for minimum 
        zerocheck=0
        cxloss=0
        rxloss=0
@@ -159,34 +176,31 @@ do j = 1,m3
 
        !Aerosol and solubility tracking
        if(zerocheck==1 .and. iccnlev>=2 .and. cnmhx(k,lcat)>0.0) then
-
-         !Determine how many number to restore
-         if(cxloss > 0.0) then
+         !Determine how many number to restore if cxloss is greater than zero.
+         !Do not do this if cxloss is negative since we cannot compute an aerosol
+         !size to restore. This could possibly impact aerosol budget conservation
+         !on long timescales and with periodic boundary domains. This is less of
+         !an issue since we lessened the constraints on rxmin and cxmin.
+         if(cxloss > 0.0 .and. rxloss > 0.0) then
            !If there are number to restore, compute median radius (rg)
            rg=((0.23873/aero_rhosol(aerocat)*cnmhx(k,lcat) / &
                max(1.e-10,cxloss))**(0.3333))/aero_rg2rm(aerocat)
-           if(rg < 0.01e-6) rg = 0.01e-6
-           if(rg > 6.50e-6) rg = 6.50e-6
-         else
-           !Compute a number to restore based on assumed 1 micron rg
-           rg = 1.0e-6
-         endif
-         !Compute the number to restore
-         cnmhx_num = cnmhx(k,lcat) * (0.23873/aero_rhosol(aerocat)) / &
+           if(rg < 0.001e-6) rg = 0.001e-6
+           if(rg > 6.500e-6) rg = 6.500e-6
+           !Compute the number to restore
+           cnmhx_num = cnmhx(k,lcat) * (0.23873/aero_rhosol(aerocat)) / &
               ((rg * aero_rg2rm(aerocat)) ** 3.)
-
-         !Restore aerosols to regenerated category
-         if(rg <= 0.96e-6) then
-           micro%regen_aero1_mp(k,i,j) = micro%regen_aero1_mp(k,i,j) + cnmhx(k,lcat)
-           micro%regen_aero1_np(k,i,j) = micro%regen_aero1_np(k,i,j) + cnmhx_num
-         else
-           micro%regen_aero2_mp(k,i,j) = micro%regen_aero2_mp(k,i,j) + cnmhx(k,lcat)
-           micro%regen_aero2_np(k,i,j) = micro%regen_aero2_np(k,i,j) + cnmhx_num  
+           !Restore aerosols to regenerated category
+           if(rg <= 0.96e-6) then
+             micro%regen_aero1_mp(k,i,j) = micro%regen_aero1_mp(k,i,j) + cnmhx(k,lcat)
+             micro%regen_aero1_np(k,i,j) = micro%regen_aero1_np(k,i,j) + cnmhx_num
+           else
+             micro%regen_aero2_mp(k,i,j) = micro%regen_aero2_mp(k,i,j) + cnmhx(k,lcat)
+             micro%regen_aero2_np(k,i,j) = micro%regen_aero2_np(k,i,j) + cnmhx_num  
+           endif
+           !Statement to check the restoration of aerosol data
+           !print*,'rmin',rxloss,cnmhx(k,lcat),cxloss,cnmhx_num,rg*1.e6
          endif
-
-         !Statement to check the restoration of aerosol data
-         !print*,'rmin',rxloss,cnmhx(k,lcat),cxloss,cnmhx_num,rg*1.e6
-
          !Zero out aerosol masses and such within hydrometeors
          cnmhx(k,lcat) = 0.
          if(itrkepsilon==1) snmhx(k,lcat) = 0.
@@ -354,13 +368,21 @@ do j = 1,m3
      toomany=1
    endif
   endif
-  if(iaerosol>0)then
+  if(iaerosol>=1)then
    if(micro%cn1np(k,i,j) > maxaero) then
      print*,"Too many CCN1:",micro%cn1np(k,i,j)
-     toomany=1  
+     toomany=1
    endif
+  endif
+  if(iaerosol>=2)then
    if(micro%cn2np(k,i,j) > maxaero) then
      print*,"Too many CCN2:",micro%cn2np(k,i,j)
+     toomany=1
+   endif
+  endif
+  if(iaerosol>=3)then
+   if(micro%cn3np(k,i,j) > maxaero) then
+     print*,"Too many CCN3:",micro%cn3np(k,i,j)
      toomany=1
    endif
   endif
@@ -409,23 +431,33 @@ do j = 1,m3
    endif
   endif
   if(toomany==1) then
-    print*,"Aerosols exceed max value at k,i,j: ",k,i+mi0(ngr),j+mj0(ngr)
-    print*,"This error typically occurs due to advection/diffusion"
-    print*,"around too steep topography in the sigma-z coordinate."
+    print'(A36,4(1X,i4))',"Aerosols exceed max at ngrid,k,i,j:" &
+                          ,ngr,k,i+mi0(ngr),j+mj0(ngr)
+    print*,"This error typically occurs due to diffusion (flux div)"
+    print*,"around too steep topography in the sigma-z coordinate,"
+    print*,"or due to lateral boundary conditions."
     print*,"Solutions are: (1)reduce timestep, (2)use IHORGRAD=2,"
     print*,"or (3)smooth your topography in RAMSIN."
     stop
   endif
 
   !SET SMALL VALUES TO ZERO
-  if(iaerosol>0) then
+  if(iaerosol>=1) then
    if(micro%cn1np(k,i,j)<mincon .or. micro%cn1mp(k,i,j)<minmas) then
       micro%cn1np(k,i,j) = 0.0
       micro%cn1mp(k,i,j) = 0.0
    endif
+  endif
+  if(iaerosol>=2) then
    if(micro%cn2np(k,i,j)<mincon .or. micro%cn2mp(k,i,j)<minmas) then
       micro%cn2np(k,i,j) = 0.0
       micro%cn2mp(k,i,j) = 0.0
+   endif
+  endif
+  if(iaerosol>=3) then
+   if(micro%cn3np(k,i,j)<mincon .or. micro%cn3mp(k,i,j)<minmas) then
+      micro%cn3np(k,i,j) = 0.0
+      micro%cn3mp(k,i,j) = 0.0
    endif
   endif
   if(idust>0) then

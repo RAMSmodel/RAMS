@@ -187,3 +187,109 @@ endif
 
 return
 END SUBROUTINE handle_dustsource
+
+!##########################################################################
+Subroutine readforcing ()
+
+use ref_sounding
+use node_mod
+use mem_grid
+use netcdf
+use io_params, only:iupdsst
+
+implicit none
+
+integer :: ivar, dimid
+integer :: ncid, stat, varid, nlev, nt
+integer :: ispresent(2)=0
+
+! Forcing file should conform to the DEPHY format for variable names
+
+!Initialize nlev in case it isn't read from the file
+nlev = 1
+if ((my_rams_num .eq. mainnum) .or. (nmachs .eq. 1)) then
+   if (nf90_open(trim(forcingfile), NF90_NOWRITE, ncid) .eq. NF90_NOERR) then
+
+      !Get dimensions and read them
+     if(iugforce==2) then
+      stat = nf90_inq_dimid(ncid, "lev", dimid)
+      if (stat .eq. NF90_NOERR) then
+         stat = nf90_inquire_dimension(ncid, dimid, len=nlev)
+      else
+         stop "Can't find dimension 'lev' in forcing file"
+      endif
+      allocate(forc_lev(nlev))
+      stat = nf90_inq_varid(ncid,"lev",varid)
+      stat = nf90_get_var(ncid, varid, forc_lev)
+    endif
+ 
+    if(iugforce==2 .or. iupdsst==2) then
+      stat = nf90_inq_dimid(ncid, "time", dimid)
+      if (stat .eq. NF90_NOERR) then
+         stat = nf90_inquire_dimension(ncid, dimid, len=nt)
+      else
+         stop "Can't find dimension 'time' in forcing file"
+      endif
+      allocate(forc_time(nt))
+      stat = nf90_inq_varid(ncid,"time",varid)
+      stat = nf90_get_var(ncid, varid, forc_time)
+    endif
+
+      !Now start checking for possible forcing variables and reading them
+      stat = nf90_inq_varid(ncid,"ug",varid)
+      if (stat == NF90_NOERR) then
+         allocate(ug(nlev,nt), vg(nlev,nt))
+         stat = nf90_get_var(ncid, varid, ug)
+         
+         stat = nf90_inq_varid(ncid,"vg",varid)
+         stat = nf90_get_var(ncid,varid, vg)
+         if (stat .ne. NF90_NOERR) stop "can't read geostrophic wind in forcing file"
+      elseif (stat .ne. NF90_NOERR .and. iugforce==2) then
+         stop "geostrophic wind not present in forcing file"
+      endif
+
+      stat = nf90_inq_varid(ncid,"ts",varid)
+      if (stat == NF90_NOERR) then
+         allocate(forc_ts(nt))
+         stat = nf90_get_var(ncid,varid,forc_ts)
+         if (stat .ne. NF90_NOERR) stop "can't read surface temperature forcing"
+      elseif (stat .ne. NF90_NOERR .and. iupdsst==2) then
+         stop "SSTs not present in forcing file"
+      endif
+         
+   else
+      print*,'Error opening forcing file!!!!'
+      stop
+   endif
+endif
+
+! Process mainnum now has the desired data. If there
+! are model nodes, broadcast that information to them.
+if(nmachs .gt. 1) then
+  CALL broadcast_forcing_dims(nlev,nt)
+
+  if (my_rams_num .ne. mainnum) then 
+     if (iugforce==2) then
+        allocate(forc_lev(nlev),forc_time(nt))
+        allocate(ug(nlev,nt),vg(nlev,nt))
+     endif
+     if (iupdsst==2) then
+        if (.not. allocated(forc_time)) allocate(forc_time(nt))
+        allocate(forc_ts(nt))
+     endif
+  endif
+
+  if (iugforce == 2) then     
+     CALL broadcast_forcing (ug,nlev,nt)
+     CALL broadcast_forcing (vg,nlev,nt)
+     CALL broadcast_forcing (forc_lev,nlev,1)
+  endif
+  if (iupdsst == 2) then
+     CALL broadcast_forcing (forc_ts,1,nt)
+  endif
+  if (iugforce == 2 .or. iupdsst == 2) then
+     CALL broadcast_forcing (forc_time,1,nt)
+  endif
+endif
+
+END SUBROUTINE readforcing

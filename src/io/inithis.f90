@@ -90,8 +90,10 @@ ie=cio_f(iunhd,1,'us',us,nsndg)
 ie=cio_f(iunhd,1,'vs',vs,nsndg)
 ie=cio_f(iunhd,1,'ts',ts,nsndg)
 ie=cio_f(iunhd,1,'thds',thds,nsndg)
+ie=cio_f(iunhd,1,'rts',rts,nsndg)
 ie=cio_f(iunhd,1,'ps',ps,nsndg)
 ie=cio_f(iunhd,1,'hs',hs,nsndg)
+if(io3flg==1)ie=cio_f(iunhd,1,'o3s',o3s,nsndg)
 
 !Get original simulation type
 ie=cio_i(iunhd,1,'initorig',initorig,1)
@@ -627,6 +629,13 @@ if(inithisflg == 1) then
  !Deallocate temporary arrays
  deallocate(u01dn1,v01dn1,rt01dn1,th01dn1,pi01dn1,dn01dn1)
 
+ !Calculate number of levels for radiation profiles using a combination 
+ !of the model prognostic grid and the input sounding. If ozone is present,
+ !also fill the ozone reference profile above the prognostic model top
+ CALL calc_refs()
+
+ !Calculate large-scale subsidence
+ CALL calc_wsub()
 endif !If doing full history initialization
 
 !Deallocate temporary arrays
@@ -659,6 +668,7 @@ implicit none
 integer :: i,j,ifm,ipat,k,nveg,nsoil,hifm,maxmatch
 real :: c1,hpis,hprss
 
+if (isfcl == 3) return
 ! This routine fills the LEAF arrays for a history-initial start.
 
 ! Refill many of the LEAF variables, as the interpolated values may not be relevant.
@@ -689,7 +699,8 @@ do j = 1,mmyp(ifm)
  
       hprss = hpis ** cpor * p00
 
-      leaf_g(ifm)%patch_rough(i,j,1) = 0.001
+      leaf_g(ifm)%patch_rought(i,j,1) = 0.001
+      leaf_g(ifm)%patch_roughm(i,j,1) = 0.001
 
       do ipat = 2,npatch
 
@@ -701,8 +712,9 @@ do j = 1,mmyp(ifm)
          !since leaf class may change due to interpolation. Land patch may
          !now be a small fraction (<.009) or could be significantly different
          !such as water patch. These values will be correctly set 1st timestep.
-         leaf_g(ifm)%soil_rough(i,j,ipat) = zrough
-         leaf_g(ifm)%patch_rough(i,j,ipat) = max(zrough,grid_g(ifm)%topzo(i,j))
+         leaf_g(ifm)%soil_rough(i,j,ipat) = ztrough
+         leaf_g(ifm)%patch_rought(i,j,ipat) = max(ztrough,grid_g(ifm)%topzo(i,j))
+         leaf_g(ifm)%patch_roughm(i,j,ipat) = max(zmrough,grid_g(ifm)%topzo(i,j))
          leaf_g(ifm)%stom_resist(i,j,ipat) = 1.e6
 
          !Recompute soil moisture since we changed soil classes. Must make
@@ -723,7 +735,7 @@ do j = 1,mmyp(ifm)
                leaf_g(ifm)%sfcwater_nlev(i,j,ipat) = float(k)
          enddo
 
-         !Initialize for all land surface options (isfcl=0,1,2)
+         !Initialize for most land surface options (isfcl=0,1,2,not 3)
          !Update this since leaf classes and ndvi have changes due to
          !history initialization on different grid.
          if (ipat >= 2) CALL ndvi (ifm  &

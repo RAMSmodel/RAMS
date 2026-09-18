@@ -300,70 +300,95 @@ if (iand(ibcon,1) .ne. 0) then
    if(igraup >= 1) micro%pcpvg(k,1,j) = 0.
    if(ihail  >= 1) micro%pcpvh(k,1,j) = 0.
    if(level==3) then
-    if(imbudget>=1) then
-     micro%latheatvap(k,1,j) = 0.
-     micro%latheatfrz(k,1,j) = 0.
-     micro%nuccldrt(k,1,j) = 0.
-     micro%cld2raint(k,1,j) = 0.
-     micro%ice2raint(k,1,j) = 0.
-     micro%nucicert(k,1,j) = 0.
-     micro%vapliqt(k,1,j) = 0.
-     micro%vapicet(k,1,j) = 0.
-     micro%evapliqt(k,1,j) = 0.
-     micro%evapicet(k,1,j) = 0.
-     micro%freezingt(k,1,j) = 0.
-     micro%meltingt(k,1,j) = 0.
-     micro%melticet(k,1,j) = 0.
-     micro%rimecldt(k,1,j) = 0.
-     micro%rain2icet(k,1,j) = 0.
-     micro%aggregatet(k,1,j) = 0.
-     micro%latheatvapt(k,1,j) = 0.
-     micro%latheatfrzt(k,1,j) = 0.
+    if(imbudget>=1)then
+     micro%latheatvap      (k,1,j) = 0.
+     micro%latheatfrz      (k,1,j) = 0.
+     micro%latheatvapt     (k,1,j) = 0.
+     micro%latheatfrzt     (k,1,j) = 0.
+     micro%nuccldrt        (k,1,j) = 0.
+     micro%nuccldct        (k,1,j) = 0.
+     micro%nucicert        (k,1,j) = 0.
+     micro%nucicect        (k,1,j) = 0.
+     micro%vapliqt         (k,1,j) = 0.
+     micro%vapicet         (k,1,j) = 0.
+     micro%evapliqt        (k,1,j) = 0.
+     micro%evapicet        (k,1,j) = 0.
+     micro%melt2liqthermt  (k,1,j) = 0.
+     micro%melt2raincolt   (k,1,j) = 0.
+     micro%meltvapt        (k,1,j) = 0.
+     micro%meltcolmeltt    (k,1,j) = 0.
+     micro%freezvapt       (k,1,j) = 0.
+     micro%freezcolmeltt   (k,1,j) = 0.
+     micro%freezicenuct    (k,1,j) = 0.
+     micro%cld2raint       (k,1,j) = 0.
+     micro%cld2drizt       (k,1,j) = 0.
+     micro%drz2raint       (k,1,j) = 0.
+     micro%rimecldt        (k,1,j) = 0.
+     micro%rimedrzt        (k,1,j) = 0.
+     micro%rimeraint       (k,1,j) = 0.
+     micro%aggrselfprist   (k,1,j) = 0.
+     micro%aggrselfsnowt   (k,1,j) = 0.
+     micro%aggrpsprist     (k,1,j) = 0.
+     micro%aggrpssnowt     (k,1,j) = 0.
+     micro%rainbreakupt    (k,1,j) = 0.
+     micro%cldsiphmt       (k,1,j) = 0.
+     micro%drzsiphmt       (k,1,j) = 0.
+     micro%rainshedt       (k,1,j) = 0.
     endif
-    if(imbudget>=2) then
-     micro%inuchomrt(k,1,j) = 0.
-     micro%inuccontrt(k,1,j) = 0.
-     micro%inucifnrt(k,1,j) = 0.
-     micro%inuchazrt(k,1,j) = 0.
-     micro%vapcldt(k,1,j) = 0.
-     micro%vapraint(k,1,j) = 0.
-     micro%vapprist(k,1,j) = 0.
-     micro%vapsnowt(k,1,j) = 0.
-     micro%vapaggrt(k,1,j) = 0.
-     micro%vapgraut(k,1,j) = 0.
-     micro%vaphailt(k,1,j) = 0.
-     micro%vapdrizt(k,1,j) = 0.
-     micro%evapcldt(k,1,j) = 0.
-     micro%evapraint(k,1,j) = 0.
-     micro%evapprist(k,1,j) = 0.
-     micro%evapsnowt(k,1,j) = 0.
-     micro%evapaggrt(k,1,j) = 0.
-     micro%evapgraut(k,1,j) = 0.
-     micro%evaphailt(k,1,j) = 0.
-     micro%evapdrizt(k,1,j) = 0.
-     micro%meltprist(k,1,j) = 0.
-     micro%meltsnowt(k,1,j) = 0.
-     micro%meltaggrt(k,1,j) = 0.
-     micro%meltgraut(k,1,j) = 0.
-     micro%melthailt(k,1,j) = 0.
-     micro%rimecldsnowt(k,1,j) = 0.
-     micro%rimecldaggrt(k,1,j) = 0.
-     micro%rimecldgraut(k,1,j) = 0.
-     micro%rimecldhailt(k,1,j) = 0.
-     micro%rain2prt(k,1,j) = 0.
-     micro%rain2snt(k,1,j) = 0.
-     micro%rain2agt(k,1,j) = 0.
-     micro%rain2grt(k,1,j) = 0.
-     micro%rain2hat(k,1,j) = 0.
-     micro%aggrselfprist(k,1,j) = 0.
-     micro%aggrselfsnowt(k,1,j) = 0.
-     micro%aggrprissnowt(k,1,j) = 0.
+    if(imbudget>=2)then
+     micro%inuchomrt     (k,1,j) = 0.
+     micro%inuccontrt    (k,1,j) = 0.
+     micro%inucifnrt     (k,1,j) = 0.
+     micro%inuchazrt     (k,1,j) = 0.
+     micro%inuchomct     (k,1,j) = 0.
+     micro%inuccontct    (k,1,j) = 0.
+     micro%inucifnct     (k,1,j) = 0.
+     micro%inuchazct     (k,1,j) = 0.
+     micro%vapcldt       (k,1,j) = 0.
+     micro%vapraint      (k,1,j) = 0.
+     micro%vapprist      (k,1,j) = 0.
+     micro%vapsnowt      (k,1,j) = 0.
+     micro%vapaggrt      (k,1,j) = 0.
+     micro%vapgraut      (k,1,j) = 0.
+     micro%vaphailt      (k,1,j) = 0.
+     micro%vapdrizt      (k,1,j) = 0.
+     micro%evapcldt      (k,1,j) = 0.
+     micro%evapraint     (k,1,j) = 0.
+     micro%evapprist     (k,1,j) = 0.
+     micro%evapsnowt     (k,1,j) = 0.
+     micro%evapaggrt     (k,1,j) = 0.
+     micro%evapgraut     (k,1,j) = 0.
+     micro%evaphailt     (k,1,j) = 0.
+     micro%evapdrizt     (k,1,j) = 0.
+     micro%meltpristhmt  (k,1,j) = 0.
+     micro%meltsnowthmt  (k,1,j) = 0.
+     micro%meltaggrthmt  (k,1,j) = 0.
+     micro%meltgrauthmt  (k,1,j) = 0.
+     micro%melthailthmt  (k,1,j) = 0.
+     micro%meltpriscolt  (k,1,j) = 0.
+     micro%meltsnowcolt  (k,1,j) = 0.
+     micro%meltaggrcolt  (k,1,j) = 0.
+     micro%meltgraucolt  (k,1,j) = 0.
+     micro%melthailcolt  (k,1,j) = 0.
+     micro%rimecldsnowt  (k,1,j) = 0.
+     micro%rimecldaggrt  (k,1,j) = 0.
+     micro%rimecldgraut  (k,1,j) = 0.
+     micro%rimecldhailt  (k,1,j) = 0.
+     micro%rimedrzsnowt  (k,1,j) = 0.
+     micro%rimedrzaggrt  (k,1,j) = 0.
+     micro%rimedrzgraut  (k,1,j) = 0.
+     micro%rimedrzhailt  (k,1,j) = 0.
+     micro%rimerainprist (k,1,j) = 0.
+     micro%rimerainsnowt (k,1,j) = 0.
+     micro%rimerainaggrt (k,1,j) = 0.
+     micro%rimeraingraut (k,1,j) = 0.
+     micro%rimerainhailt (k,1,j) = 0.
     endif
-    if(imbudget==3 .and. idust>=1) then
-     micro%dust1cldrt(k,1,j) = 0.
-     micro%dust2cldrt(k,1,j) = 0.
-     micro%dust1drzrt(k,1,j) = 0.
-     micro%dust2drzrt(k,1,j) = 0.
+    if(imbudget==3 .and. idust>=1)then
+     micro%dust1cldrt    (k,1,j) = 0.
+     micro%dust2cldrt    (k,1,j) = 0.
+     micro%dust1drzrt    (k,1,j) = 0.
+     micro%dust2drzrt    (k,1,j) = 0.
     endif
    endif
   enddo
@@ -400,70 +425,95 @@ if (iand(ibcon,2) .ne. 0) then
    if(igraup >= 1) micro%pcpvg(k,m2,j) = 0.
    if(ihail  >= 1) micro%pcpvh(k,m2,j) = 0.
    if(level==3) then
-    if(imbudget>=1) then
-     micro%latheatvap(k,m2,j) = 0.
-     micro%latheatfrz(k,m2,j) = 0.
-     micro%nuccldrt(k,m2,j) = 0.
-     micro%cld2raint(k,m2,j) = 0.
-     micro%ice2raint(k,m2,j) = 0.
-     micro%nucicert(k,m2,j) = 0.
-     micro%vapliqt(k,m2,j) = 0.
-     micro%vapicet(k,m2,j) = 0.
-     micro%evapliqt(k,m2,j) = 0.
-     micro%evapicet(k,m2,j) = 0.
-     micro%freezingt(k,m2,j) = 0.
-     micro%meltingt(k,m2,j) = 0.
-     micro%melticet(k,m2,j) = 0.
-     micro%rimecldt(k,m2,j) = 0.
-     micro%rain2icet(k,m2,j) = 0.
-     micro%aggregatet(k,m2,j) = 0.
-     micro%latheatvapt(k,m2,j) = 0.
-     micro%latheatfrzt(k,m2,j) = 0.
+    if(imbudget>=1)then
+     micro%latheatvap      (k,m2,j) = 0.
+     micro%latheatfrz      (k,m2,j) = 0.
+     micro%latheatvapt     (k,m2,j) = 0.
+     micro%latheatfrzt     (k,m2,j) = 0.
+     micro%nuccldrt        (k,m2,j) = 0.
+     micro%nuccldct        (k,m2,j) = 0.
+     micro%nucicert        (k,m2,j) = 0.
+     micro%nucicect        (k,m2,j) = 0.
+     micro%vapliqt         (k,m2,j) = 0.
+     micro%vapicet         (k,m2,j) = 0.
+     micro%evapliqt        (k,m2,j) = 0.
+     micro%evapicet        (k,m2,j) = 0.
+     micro%melt2liqthermt  (k,m2,j) = 0.
+     micro%melt2raincolt   (k,m2,j) = 0.
+     micro%meltvapt        (k,m2,j) = 0.
+     micro%meltcolmeltt    (k,m2,j) = 0.
+     micro%freezvapt       (k,m2,j) = 0.
+     micro%freezcolmeltt   (k,m2,j) = 0.
+     micro%freezicenuct    (k,m2,j) = 0.
+     micro%cld2raint       (k,m2,j) = 0.
+     micro%cld2drizt       (k,m2,j) = 0.
+     micro%drz2raint       (k,m2,j) = 0.
+     micro%rimecldt        (k,m2,j) = 0.
+     micro%rimedrzt        (k,m2,j) = 0.
+     micro%rimeraint       (k,m2,j) = 0.
+     micro%aggrselfprist   (k,m2,j) = 0.
+     micro%aggrselfsnowt   (k,m2,j) = 0.
+     micro%aggrpsprist     (k,m2,j) = 0.
+     micro%aggrpssnowt     (k,m2,j) = 0.
+     micro%rainbreakupt    (k,m2,j) = 0.
+     micro%cldsiphmt       (k,m2,j) = 0.
+     micro%drzsiphmt       (k,m2,j) = 0.
+     micro%rainshedt       (k,m2,j) = 0.
     endif
-    if(imbudget>=2) then
-     micro%inuchomrt(k,m2,j) = 0.
-     micro%inuccontrt(k,m2,j) = 0.
-     micro%inucifnrt(k,m2,j) = 0.
-     micro%inuchazrt(k,m2,j) = 0.
-     micro%vapcldt(k,m2,j) = 0.
-     micro%vapraint(k,m2,j) = 0.
-     micro%vapprist(k,m2,j) = 0.
-     micro%vapsnowt(k,m2,j) = 0.
-     micro%vapaggrt(k,m2,j) = 0.
-     micro%vapgraut(k,m2,j) = 0.
-     micro%vaphailt(k,m2,j) = 0.
-     micro%vapdrizt(k,m2,j) = 0.
-     micro%evapcldt(k,m2,j) = 0.
-     micro%evapraint(k,m2,j) = 0.
-     micro%evapprist(k,m2,j) = 0.
-     micro%evapsnowt(k,m2,j) = 0.
-     micro%evapaggrt(k,m2,j) = 0.
-     micro%evapgraut(k,m2,j) = 0.
-     micro%evaphailt(k,m2,j) = 0.
-     micro%evapdrizt(k,m2,j) = 0.
-     micro%meltprist(k,m2,j) = 0.
-     micro%meltsnowt(k,m2,j) = 0.
-     micro%meltaggrt(k,m2,j) = 0.
-     micro%meltgraut(k,m2,j) = 0.
-     micro%melthailt(k,m2,j) = 0.
-     micro%rimecldsnowt(k,m2,j) = 0.
-     micro%rimecldaggrt(k,m2,j) = 0.
-     micro%rimecldgraut(k,m2,j) = 0.
-     micro%rimecldhailt(k,m2,j) = 0.
-     micro%rain2prt(k,m2,j) = 0.
-     micro%rain2snt(k,m2,j) = 0.
-     micro%rain2agt(k,m2,j) = 0.
-     micro%rain2grt(k,m2,j) = 0.
-     micro%rain2hat(k,m2,j) = 0.
-     micro%aggrselfprist(k,m2,j) = 0.
-     micro%aggrselfsnowt(k,m2,j) = 0.
-     micro%aggrprissnowt(k,m2,j) = 0.
+    if(imbudget>=2)then
+     micro%inuchomrt     (k,m2,j) = 0.
+     micro%inuccontrt    (k,m2,j) = 0.
+     micro%inucifnrt     (k,m2,j) = 0.
+     micro%inuchazrt     (k,m2,j) = 0.
+     micro%inuchomct     (k,m2,j) = 0.
+     micro%inuccontct    (k,m2,j) = 0.
+     micro%inucifnct     (k,m2,j) = 0.
+     micro%inuchazct     (k,m2,j) = 0.
+     micro%vapcldt       (k,m2,j) = 0.
+     micro%vapraint      (k,m2,j) = 0.
+     micro%vapprist      (k,m2,j) = 0.
+     micro%vapsnowt      (k,m2,j) = 0.
+     micro%vapaggrt      (k,m2,j) = 0.
+     micro%vapgraut      (k,m2,j) = 0.
+     micro%vaphailt      (k,m2,j) = 0.
+     micro%vapdrizt      (k,m2,j) = 0.
+     micro%evapcldt      (k,m2,j) = 0.
+     micro%evapraint     (k,m2,j) = 0.
+     micro%evapprist     (k,m2,j) = 0.
+     micro%evapsnowt     (k,m2,j) = 0.
+     micro%evapaggrt     (k,m2,j) = 0.
+     micro%evapgraut     (k,m2,j) = 0.
+     micro%evaphailt     (k,m2,j) = 0.
+     micro%evapdrizt     (k,m2,j) = 0.
+     micro%meltpristhmt  (k,m2,j) = 0.
+     micro%meltsnowthmt  (k,m2,j) = 0.
+     micro%meltaggrthmt  (k,m2,j) = 0.
+     micro%meltgrauthmt  (k,m2,j) = 0.
+     micro%melthailthmt  (k,m2,j) = 0.
+     micro%meltpriscolt  (k,m2,j) = 0.
+     micro%meltsnowcolt  (k,m2,j) = 0.
+     micro%meltaggrcolt  (k,m2,j) = 0.
+     micro%meltgraucolt  (k,m2,j) = 0.
+     micro%melthailcolt  (k,m2,j) = 0.
+     micro%rimecldsnowt  (k,m2,j) = 0.
+     micro%rimecldaggrt  (k,m2,j) = 0.
+     micro%rimecldgraut  (k,m2,j) = 0.
+     micro%rimecldhailt  (k,m2,j) = 0.
+     micro%rimedrzsnowt  (k,m2,j) = 0.
+     micro%rimedrzaggrt  (k,m2,j) = 0.
+     micro%rimedrzgraut  (k,m2,j) = 0.
+     micro%rimedrzhailt  (k,m2,j) = 0.
+     micro%rimerainprist (k,m2,j) = 0.
+     micro%rimerainsnowt (k,m2,j) = 0.
+     micro%rimerainaggrt (k,m2,j) = 0.
+     micro%rimeraingraut (k,m2,j) = 0.
+     micro%rimerainhailt (k,m2,j) = 0.
     endif
-    if(imbudget==3 .and. idust>=1) then
-     micro%dust1cldrt(k,m2,j) = 0.
-     micro%dust2cldrt(k,m2,j) = 0.
-     micro%dust1drzrt(k,m2,j) = 0.
-     micro%dust2drzrt(k,m2,j) = 0.
+    if(imbudget==3 .and. idust>=1)then
+     micro%dust1cldrt    (k,m2,j) = 0.
+     micro%dust2cldrt    (k,m2,j) = 0.
+     micro%dust1drzrt    (k,m2,j) = 0.
+     micro%dust2drzrt    (k,m2,j) = 0.
     endif
    endif
   enddo
@@ -500,70 +550,95 @@ if ((iand(ibcon,4) .ne. 0) .and. (jdim .eq. 1)) then
      if(igraup >= 1) micro%pcpvg(k,i,1) = 0.
      if(ihail  >= 1) micro%pcpvh(k,i,1) = 0.
      if(level==3) then
-      if(imbudget>=1) then
-       micro%latheatvap(k,i,1) = 0.
-       micro%latheatfrz(k,i,1) = 0.
-       micro%nuccldrt(k,i,1) = 0.
-       micro%cld2raint(k,i,1) = 0.
-       micro%ice2raint(k,i,1) = 0.
-       micro%nucicert(k,i,1) = 0.
-       micro%vapliqt(k,i,1) = 0.
-       micro%vapicet(k,i,1) = 0.
-       micro%evapliqt(k,i,1) = 0.
-       micro%evapicet(k,i,1) = 0.
-       micro%freezingt(k,i,1) = 0.
-       micro%meltingt(k,i,1) = 0.
-       micro%melticet(k,i,1) = 0.
-       micro%rimecldt(k,i,1) = 0.
-       micro%rain2icet(k,i,1) = 0.
-       micro%aggregatet(k,i,1) = 0.
-       micro%latheatvapt(k,i,1) = 0.
-       micro%latheatfrzt(k,i,1) = 0.
+      if(imbudget>=1)then
+       micro%latheatvap      (k,i,1) = 0.
+       micro%latheatfrz      (k,i,1) = 0.
+       micro%latheatvapt     (k,i,1) = 0.
+       micro%latheatfrzt     (k,i,1) = 0.
+       micro%nuccldrt        (k,i,1) = 0.
+       micro%nuccldct        (k,i,1) = 0.
+       micro%nucicert        (k,i,1) = 0.
+       micro%nucicect        (k,i,1) = 0.
+       micro%vapliqt         (k,i,1) = 0.
+       micro%vapicet         (k,i,1) = 0.
+       micro%evapliqt        (k,i,1) = 0.
+       micro%evapicet        (k,i,1) = 0.
+       micro%melt2liqthermt  (k,i,1) = 0.
+       micro%melt2raincolt   (k,i,1) = 0.
+       micro%meltvapt        (k,i,1) = 0.
+       micro%meltcolmeltt    (k,i,1) = 0.
+       micro%freezvapt       (k,i,1) = 0.
+       micro%freezcolmeltt   (k,i,1) = 0.
+       micro%freezicenuct    (k,i,1) = 0.
+       micro%cld2raint       (k,i,1) = 0.
+       micro%cld2drizt       (k,i,1) = 0.
+       micro%drz2raint       (k,i,1) = 0.
+       micro%rimecldt        (k,i,1) = 0.
+       micro%rimedrzt        (k,i,1) = 0.
+       micro%rimeraint       (k,i,1) = 0.
+       micro%aggrselfprist   (k,i,1) = 0.
+       micro%aggrselfsnowt   (k,i,1) = 0.
+       micro%aggrpsprist     (k,i,1) = 0.
+       micro%aggrpssnowt     (k,i,1) = 0.
+       micro%rainbreakupt    (k,i,1) = 0.
+       micro%cldsiphmt       (k,i,1) = 0.
+       micro%drzsiphmt       (k,i,1) = 0.
+       micro%rainshedt       (k,i,1) = 0.
       endif
-      if(imbudget>=2) then
-       micro%inuchomrt(k,i,1) = 0.
-       micro%inuccontrt(k,i,1) = 0.
-       micro%inucifnrt(k,i,1) = 0.
-       micro%inuchazrt(k,i,1) = 0.
-       micro%vapcldt(k,i,1) = 0.
-       micro%vapraint(k,i,1) = 0.
-       micro%vapprist(k,i,1) = 0.
-       micro%vapsnowt(k,i,1) = 0.
-       micro%vapaggrt(k,i,1) = 0.
-       micro%vapgraut(k,i,1) = 0.
-       micro%vaphailt(k,i,1) = 0.
-       micro%vapdrizt(k,i,1) = 0.
-       micro%evapcldt(k,i,1) = 0.
-       micro%evapraint(k,i,1) = 0.
-       micro%evapprist(k,i,1) = 0.
-       micro%evapsnowt(k,i,1) = 0.
-       micro%evapaggrt(k,i,1) = 0.
-       micro%evapgraut(k,i,1) = 0.
-       micro%evaphailt(k,i,1) = 0.
-       micro%evapdrizt(k,i,1) = 0.
-       micro%meltprist(k,i,1) = 0.
-       micro%meltsnowt(k,i,1) = 0.
-       micro%meltaggrt(k,i,1) = 0.
-       micro%meltgraut(k,i,1) = 0.
-       micro%melthailt(k,i,1) = 0.
-       micro%rimecldsnowt(k,i,1) = 0.
-       micro%rimecldaggrt(k,i,1) = 0.
-       micro%rimecldgraut(k,i,1) = 0.
-       micro%rimecldhailt(k,i,1) = 0.
-       micro%rain2prt(k,i,1) = 0.
-       micro%rain2snt(k,i,1) = 0.
-       micro%rain2agt(k,i,1) = 0.
-       micro%rain2grt(k,i,1) = 0.
-       micro%rain2hat(k,i,1) = 0.
-       micro%aggrselfprist(k,i,1) = 0.
-       micro%aggrselfsnowt(k,i,1) = 0.
-       micro%aggrprissnowt(k,i,1) = 0.
+      if(imbudget>=2)then
+       micro%inuchomrt     (k,i,1) = 0.
+       micro%inuccontrt    (k,i,1) = 0.
+       micro%inucifnrt     (k,i,1) = 0.
+       micro%inuchazrt     (k,i,1) = 0.
+       micro%inuchomct     (k,i,1) = 0.
+       micro%inuccontct    (k,i,1) = 0.
+       micro%inucifnct     (k,i,1) = 0.
+       micro%inuchazct     (k,i,1) = 0.
+       micro%vapcldt       (k,i,1) = 0.
+       micro%vapraint      (k,i,1) = 0.
+       micro%vapprist      (k,i,1) = 0.
+       micro%vapsnowt      (k,i,1) = 0.
+       micro%vapaggrt      (k,i,1) = 0.
+       micro%vapgraut      (k,i,1) = 0.
+       micro%vaphailt      (k,i,1) = 0.
+       micro%vapdrizt      (k,i,1) = 0.
+       micro%evapcldt      (k,i,1) = 0.
+       micro%evapraint     (k,i,1) = 0.
+       micro%evapprist     (k,i,1) = 0.
+       micro%evapsnowt     (k,i,1) = 0.
+       micro%evapaggrt     (k,i,1) = 0.
+       micro%evapgraut     (k,i,1) = 0.
+       micro%evaphailt     (k,i,1) = 0.
+       micro%evapdrizt     (k,i,1) = 0.
+       micro%meltpristhmt  (k,i,1) = 0.
+       micro%meltsnowthmt  (k,i,1) = 0.
+       micro%meltaggrthmt  (k,i,1) = 0.
+       micro%meltgrauthmt  (k,i,1) = 0.
+       micro%melthailthmt  (k,i,1) = 0.
+       micro%meltpriscolt  (k,i,1) = 0.
+       micro%meltsnowcolt  (k,i,1) = 0.
+       micro%meltaggrcolt  (k,i,1) = 0.
+       micro%meltgraucolt  (k,i,1) = 0.
+       micro%melthailcolt  (k,i,1) = 0.
+       micro%rimecldsnowt  (k,i,1) = 0.
+       micro%rimecldaggrt  (k,i,1) = 0.
+       micro%rimecldgraut  (k,i,1) = 0.
+       micro%rimecldhailt  (k,i,1) = 0.
+       micro%rimedrzsnowt  (k,i,1) = 0.
+       micro%rimedrzaggrt  (k,i,1) = 0.
+       micro%rimedrzgraut  (k,i,1) = 0.
+       micro%rimedrzhailt  (k,i,1) = 0.
+       micro%rimerainprist (k,i,1) = 0.
+       micro%rimerainsnowt (k,i,1) = 0.
+       micro%rimerainaggrt (k,i,1) = 0.
+       micro%rimeraingraut (k,i,1) = 0.
+       micro%rimerainhailt (k,i,1) = 0.
       endif
-      if(imbudget==3 .and. idust>=1) then
-       micro%dust1cldrt(k,i,1) = 0.
-       micro%dust2cldrt(k,i,1) = 0.
-       micro%dust1drzrt(k,i,1) = 0.
-       micro%dust2drzrt(k,i,1) = 0.
+      if(imbudget==3 .and. idust>=1)then
+       micro%dust1cldrt    (k,i,1) = 0.
+       micro%dust2cldrt    (k,i,1) = 0.
+       micro%dust1drzrt    (k,i,1) = 0.
+       micro%dust2drzrt    (k,i,1) = 0.
       endif
      endif
     enddo
@@ -600,70 +675,95 @@ if ((iand(ibcon,8) .ne. 0) .and. (jdim .eq. 1)) then
      if(igraup >= 1) micro%pcpvg(k,i,m3) = 0.
      if(ihail  >= 1) micro%pcpvh(k,i,m3) = 0.
      if(level==3) then
-      if(imbudget>=1) then
-       micro%latheatvap(k,i,m3) = 0.
-       micro%latheatfrz(k,i,m3) = 0.
-       micro%nuccldrt(k,i,m3) = 0.
-       micro%cld2raint(k,i,m3) = 0.
-       micro%ice2raint(k,i,m3) = 0.
-       micro%nucicert(k,i,m3) = 0.
-       micro%vapliqt(k,i,m3) = 0.
-       micro%vapicet(k,i,m3) = 0.
-       micro%evapliqt(k,i,m3) = 0.
-       micro%evapicet(k,i,m3) = 0.
-       micro%freezingt(k,i,m3) = 0.
-       micro%meltingt(k,i,m3) = 0.
-       micro%melticet(k,i,m3) = 0.
-       micro%rimecldt(k,i,m3) = 0.
-       micro%rain2icet(k,i,m3) = 0.
-       micro%aggregatet(k,i,m3) = 0.
-       micro%latheatvapt(k,i,m3) = 0.
-       micro%latheatfrzt(k,i,m3) = 0.
+      if(imbudget>=1)then
+       micro%latheatvap      (k,i,m3) = 0.
+       micro%latheatfrz      (k,i,m3) = 0.
+       micro%latheatvapt     (k,i,m3) = 0.
+       micro%latheatfrzt     (k,i,m3) = 0.
+       micro%nuccldrt        (k,i,m3) = 0.
+       micro%nuccldct        (k,i,m3) = 0.
+       micro%nucicert        (k,i,m3) = 0.
+       micro%nucicect        (k,i,m3) = 0.
+       micro%vapliqt         (k,i,m3) = 0.
+       micro%vapicet         (k,i,m3) = 0.
+       micro%evapliqt        (k,i,m3) = 0.
+       micro%evapicet        (k,i,m3) = 0.
+       micro%melt2liqthermt  (k,i,m3) = 0.
+       micro%melt2raincolt   (k,i,m3) = 0.
+       micro%meltvapt        (k,i,m3) = 0.
+       micro%meltcolmeltt    (k,i,m3) = 0.
+       micro%freezvapt       (k,i,m3) = 0.
+       micro%freezcolmeltt   (k,i,m3) = 0.
+       micro%freezicenuct    (k,i,m3) = 0.
+       micro%cld2raint       (k,i,m3) = 0.
+       micro%cld2drizt       (k,i,m3) = 0.
+       micro%drz2raint       (k,i,m3) = 0.
+       micro%rimecldt        (k,i,m3) = 0.
+       micro%rimedrzt        (k,i,m3) = 0.
+       micro%rimeraint       (k,i,m3) = 0.
+       micro%aggrselfprist   (k,i,m3) = 0.
+       micro%aggrselfsnowt   (k,i,m3) = 0.
+       micro%aggrpsprist     (k,i,m3) = 0.
+       micro%aggrpssnowt     (k,i,m3) = 0.
+       micro%rainbreakupt    (k,i,m3) = 0.
+       micro%cldsiphmt       (k,i,m3) = 0.
+       micro%drzsiphmt       (k,i,m3) = 0.
+       micro%rainshedt       (k,i,m3) = 0.
       endif
-      if(imbudget>=2) then
-       micro%inuchomrt(k,i,m3) = 0.
-       micro%inuccontrt(k,i,m3) = 0.
-       micro%inucifnrt(k,i,m3) = 0.
-       micro%inuchazrt(k,i,m3) = 0.
-       micro%vapcldt(k,i,m3) = 0.
-       micro%vapraint(k,i,m3) = 0.
-       micro%vapprist(k,i,m3) = 0.
-       micro%vapsnowt(k,i,m3) = 0.
-       micro%vapaggrt(k,i,m3) = 0.
-       micro%vapgraut(k,i,m3) = 0.
-       micro%vaphailt(k,i,m3) = 0.
-       micro%vapdrizt(k,i,m3) = 0.
-       micro%evapcldt(k,i,m3) = 0.
-       micro%evapraint(k,i,m3) = 0.
-       micro%evapprist(k,i,m3) = 0.
-       micro%evapsnowt(k,i,m3) = 0.
-       micro%evapaggrt(k,i,m3) = 0.
-       micro%evapgraut(k,i,m3) = 0.
-       micro%evaphailt(k,i,m3) = 0.
-       micro%evapdrizt(k,i,m3) = 0.
-       micro%meltprist(k,i,m3) = 0.
-       micro%meltsnowt(k,i,m3) = 0.
-       micro%meltaggrt(k,i,m3) = 0.
-       micro%meltgraut(k,i,m3) = 0.
-       micro%melthailt(k,i,m3) = 0.
-       micro%rimecldsnowt(k,i,m3) = 0.
-       micro%rimecldaggrt(k,i,m3) = 0.
-       micro%rimecldgraut(k,i,m3) = 0.
-       micro%rimecldhailt(k,i,m3) = 0.
-       micro%rain2prt(k,i,m3) = 0.
-       micro%rain2snt(k,i,m3) = 0.
-       micro%rain2agt(k,i,m3) = 0.
-       micro%rain2grt(k,i,m3) = 0.
-       micro%rain2hat(k,i,m3) = 0.
-       micro%aggrselfprist(k,i,m3) = 0.
-       micro%aggrselfsnowt(k,i,m3) = 0.
-       micro%aggrprissnowt(k,i,m3) = 0.
+      if(imbudget>=2)then
+       micro%inuchomrt     (k,i,m3) = 0.
+       micro%inuccontrt    (k,i,m3) = 0.
+       micro%inucifnrt     (k,i,m3) = 0.
+       micro%inuchazrt     (k,i,m3) = 0.
+       micro%inuchomct     (k,i,m3) = 0.
+       micro%inuccontct    (k,i,m3) = 0.
+       micro%inucifnct     (k,i,m3) = 0.
+       micro%inuchazct     (k,i,m3) = 0.
+       micro%vapcldt       (k,i,m3) = 0.
+       micro%vapraint      (k,i,m3) = 0.
+       micro%vapprist      (k,i,m3) = 0.
+       micro%vapsnowt      (k,i,m3) = 0.
+       micro%vapaggrt      (k,i,m3) = 0.
+       micro%vapgraut      (k,i,m3) = 0.
+       micro%vaphailt      (k,i,m3) = 0.
+       micro%vapdrizt      (k,i,m3) = 0.
+       micro%evapcldt      (k,i,m3) = 0.
+       micro%evapraint     (k,i,m3) = 0.
+       micro%evapprist     (k,i,m3) = 0.
+       micro%evapsnowt     (k,i,m3) = 0.
+       micro%evapaggrt     (k,i,m3) = 0.
+       micro%evapgraut     (k,i,m3) = 0.
+       micro%evaphailt     (k,i,m3) = 0.
+       micro%evapdrizt     (k,i,m3) = 0.
+       micro%meltpristhmt  (k,i,m3) = 0.
+       micro%meltsnowthmt  (k,i,m3) = 0.
+       micro%meltaggrthmt  (k,i,m3) = 0.
+       micro%meltgrauthmt  (k,i,m3) = 0.
+       micro%melthailthmt  (k,i,m3) = 0.
+       micro%meltpriscolt  (k,i,m3) = 0.
+       micro%meltsnowcolt  (k,i,m3) = 0.
+       micro%meltaggrcolt  (k,i,m3) = 0.
+       micro%meltgraucolt  (k,i,m3) = 0.
+       micro%melthailcolt  (k,i,m3) = 0.
+       micro%rimecldsnowt  (k,i,m3) = 0.
+       micro%rimecldaggrt  (k,i,m3) = 0.
+       micro%rimecldgraut  (k,i,m3) = 0.
+       micro%rimecldhailt  (k,i,m3) = 0.
+       micro%rimedrzsnowt  (k,i,m3) = 0.
+       micro%rimedrzaggrt  (k,i,m3) = 0.
+       micro%rimedrzgraut  (k,i,m3) = 0.
+       micro%rimedrzhailt  (k,i,m3) = 0.
+       micro%rimerainprist (k,i,m3) = 0.
+       micro%rimerainsnowt (k,i,m3) = 0.
+       micro%rimerainaggrt (k,i,m3) = 0.
+       micro%rimeraingraut (k,i,m3) = 0.
+       micro%rimerainhailt (k,i,m3) = 0.
       endif
-      if(imbudget==3 .and. idust>=1) then
-       micro%dust1cldrt(k,i,m3) = 0.
-       micro%dust2cldrt(k,i,m3) = 0.
-       micro%dust1drzrt(k,i,m3) = 0.
-       micro%dust2drzrt(k,i,m3) = 0.
+      if(imbudget==3 .and. idust>=1)then
+       micro%dust1cldrt    (k,i,m3) = 0.
+       micro%dust2cldrt    (k,i,m3) = 0.
+       micro%dust1drzrt    (k,i,m3) = 0.
+       micro%dust2drzrt    (k,i,m3) = 0.
       endif
      endif
     enddo
@@ -720,7 +820,8 @@ if (iand(ibcon,1) .ne. 0) then
       leaf%veg_tai        (1,j,ipat) = leaf%veg_tai          (2,j,ipat)
       leaf%veg_rough      (1,j,ipat) = leaf%veg_rough        (2,j,ipat)
       leaf%veg_height     (1,j,ipat) = leaf%veg_height       (2,j,ipat)
-      leaf%patch_rough    (1,j,ipat) = leaf%patch_rough      (2,j,ipat)
+      leaf%patch_rought   (1,j,ipat) = leaf%patch_rought     (2,j,ipat)
+      leaf%patch_roughm   (1,j,ipat) = leaf%patch_roughm     (2,j,ipat)
       leaf%soil_rough     (1,j,ipat) = leaf%soil_rough       (2,j,ipat)
       leaf%sfcwater_nlev  (1,j,ipat) = leaf%sfcwater_nlev    (2,j,ipat)
       leaf%stom_resist    (1,j,ipat) = leaf%stom_resist      (2,j,ipat)
@@ -760,7 +861,8 @@ if (iand(ibcon,2) .ne. 0) then
       leaf%veg_tai       (m2,j,ipat) = leaf%veg_tai       (m2-1,j,ipat)
       leaf%veg_rough     (m2,j,ipat) = leaf%veg_rough     (m2-1,j,ipat)
       leaf%veg_height    (m2,j,ipat) = leaf%veg_height    (m2-1,j,ipat)
-      leaf%patch_rough   (m2,j,ipat) = leaf%patch_rough   (m2-1,j,ipat)
+      leaf%patch_rought  (m2,j,ipat) = leaf%patch_rought  (m2-1,j,ipat)
+      leaf%patch_roughm  (m2,j,ipat) = leaf%patch_roughm  (m2-1,j,ipat)
       leaf%soil_rough    (m2,j,ipat) = leaf%soil_rough    (m2-1,j,ipat)
       leaf%sfcwater_nlev (m2,j,ipat) = leaf%sfcwater_nlev (m2-1,j,ipat)
       leaf%stom_resist   (m2,j,ipat) = leaf%stom_resist   (m2-1,j,ipat)
@@ -800,7 +902,8 @@ if ((iand(ibcon,4) .ne. 0) .and. (jdim .eq. 1)) then
          leaf%veg_tai        (i,1,ipat) = leaf%veg_tai          (i,2,ipat)
          leaf%veg_rough      (i,1,ipat) = leaf%veg_rough        (i,2,ipat)
          leaf%veg_height     (i,1,ipat) = leaf%veg_height       (i,2,ipat)
-         leaf%patch_rough    (i,1,ipat) = leaf%patch_rough      (i,2,ipat)
+         leaf%patch_rought   (i,1,ipat) = leaf%patch_rought     (i,2,ipat)
+         leaf%patch_roughm   (i,1,ipat) = leaf%patch_roughm     (i,2,ipat)
          leaf%soil_rough     (i,1,ipat) = leaf%soil_rough       (i,2,ipat)
          leaf%sfcwater_nlev  (i,1,ipat) = leaf%sfcwater_nlev    (i,2,ipat)
          leaf%stom_resist    (i,1,ipat) = leaf%stom_resist      (i,2,ipat)
@@ -840,7 +943,8 @@ if ((iand(ibcon,8) .ne. 0) .and. (jdim .eq. 1)) then
          leaf%veg_tai       (i,m3,ipat) = leaf%veg_tai       (i,m3-1,ipat)
          leaf%veg_rough     (i,m3,ipat) = leaf%veg_rough     (i,m3-1,ipat)
          leaf%veg_height    (i,m3,ipat) = leaf%veg_height    (i,m3-1,ipat)
-         leaf%patch_rough   (i,m3,ipat) = leaf%patch_rough   (i,m3-1,ipat)
+         leaf%patch_rought  (i,m3,ipat) = leaf%patch_rought  (i,m3-1,ipat)
+         leaf%patch_roughm  (i,m3,ipat) = leaf%patch_roughm  (i,m3-1,ipat)
          leaf%soil_rough    (i,m3,ipat) = leaf%soil_rough    (i,m3-1,ipat)
          leaf%sfcwater_nlev (i,m3,ipat) = leaf%sfcwater_nlev (i,m3-1,ipat)
          leaf%stom_resist   (i,m3,ipat) = leaf%stom_resist   (i,m3-1,ipat)
@@ -888,14 +992,17 @@ if (iand(ibcon,1) .ne. 0) then
  do j = 1,m3
   do k = 1,m1
    radiate%fthrd(k,1,j)  = radiate%fthrd(k,2,j)
-   if(ilwrtyp == 3 .or. iswrtyp == 3) then
+   ! GRL 2024-03-22 added lw and sw heating rates
+   radiate%fthrdlw(k,1,j)  = radiate%fthrdlw(k,2,j)
+   radiate%fthrdsw(k,1,j)  = radiate%fthrdsw(k,2,j)
+   if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
      radiate%bext(k,1,j)   = radiate%bext(k,2,j)
    endif
-   if(iswrtyp == 3) then
+   if(iswrtyp >= 3) then
      radiate%swup(k,1,j) = radiate%swup(k,2,j)
      radiate%swdn(k,1,j) = radiate%swdn(k,2,j)
    endif
-   if(ilwrtyp == 3) then
+   if(ilwrtyp >= 3) then
      radiate%lwup(k,1,j) = radiate%lwup(k,2,j)
      radiate%lwdn(k,1,j) = radiate%lwdn(k,2,j)
    endif
@@ -908,14 +1015,17 @@ if (iand(ibcon,2) .ne. 0) then
  do j = 1,m3
   do k = 1,m1
    radiate%fthrd(k,m2,j) = radiate%fthrd(k,m2-1,j)
-   if(ilwrtyp == 3 .or. iswrtyp == 3) then
+   ! GRL 2024-03-22 added lw and sw heating rates
+   radiate%fthrdlw(k,m2,j) = radiate%fthrdlw(k,m2-1,j)
+   radiate%fthrdsw(k,m2,j) = radiate%fthrdsw(k,m2-1,j)
+   if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
      radiate%bext(k,m2,j)  = radiate%bext(k,m2-1,j)
    endif
-   if(iswrtyp == 3) then
+   if(iswrtyp >= 3) then
      radiate%swup(k,m2,j) = radiate%swup(k,m2-1,j)
      radiate%swdn(k,m2,j) = radiate%swdn(k,m2-1,j)
    endif
-   if(ilwrtyp == 3) then
+   if(ilwrtyp >= 3) then
      radiate%lwup(k,m2,j) = radiate%lwup(k,m2-1,j)
      radiate%lwdn(k,m2,j) = radiate%lwdn(k,m2-1,j)
    endif
@@ -928,14 +1038,17 @@ if ((iand(ibcon,4) .ne. 0) .and. (jdim .eq. 1)) then
   do i = 1,m2
    do k = 1,m1
      radiate%fthrd(k,i,1)   = radiate%fthrd(k,i,2)
-     if(ilwrtyp == 3 .or. iswrtyp == 3) then
+     ! GRL 2024-03-22 added lw and sw heating rates
+     radiate%fthrdlw(k,i,1)   = radiate%fthrdlw(k,i,2)
+     radiate%fthrdsw(k,i,1)   = radiate%fthrdsw(k,i,2)
+     if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
        radiate%bext(k,i,1)    = radiate%bext(k,i,2)
      endif
-     if(iswrtyp == 3) then
+     if(iswrtyp >= 3) then
        radiate%swup(k,i,1) = radiate%swup(k,i,2)
        radiate%swdn(k,i,1) = radiate%swdn(k,i,2)
      endif
-     if(ilwrtyp == 3) then
+     if(ilwrtyp >= 3) then
        radiate%lwup(k,i,1) = radiate%lwup(k,i,2)
        radiate%lwdn(k,i,1) = radiate%lwdn(k,i,2)
      endif
@@ -948,14 +1061,17 @@ if ((iand(ibcon,8) .ne. 0) .and. (jdim .eq. 1)) then
   do i = 1,m2
    do k = 1,m1
      radiate%fthrd(k,i,m3)  = radiate%fthrd(k,i,m3-1)
-     if(ilwrtyp == 3 .or. iswrtyp == 3) then
+     ! GRL 2024-03-22 added lw and sw heating rates
+     radiate%fthrdlw(k,i,m3)  = radiate%fthrdlw(k,i,m3-1)
+     radiate%fthrdsw(k,i,m3)  = radiate%fthrdsw(k,i,m3-1)
+     if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
        radiate%bext(k,i,m3)   = radiate%bext(k,i,m3-1)
      endif
-     if(iswrtyp == 3) then
+     if(iswrtyp >= 3) then
        radiate%swup(k,i,m3) = radiate%swup(k,i,m3-1)
        radiate%swdn(k,i,m3) = radiate%swdn(k,i,m3-1)
      endif
-     if(ilwrtyp == 3) then
+     if(ilwrtyp >= 3) then
        radiate%lwup(k,i,m3) = radiate%lwup(k,i,m3-1)
        radiate%lwdn(k,i,m3) = radiate%lwdn(k,i,m3-1)
      endif
@@ -1043,6 +1159,7 @@ if (iand(ibcon,1) .ne. 0) then
   radiate%rshort(1,j)  = radiate%rshort(2,j)
   radiate%rlong(1,j)   = radiate%rlong(2,j)
   radiate%rlongup(1,j) = radiate%rlongup(2,j)
+  radiate%rlontop(1,j) = radiate%rlontop(2,j)
   radiate%albedt(1,j)  = radiate%albedt(2,j)
   radiate%cosz(1,j)    = radiate%cosz(2,j)
   radiate%aodt(1,j)    = radiate%aodt(2,j)
@@ -1055,6 +1172,7 @@ if (iand(ibcon,2) .ne. 0) then
   radiate%rshort(m2,j)  = radiate%rshort(m2-1,j)
   radiate%rlong(m2,j)   = radiate%rlong(m2-1,j)
   radiate%rlongup(m2,j) = radiate%rlongup(m2-1,j)
+  radiate%rlontop(m2,j) = radiate%rlontop(m2-1,j)
   radiate%albedt(m2,j)  = radiate%albedt(m2-1,j)
   radiate%cosz(m2,j)    = radiate%cosz(m2-1,j)
   radiate%aodt(m2,j)    = radiate%aodt(m2-1,j)
@@ -1067,6 +1185,7 @@ if ((iand(ibcon,4) .ne. 0) .and. (jdim .eq. 1)) then
      radiate%rshort(i,1)  = radiate%rshort(i,2)
      radiate%rlong(i,1)   = radiate%rlong(i,2)
      radiate%rlongup(i,1) = radiate%rlongup(i,2)
+     radiate%rlontop(i,1) = radiate%rlontop(i,2)
      radiate%albedt(i,1)  = radiate%albedt(i,2)
      radiate%cosz(i,1)    = radiate%cosz(i,2)
      radiate%aodt(i,1)    = radiate%aodt(i,2)
@@ -1079,6 +1198,7 @@ if ((iand(ibcon,8) .ne. 0) .and. (jdim .eq. 1)) then
      radiate%rshort(i,m3)  = radiate%rshort(i,m3-1)
      radiate%rlong(i,m3)   = radiate%rlong(i,m3-1)
      radiate%rlongup(i,m3) = radiate%rlongup(i,m3-1)
+     radiate%rlontop(i,m3) = radiate%rlontop(i,m3-1)
      radiate%albedt(i,m3)  = radiate%albedt(i,m3-1)
      radiate%cosz(i,m3)    = radiate%cosz(i,m3-1)
      radiate%aodt(i,m3)    = radiate%aodt(i,m3-1)

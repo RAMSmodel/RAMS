@@ -688,7 +688,7 @@ real :: dtlt
 
 allocate(vtemp(m1,m2,m3))
 
-if(imbudget>=1) then
+if(imbudget>=1)then
  allocate(wpbuoytheta(m1,m2,m3))
  allocate(wpbuoycond(m1,m2,m3))
  allocate(wpadvdif(m1,m2,m3))
@@ -704,7 +704,7 @@ if (level .ge. 1) then
             vtemp(k,i,j) = gg * ((theta(k,i,j) * (1. + .61 * rv(k,i,j))  &
                - th0(k,i,j)) / th0(k,i,j) - (rtc(k,i,j) - rv(k,i,j)) )
             !calculate partial W buoyancy budgets
-            if(imbudget>=1) then
+            if(imbudget>=1)then
               wpbuoytheta(k,i,j) = gg * ((theta(k,i,j)*(1.+.61*rv(k,i,j)) &
                 - th0(k,i,j)) / th0(k,i,j))
               wpbuoycond(k,i,j)  = gg * (-1.0*(rtc(k,i,j) - rv(k,i,j)))
@@ -718,7 +718,9 @@ else
          do k = 2,m1-1
             vtemp(k,i,j) = gg * (theta(k,i,j) / th0(k,i,j) - 1.)
             !calculate partial W buoyancy budgets
-            if(imbudget>=1) wpbuoytheta(k,i,j) = vtemp(k,i,j)
+            if(imbudget>=1)then
+              wpbuoytheta(k,i,j) = vtemp(k,i,j)
+            endif
          enddo
       enddo
    enddo
@@ -730,7 +732,7 @@ do j = ja,jz
          !Calculate W buoyancy budgets (m/s)
          !Calculate W due to advection and diffusion (current wt)
          !Multiply by 2*dt for leapfrog timestep t-dt to t+dt
-         if(imbudget>=1) then         
+         if(imbudget>=1)then
            wpadvdif(k,i,j)    = 2.0 * dtlt * wt(k,i,j)
            wpbuoytheta(k,i,j) = 2.0 * dtlt * (wpbuoytheta(k,i,j) &
                                             + wpbuoytheta(k+1,i,j))
@@ -745,7 +747,7 @@ enddo
 deallocate(vtemp)
 
 !Copy local W buoyancy budgets (m/s) to global budget variables
-if(imbudget>=1) then
+if(imbudget>=1)then
  basic_g(ngrid)%wp_buoy_theta = wpbuoytheta
  basic_g(ngrid)%wp_buoy_cond  = wpbuoycond
  basic_g(ngrid)%wp_advdif     = wpadvdif

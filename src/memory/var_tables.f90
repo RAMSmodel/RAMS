@@ -10,6 +10,10 @@ implicit none
 type var_tables_r
    
    real, pointer :: var_p,var_m
+   ! How accurate to save the variable if using ZFP compression
+   ! if this is 0, use lossless compression
+   ! This parameter is used ONLY for lite file output
+   real(kind=4) :: var_acc
    integer :: npts, idim_type
    integer :: ianal,imean,ilite,impti,impt1,irecycle_sfc
    character(len=32) :: name

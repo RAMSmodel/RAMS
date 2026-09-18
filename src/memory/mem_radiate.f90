@@ -1,24 +1,29 @@
 !##############################################################################
 Module mem_radiate
 
+use grid_dims, only:strl1
+
 implicit none
 
    Type radiate_vars
    
       ! Variables to be dimensioned by (nzp,nxp,nyp)
    real, allocatable, dimension(:,:,:) :: &
-                          fthrd,fthrdp,bext,swup,swdn,lwup,lwdn
+                          fthrd,fthrdp,bext,swup,swdn,lwup,lwdn,fthrdsw,fthrdlw
+                          !GRL 2024-03-22 added variables for lw and sw heating rates
+
                           
       ! Variables to be dimensioned by (nxp,nyp)
    real, allocatable, dimension(:,:) :: &
-                          rshort,rlong,rlongup,albedt,cosz,aodt
+                          rshort,rlong,rlongup,rlontop,albedt,cosz,aodt 
 
    End Type
    
    type (radiate_vars), allocatable :: radiate_g(:), radiatem_g(:)
    
-   integer :: lonrad,ilwrtyp,iswrtyp,irce
+   integer :: lonrad,ilwrtyp,iswrtyp,irce,isndrad
    real    :: radfrq,rce_ubmn,rce_bubl,rce_solc,rce_szen
+   character(len=strl1)      :: rrtmfile
   
 Contains
 
@@ -38,18 +43,22 @@ implicit none
                          allocate (radiate%rshort(n2,n3))
                          allocate (radiate%rlong(n2,n3))
                          allocate (radiate%rlongup(n2,n3))
+                         allocate (radiate%rlontop(n2,n3))
                          allocate (radiate%albedt(n2,n3))
                          allocate (radiate%cosz(n2,n3))
                          allocate (radiate%aodt(n2,n3))
+                         !GRL 2024-03-22 added variables for lw and sw heating rates
+                         allocate (radiate%fthrdsw(n1,n2,n3))
+                         allocate (radiate%fthrdlw(n1,n2,n3))
       endif
-      if(ilwrtyp == 3 .or. iswrtyp == 3) then
+      if(ilwrtyp >= 3 .or. iswrtyp >= 3) then
          allocate (radiate%bext(n1,n2,n3))
       endif
-      if(ilwrtyp == 3)  then
+      if(ilwrtyp >= 3)  then
          allocate (radiate%lwup(n1,n2,n3))
          allocate (radiate%lwdn(n1,n2,n3))
       endif
-      if(iswrtyp == 3)  then
+      if(iswrtyp >= 3)  then
          allocate (radiate%swup(n1,n2,n3))
          allocate (radiate%swdn(n1,n2,n3))
       endif
@@ -69,6 +78,7 @@ implicit none
    if (allocated(radiate%rshort))   deallocate (radiate%rshort)
    if (allocated(radiate%rlong))    deallocate (radiate%rlong)
    if (allocated(radiate%rlongup))  deallocate (radiate%rlongup)
+   if (allocated(radiate%rlontop))  deallocate (radiate%rlontop)
    if (allocated(radiate%albedt))   deallocate (radiate%albedt)
    if (allocated(radiate%cosz))     deallocate (radiate%cosz)
    if (allocated(radiate%aodt))     deallocate (radiate%aodt)
@@ -77,6 +87,9 @@ implicit none
    if (allocated(radiate%swdn))     deallocate (radiate%swdn)
    if (allocated(radiate%lwup))     deallocate (radiate%lwup)
    if (allocated(radiate%lwdn))     deallocate (radiate%lwdn)
+   !GRL 2024-03-22 added variables for lw and sw heating rates
+   if (allocated(radiate%fthrdsw))  deallocate (radiate%fthrdsw)
+   if (allocated(radiate%fthrdlw))  deallocate (radiate%fthrdlw)
 
 return
 END SUBROUTINE dealloc_radiate
@@ -120,7 +133,15 @@ implicit none
       CALL vtables2 (radiate%lwdn(1,1,1),radiatem%lwdn(1,1,1)  &
                  ,ng, npts, imean,  &
                  'LWDN :3:anal:mpti')
-
+   !GRL 2024-03-22 added variables for lw and sw heating rates
+   if (allocated(radiate%fthrdlw))  &
+      CALL vtables2 (radiate%fthrdlw(1,1,1),radiatem%fthrdlw(1,1,1)  &
+                 ,ng, npts, imean,  &
+                 'FTHRDLW :3:anal:mpti')
+   if (allocated(radiate%fthrdsw))  &
+      CALL vtables2 (radiate%fthrdsw(1,1,1),radiatem%fthrdsw(1,1,1)  &
+                 ,ng, npts, imean,  &
+                 'FTHRDSW :3:anal:mpti')
 
    npts=n2*n3
    if (allocated(radiate%rshort))  &
@@ -135,6 +156,10 @@ implicit none
       CALL vtables2 (radiate%rlongup(1,1),radiatem%rlongup(1,1)  &
                  ,ng, npts, imean,  &
                  'RLONGUP :2:anal:mpti')
+   if (allocated(radiate%rlontop))  &
+      CALL vtables2 (radiate%rlontop(1,1),radiatem%rlontop(1,1)  &
+                 ,ng, npts, imean,  &
+                 'RLONTOP :2:anal:mpti')
    if (allocated(radiate%albedt))  &
       CALL vtables2 (radiate%albedt(1,1),radiatem%albedt(1,1)  &
                  ,ng, npts, imean,  &

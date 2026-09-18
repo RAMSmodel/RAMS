@@ -1,0 +1,40 @@
+# Module files
+*.mod
+
+# Libraries
+*.a
+
+# Object files
+*.o
+
+# Dependency files
+*.d
+
+# Fortran module files
+*.mod
+*.mod.proxy
+
+# Intel vectorization reports
+*.optrpt
+
+# Netcdf file during testing
+examples/*/*.nc
+examples/*/*/*.nc
+
+# Jupyter notebooks
+.ipynb_checkpoints
+
+# Intel code coverage
+*.dyn
+*.dpi
+*.spi
+*.spl
+*.HTML
+*.html
+*.gif
+
+# gh-pages directory
+public
+
+# Ruby stuff
+**/Gemfile.lock

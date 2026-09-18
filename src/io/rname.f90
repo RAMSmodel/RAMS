@@ -7,7 +7,7 @@ Subroutine nvfillm (group,vr,ii,ff,cc,nv)
 
 use mem_all
 use node_mod
-use leaf_coms, only:ifreeslip
+use leaf_coms, only:ifreeslip,icharnock
 
 implicit none
 
@@ -25,7 +25,7 @@ character(len=*) :: group,vr,cc
 real :: ff
 integer :: ii,nv
 integer :: inrflg
-integer, parameter ::nvgrid=37,nvstrt=77,nvindat=147,nvsound=10
+integer, parameter ::nvgrid=38,nvstrt=79,nvindat=156,nvsound=13
 integer ::  igrids(nvgrid),istart(nvstrt),iindat(nvindat),isound(nvsound)
 character(len=16) :: grids(nvgrid),start(nvstrt),indat(nvindat),sound(nvsound)
 data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
@@ -33,7 +33,7 @@ data igrids/nvgrid*0/,istart/nvstrt*0/,iindat/nvindat*0/,isound/nvsound*0/
 DATA GRIDS/  &
       'EXPNME','RUNTYPE','TIMEUNIT','TIMMAX','IMONTH1','IDATE1','IYEAR1' &
      ,'ITIME1','NGRIDS','NNXP','NNYP','NNZP','NZG','NZS','NXTNEST'       &
-     ,'IPRNTSTMT','IHTRAN','DELTAX','DELTAZ','DZRAT'                     &
+     ,'IPRNTSTMT','IHTRAN','DELTAX','DELTAZ','DZRAT','ZDELAY'            &
      ,'DZMAX','ZZ','DTLONG','NACOUST','NSTRATX'                          &
      ,'NNDTRAT','NESTZ','NSTRATZ','POLELAT','POLELON','NINEST','NJNEST'  &
      ,'NKNEST','CENTLAT','CENTLON','NNSTTOP','NNSTBOT'/
@@ -47,20 +47,21 @@ DATA START/  &
      ,'WT_ODA_PI','WT_ODA_RT','RODA_SFCE','RODA_SFC0','RODA_UPAE'        &
      ,'RODA_UPA0','RODA_HGT','RODA_ZFAC','ODA_SFC_TIL','ODA_SFC_TEL'     &
      ,'ODA_UPA_TIL','ODA_UPA_TEL','HFILIN','IPAST_SFC','ICLOBBER'        &
-     ,'IOUTPUT','AFILEPREF','FRQSTATE','FRQST_KEEP','FRQLITE'            &
-     ,'NLITE_VARS','LITE_VARS','AVGTIM','FRQMEAN','FRQBOTH','TOPFILES'   &
+     ,'IOUTPUT','AFILEPREF','FRQSTATE','FRQST_KEEP','FRQLITE','ITRUNCLITE' &
+     ,'NLITE_VARS','LITE_VARS','ACC_LT_VAR','AVGTIM','FRQMEAN','FRQBOTH','TOPFILES' &
      ,'SFCFILES','SSTFPFX','NDVIFPFX','ITOPTFLG','ISSTFLG','IVEGTFLG'    &
      ,'ISOILFLG','NDVIFLG','IUPDNDVI','IUPDSST','ITOPTFN'                &
      ,'ISSTFN','IVEGTFN','ISOILFN','NDVIFN','ITOPSFLG','TOPTENH'         &
      ,'TOPTWVL','IZ0FLG','Z0MAX','Z0FACT'/
 DATA INDAT/  &
-      'ICORFLG','IBND','JBND','ISPONGE_PTS','SPONGE_TAU','CPHAS','LSFLG' &
-     ,'NFPT','DISTIM','ISWRTYP'  &
+      'ICORFLG','IUGFORCE','FORCINGFILE','DIVLS','IBND','JBND','ISPONGE_PTS' &
+     ,'SPONGE_TAU','CPHAS','LSFLG','NFPT','DISTIM','RRTMFILE','ISNDRAD','ISWRTYP' &
      ,'ILWRTYP','RADFRQ','LONRAD','NNQPARM','CONFRQ','WCLDBS','IKPP'     &
      ,'NKPPZ','FRQKPP','RELAX_SST','RELAX_OCNT','RELAX_SAL','DMAXKPP'    &
      ,'DSCALEKPP','KPPITERMAX','KPPRNT','UBMN_KPP','NPATCH','NVEGPAT'    &
      ,'ISFCL','IFREESLIP','SIBFILE','CO2_INIT','ISOILDAT','SNUDCENT'     &
-     ,'ISNOWDAT','NVGCON','PCTLCON','NSLCON','ZROUGH','ALBEDO','SEATMP'  &
+     ,'ISNOWDAT','NVGCON','PCTLCON','NSLCON','ZTROUGH','ZMROUGH'         &
+     ,'ICHARNOCK','ALBEDO','SEATMP'                                      &
      ,'DTHCON','DRTCON','SLZ','SLMSTR','STGOFF','IDIFFK','IDIFFPERTS'    &
      ,'IHORGRAD','CSX','CSZ','XKHKM','ZKHKM','AKMIN','IBUBBLE','IBUBGRD' &
      ,'IBDXIA','IBDXIZ','IBDYJA','IBDYJZ','IBDZK1','IBDZK2','BTHP'       &
@@ -68,18 +69,19 @@ DATA INDAT/  &
      ,'ICVERT','ICKMAX','CZRAD','ICKCENT','CDIVMAX','CTAU','CTMAX'       &
      ,'IRCE','RCE_SZEN','RCE_SOLC','RCE_UBMN','RCE_BUBL','LEVEL','ISCM'  &
      ,'ICHECKMIC','ITRACER','ITRACHIST','IMBUDGET','IRIME','IPLAWS'      &
-     ,'ISEDIM','ICLOUD','IDRIZ','IRAIN','IPRIS','ISNOW','IAGGR'          &
+     ,'ISEDIM','IKERNELA','ICLOUD','IDRIZ','IRAIN','IPRIS','ISNOW','IAGGR'&
      ,'IGRAUP','IHAIL','CPARM','DPARM','RPARM','PPARM','SPARM','APARM'   &
      ,'GPARM','HPARM','GNU','HUCMFILE','NDTCOLL','IAEROSOL','ISALT'      &
      ,'IDUST','IDUSTLOFT','DUSTFILE','ICCNLEV','IIFN','IIFN_FORMULA'     &
      ,'IAERORAD','IAERODEP','IAEROPRNT','IAEROHIST','CIN_MAX','CCN1_MAX' &
-     ,'CCN2_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'         &
+     ,'CCN2_MAX','CCN3_MAX','DUST1_MAX','DUST2_MAX','SALTF_MAX','SALTJ_MAX'&
      ,'SALTS_MAX','IAEROLBC','ICO2LBC','BCTAU','IAERO_CHEM'              &
      ,'AERO_EPSILON','AERO_MEDRAD','ITRKEPSILON','ITRKDUST'              &
      ,'ITRKDUSTIFN','SCMTIME','ISCMX','ISCMY','FRACSAT','IABCARB'        &
      ,'ABC1_MAX','ABC2_MAX'/
 DATA SOUND/  &
-      'IPSFLG','ITSFLG','IRTSFLG','IUSFLG','HS','PS','TS','RTS','US','VS'/
+      'IPSFLG','ITSFLG','IRTSFLG','IUSFLG','IO3FLG','SOUND_FILE'         &
+      ,'HS','PS','TS','RTS','US','VS','O3S'/
 
 !##############################################################################
 interface
@@ -131,6 +133,7 @@ IF(GROUP.EQ.'$MODEL_GRIDS') THEN
  IF(VR.EQ.'DELTAX')    CALL varsetf (VR,DELTAX,NV,1,FF,.001,1.E6)
  IF(VR.EQ.'DELTAZ')    CALL varsetf (VR,DELTAZ,NV,1,FF,0.,1.E5)
  IF(VR.EQ.'DZRAT')     CALL varsetf (VR,DZRAT,NV,1,FF,.1,10.)
+ IF(VR.EQ.'ZDELAY')    CALL varsetf (VR,ZDELAY,NV,1,FF,0.,1.E6)
  IF(VR.EQ.'DZMAX')     CALL varsetf (VR,DZMAX,NV,1,FF,.001,1.E5)
  IF(VR.EQ.'ZZ')        CALL varsetf (VR,ZZ(NV),NV,NZPMAX,FF,0.,1.E6)
  IF(VR.EQ.'DTLONG')    CALL varsetf (VR,DTLONG,NV,1,FF,0.,1.E8)
@@ -202,9 +205,11 @@ IF(GROUP.EQ.'$MODEL_FILE_INFO') THEN
  IF(VR.EQ.'AFILEPREF')   CALL varsetc (VR,AFILEPREF,NV,1,CC,1,strl1)
  IF(VR.EQ.'FRQSTATE')    CALL varsetf (VR,FRQSTATE(NV),NV,MAXGRDS,FF,0.,1.E20)
  IF(VR.EQ.'FRQST_KEEP')  CALL varsetf (VR,FRQST_KEEP,NV,1,FF,0.,1.E20)
- IF(VR.EQ.'FRQLITE')     CALL varsetf (VR,FRQLITE,NV,1,FF,0.,1.E20)
+ IF(VR.EQ.'FRQLITE')     CALL varsetf (VR,FRQLITE(NV),NV,MAXGRDS,FF,0.,1.E20)
+ IF(VR.EQ.'ITRUNCLITE')  CALL varseti (VR,ITRUNCLITE,NV,1,II,0,1)
  IF(VR.EQ.'NLITE_VARS')  CALL varseti (VR,NLITE_VARS,NV,1,II,0,MAXLITE)
  IF(VR.EQ.'LITE_VARS')   CALL varsetc (VR,LITE_VARS(NV),NV,MAXLITE,CC,1,32)
+ IF(VR.EQ.'ACC_LT_VAR')  CALL varsetf (VR,LITE_VAR_ACC(NV),NV,MAXLITE,FF,0.,1.e20)
  IF(VR.EQ.'AVGTIM')      CALL varsetf (VR,AVGTIM,NV,1,FF,-1.E20,1.E20)
  IF(VR.EQ.'FRQMEAN')     CALL varsetf (VR,FRQMEAN,NV,1,FF,0.,1.E20)
  IF(VR.EQ.'FRQBOTH')     CALL varsetf (VR,FRQBOTH,NV,1,FF,0.,1.E20)
@@ -236,6 +241,9 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  CALL varchk (VR,GROUP,INDAT,IINDAT,NVINDAT,INRFLG)
  IF(INRFLG.EQ.1) RETURN
  IF(VR.EQ.'ICORFLG')      CALL varseti (VR,ICORFLG,NV,1,II,0,1)
+ IF(VR.EQ.'IUGFORCE')     CALL varseti (VR,IUGFORCE,NV,1,II,0,2)
+ IF(VR.EQ.'FORCINGFILE')  CALL varsetc (VR,FORCINGFILE,NV,1,CC,1,strl1)
+ IF(VR.EQ.'DIVLS')        CALL varsetf (VR,DIVLS,NV,1,FF,-1.,1.)
  IF(VR.EQ.'IBND')         CALL varseti (VR,IBND,NV,1,II,1,2)
  IF(VR.EQ.'JBND')         CALL varseti (VR,JBND,NV,1,II,1,2)
  IF(VR.EQ.'ISPONGE_PTS')  CALL varseti (VR,ISPONGE_PTS(NV),NV,MAXGRDS,II,0,100)
@@ -244,8 +252,10 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'LSFLG')        CALL varseti (VR,LSFLG,NV,1,II,0,3)
  IF(VR.EQ.'NFPT')         CALL varseti (VR,NFPT,NV,1,II,0,10000)
  IF(VR.EQ.'DISTIM')       CALL varsetf (VR,DISTIM,NV,1,FF,0.,10000.)
- IF(VR.EQ.'ISWRTYP')      CALL varseti (VR,ISWRTYP,NV,1,II,0,3)
- IF(VR.EQ.'ILWRTYP')      CALL varseti (VR,ILWRTYP,NV,1,II,0,3)
+ IF(VR.EQ.'RRTMFILE')     CALL varsetc (VR,RRTMFILE,NV,1,CC,1,strl1)
+ IF(VR.EQ.'ISNDRAD')      CALL varseti (VR,ISNDRAD,NV,1,II,0,1)
+ IF(VR.EQ.'ISWRTYP')      CALL varseti (VR,ISWRTYP,NV,1,II,0,5)
+ IF(VR.EQ.'ILWRTYP')      CALL varseti (VR,ILWRTYP,NV,1,II,0,5)
  IF(VR.EQ.'RADFRQ')       CALL varsetf (VR,RADFRQ,NV,1,FF,.001,100000.)
  IF(VR.EQ.'LONRAD')       CALL varseti (VR,LONRAD,NV,1,II,0,1)
  IF(VR.EQ.'NNQPARM')      CALL varseti (VR,NNQPARM(NV),NV,MAXGRDS,II,0,2)
@@ -264,7 +274,7 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'UBMN_KPP')     CALL varsetf (VR,UBMN_KPP,NV,1,FF,0.,7.)
  IF(VR.EQ.'NPATCH')       CALL varseti (VR,NPATCH,NV,1,II,2,10)
  IF(VR.EQ.'NVEGPAT')      CALL varseti (VR,NVEGPAT,NV,1,II,1,10)
- IF(VR.EQ.'ISFCL')        CALL varseti (VR,ISFCL,NV,1,II,0,2)
+ IF(VR.EQ.'ISFCL')        CALL varseti (VR,ISFCL,NV,1,II,0,3)
  IF(VR.EQ.'IFREESLIP')    CALL varseti (VR,IFREESLIP,NV,1,II,0,1)
  IF(VR.EQ.'SIBFILE')      CALL varsetc (VR,SIBFILE,NV,1,CC,1,strl1)
  IF(VR.EQ.'CO2_INIT')     CALL varsetf (VR,CO2_INIT(NV),NV,NZPMAX,FF,0.,1000.)
@@ -274,11 +284,13 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'NVGCON')       CALL varseti (VR,NVGCON,NV,1,II,0,20)
  IF(VR.EQ.'PCTLCON')      CALL varsetf (VR,PCTLCON,NV,1,FF,0.,1.)
  IF(VR.EQ.'NSLCON')       CALL varseti (VR,NSLCON,NV,1,II,1,12)
- IF(VR.EQ.'ZROUGH')       CALL varsetf (VR,ZROUGH,NV,1,FF,.0001,100.)
+ IF(VR.EQ.'ZTROUGH')      CALL varsetf (VR,ZTROUGH,NV,1,FF,.0001,100.)
+ IF(VR.EQ.'ZMROUGH')      CALL varsetf (VR,ZMROUGH,NV,1,FF,.0001,100.)
+ IF(VR.EQ.'ICHARNOCK')    CALL varseti (VR,ICHARNOCK,NV,1,II,0,1)
  IF(VR.EQ.'ALBEDO')       CALL varsetf (VR,ALBEDO,NV,1,FF,0.,1.)
  IF(VR.EQ.'SEATMP')       CALL varsetf (VR,SEATMP,NV,1,FF,100.,500.)
- IF(VR.EQ.'DTHCON')       CALL varsetf (VR,DTHCON,NV,1,FF,-100.,100.)
- IF(VR.EQ.'DRTCON')       CALL varsetf (VR,DRTCON,NV,1,FF,-1.,1.)
+ IF(VR.EQ.'DTHCON')       CALL varsetf (VR,DTHCON,NV,1,FF,-500.,500.)
+ IF(VR.EQ.'DRTCON')       CALL varsetf (VR,DRTCON,NV,1,FF,-500.,500.)
  IF(VR.EQ.'SLZ')          CALL varsetf (VR,SLZ(NV),NV,NZGMAX,FF,-1.E5,0.)
  IF(VR.EQ.'SLMSTR')       CALL varsetf (VR,SLMSTR(NV),NV,NZGMAX,FF,0.,1.)
  IF(VR.EQ.'STGOFF')       CALL varsetf (VR,STGOFF(NV),NV,NZGMAX,FF,-50.,50.)
@@ -331,6 +343,7 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'IRIME')        CALL varseti (VR,IRIME,NV,1,II,0,1)
  IF(VR.EQ.'IPLAWS')       CALL varseti (VR,IPLAWS,NV,1,II,0,2)
  IF(VR.EQ.'ISEDIM')       CALL varseti (VR,ISEDIM,NV,1,II,0,1)
+ IF(VR.EQ.'IKERNELA')     CALL varseti (VR,IKERNELA,NV,1,II,1,2)
  IF(VR.EQ.'ICLOUD')       CALL varseti (VR,ICLOUD,NV,1,II,0,5)
  IF(VR.EQ.'IDRIZ')        CALL varseti (VR,IDRIZ,NV,1,II,0,5)
  IF(VR.EQ.'IRAIN')        CALL varseti (VR,IRAIN,NV,1,II,0,5)
@@ -350,22 +363,23 @@ IF(GROUP.EQ.'$MODEL_OPTIONS') THEN
  IF(VR.EQ.'GNU')          CALL varsetf (VR,GNU(NV),NV,8,FF,0.,20.)
  IF(VR.EQ.'HUCMFILE')     CALL varsetc (VR,HUCMFILE,NV,1,CC,1,strl1)
  IF(VR.EQ.'NDTCOLL')      CALL varseti (VR,NDTCOLL,NV,1,II,1,10)
- IF(VR.EQ.'IAEROSOL')     CALL varseti (VR,IAEROSOL,NV,1,II,0,1)
+ IF(VR.EQ.'IAEROSOL')     CALL varseti (VR,IAEROSOL,NV,1,II,0,3)
  IF(VR.EQ.'IABCARB')      CALL varseti (VR,IABCARB,NV,1,II,0,1)
  IF(VR.EQ.'ISALT')        CALL varseti (VR,ISALT,NV,1,II,0,2)
  IF(VR.EQ.'IDUST')        CALL varseti (VR,IDUST,NV,1,II,0,2)
  IF(VR.EQ.'IDUSTLOFT')    CALL varseti (VR,IDUSTLOFT,NV,1,II,0,99)
  IF(VR.EQ.'DUSTFILE')     CALL varsetc (VR,DUSTFILE,NV,1,CC,1,strl1)
  IF(VR.EQ.'ICCNLEV')      CALL varseti (VR,ICCNLEV,NV,1,II,0,3)
- IF(VR.EQ.'IIFN')         CALL varseti (VR,IIFN,NV,1,II,0,3)
+ IF(VR.EQ.'IIFN')         CALL varseti (VR,IIFN,NV,1,II,0,4)
  IF(VR.EQ.'IIFN_FORMULA') CALL varseti (VR,IIFN_FORMULA,NV,1,II,1,2)
  IF(VR.EQ.'IAERORAD')     CALL varseti (VR,IAERORAD,NV,1,II,0,1)
  IF(VR.EQ.'IAERODEP')     CALL varseti (VR,IAERODEP,NV,1,II,0,1)
  IF(VR.EQ.'IAEROPRNT')    CALL varseti (VR,IAEROPRNT,NV,1,II,0,1)
  IF(VR.EQ.'IAEROHIST')    CALL varseti (VR,IAEROHIST,NV,1,II,0,1)
  IF(VR.EQ.'CIN_MAX')      CALL varsetf (VR,CIN_MAX,NV,1,FF,-2.,1.E3)
- IF(VR.EQ.'CCN1_MAX')     CALL varsetf (VR,CCN1_MAX,NV,1,FF,0.,1.E4)
- IF(VR.EQ.'CCN2_MAX')     CALL varsetf (VR,CCN2_MAX,NV,1,FF,0.,1.E4)
+ IF(VR.EQ.'CCN1_MAX')     CALL varsetf (VR,CCN1_MAX,NV,1,FF,0.,2.E4)
+ IF(VR.EQ.'CCN2_MAX')     CALL varsetf (VR,CCN2_MAX,NV,1,FF,0.,2.E4)
+ IF(VR.EQ.'CCN3_MAX')     CALL varsetf (VR,CCN3_MAX,NV,1,FF,0.,2.E4)
  IF(VR.EQ.'DUST1_MAX')    CALL varsetf (VR,DUST1_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'DUST2_MAX')    CALL varsetf (VR,DUST2_MAX,NV,1,FF,0.,1.E4)
  IF(VR.EQ.'ABC1_MAX')     CALL varsetf (VR,ABC1_MAX,NV,1,FF,0.,1.E4)
@@ -391,12 +405,15 @@ IF(GROUP.EQ.'$MODEL_SOUND') THEN
  IF(VR.EQ.'ITSFLG')  CALL varseti (VR,ITSFLG,NV,1,II,0,10)
  IF(VR.EQ.'IRTSFLG') CALL varseti (VR,IRTSFLG,NV,1,II,0,10)
  IF(VR.EQ.'IUSFLG')  CALL varseti (VR,IUSFLG,NV,1,II,0,10)
+ IF(VR.EQ.'IO3FLG')  CALL varseti (VR,IO3FLG,NV,1,II,0,10)
+ IF(VR.EQ.'SOUND_FILE')  CALL varsetc (VR,SOUND_FILE,NV,1,CC,1,strl1)
  IF(VR.EQ.'HS')      CALL varsetf (VR,HS(NV),NV,MAXSNDG,FF,-1.e3,1.E5)
  IF(VR.EQ.'PS')      CALL varsetf (VR,PS(NV),NV,MAXSNDG,FF,0.,1.E7)
  IF(VR.EQ.'TS')      CALL varsetf (VR,TS(NV),NV,MAXSNDG,FF,-200.,1000.)
  IF(VR.EQ.'RTS')     CALL varsetf (VR,RTS(NV),NV,MAXSNDG,FF,-200.,1000.)
  IF(VR.EQ.'US')      CALL varsetf (VR,US(NV),NV,MAXSNDG,FF,-500.,500.)
  IF(VR.EQ.'VS')      CALL varsetf (VR,VS(NV),NV,MAXSNDG,FF,-500.,500.)
+ IF(VR.EQ.'O3S')     CALL varsetf (VR,O3S(NV),NV,MAXSNDG,FF,0.,1.e10)
 ENDIF
 
 return
@@ -407,7 +424,7 @@ Subroutine nameout ()
 
 use mem_all
 use isan_coms
-use leaf_coms, only:ifreeslip
+use leaf_coms, only:ifreeslip,icharnock
 
 implicit none
 
@@ -467,13 +484,16 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'ICLOBBER=',ICLOBBER               &
  ,'IOUTPUT=',IOUTPUT                 &
  ,'NLITE_VARS=',NLITE_VARS           &
+ ,'ITRUNCLITE=',ITRUNCLITE           &
  ,'IUPDNDVI=',IUPDNDVI               &
  ,'IUPDSST=',IUPDSST                 &
  ,'ICORFLG=',ICORFLG                 &
+ ,'IUGFORCE=',IUGFORCE               &
  ,'IBND=',IBND                       &
  ,'JBND=',JBND                       &
  ,'LSFLG=',LSFLG                     &
  ,'NFPT=',NFPT                       &
+ ,'ISNDRAD=',ISNDRAD                 &
  ,'ISWRTYP=',ISWRTYP                 &
  ,'ILWRTYP=',ILWRTYP                 &
  ,'LONRAD=',LONRAD                   &
@@ -481,6 +501,7 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'NVEGPAT=',NVEGPAT                 &
  ,'ISFCL=',ISFCL                     &
  ,'IFREESLIP=',IFREESLIP             &
+ ,'ICHARNOCK=',ICHARNOCK             &
  ,'IKPP=',IKPP                       &
  ,'NKPPZ=',NKPPZ                     &
  ,'KPPITERMAX=',KPPITERMAX           &
@@ -518,6 +539,7 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'IRIME=',IRIME                     &
  ,'IPLAWS=',IPLAWS                   &
  ,'ISEDIM=',ISEDIM                   &
+ ,'IKERNELA=',IKERNELA               &
  ,'ICLOUD=',ICLOUD                   &
  ,'IDRIZ=',IDRIZ                     &
  ,'IRAIN=',IRAIN                     &
@@ -546,6 +568,7 @@ WRITE(6,'(100(3(A19,I5)/))')         &
  ,'ITSFLG=',ITSFLG                   &
  ,'IRTSFLG=',IRTSFLG                 &
  ,'IUSFLG=',IUSFLG                   &
+ ,'IO3FLG=',IO3FLG                   &
  ,'IMPL=',IMPL
 
 PRINT*, ' '
@@ -555,6 +578,7 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'DELTAX=',DELTAX                   &
  ,'DELTAZ=',DELTAZ                   &
  ,'DZRAT=',DZRAT                     &
+ ,'ZDELAY=',ZDELAY                   &
  ,'DZMAX=',DZMAX                     &
  ,'DTLONG=',DTLONG                   &
  ,'POLELAT=',POLELAT                 &
@@ -568,6 +592,7 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'Z0FACT=',Z0FACT                   &
  ,'CPHAS=',CPHAS                     &
  ,'DISTIM=',DISTIM                   &
+ ,'DIVLS=',DIVLS                     &
  ,'RADFRQ=',RADFRQ                   &
  ,'CONFRQ=',CONFRQ                   &
  ,'FRQKPP=',FRQKPP                   &
@@ -579,7 +604,8 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'UBMN_KPP=',UBMN_KPP               &
  ,'WCLDBS=',WCLDBS                   &
  ,'PCTLCON=',PCTLCON                 &
- ,'ZROUGH=',ZROUGH                   &
+ ,'ZTROUGH=',ZTROUGH                 &
+ ,'ZMROUGH=',ZMROUGH                 &
  ,'ALBEDO=',ALBEDO                   &
  ,'SEATMP=',SEATMP                   &
  ,'DTHCON=',DTHCON                   &
@@ -609,6 +635,7 @@ WRITE(6,'(100(3(A15,E11.4)/))')      &
  ,'CIN_MAX=',CIN_MAX                 &
  ,'CCN1_MAX=',CCN1_MAX               &
  ,'CCN2_MAX=',CCN2_MAX               &
+ ,'CCN3_MAX=',CCN3_MAX               &
  ,'DUST1_MAX=',DUST1_MAX             &
  ,'DUST2_MAX=',DUST2_MAX             &
  ,'ABC1_MAX=',ABC1_MAX               &
@@ -645,6 +672,7 @@ WRITE(6,609) ' ',trim(NDVIFPFX)
 WRITE(6,610) ' ',trim(DUSTFILE)
 WRITE(6,611) ' ',trim(SIBFILE)
 WRITE(6,612) ' ',trim(HUCMFILE)
+WRITE(6,613) ' ',trim(RRTMFILE)
 601  FORMAT(A1,'  ITOPTFN=',A40,999(A1,/,11X,A40))
 602  FORMAT(A1,'   ISSTFN=',A40,999(A1,/,11X,A40))
 603  FORMAT(A1,'  IVEGTFN=',A40,999(A1,/,11X,A40))
@@ -656,6 +684,7 @@ WRITE(6,612) ' ',trim(HUCMFILE)
 610  FORMAT(A1,' DUSTFILE=',A)
 611  FORMAT(A1,'  SIBFILE=',A)
 612  FORMAT(A1,' HUCMFILE=',A)
+613  FORMAT(A1,' RRTMFILE=',A)
 
 PRINT*, ' '
 WRITE(6,701)EXPNME
@@ -691,9 +720,9 @@ write(6,1301)(gnu(k),k=1,8)
 
 PRINT*, ' '
 WRITE(6,*)'IAERO_CHEM    AERO_EPSILON    AERO_MEDRAD-(default)'
-WRITE(6,*)'(category)     (fraction)      (microns)'
-WRITE(6,1404)(iaero_chem(K),aero_epsilon(K),aero_medrad(K)*1.e6,K=1,aerocat)
-1404  FORMAT(I6,F17.3,F16.2)
+WRITE(6,*)'(category)     (fraction)      (nanometers)'
+WRITE(6,1404)(iaero_chem(K),aero_epsilon(K),aero_medrad(K)*1.e9,K=1,aerocat)
+1404  FORMAT(I6,F17.3,F16.1)
 
 PRINT*, ' '
 

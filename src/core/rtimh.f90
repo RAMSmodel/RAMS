@@ -45,9 +45,9 @@ real, dimension(mzp,mxp,myp) :: thvlast
 
 !------------------------------------------------------------------------------
 !  Radiation parameterization
-!  If running Harrington radiation, this radiation call only updates
+!  If running Harrington, BUGSRAD, or RTE-RRTMGP radiation, this radiation call only updates
 !  theta-il tendency, zeros out fthrd, runs radprep and then mclatchy.
-!  Actual Harrinton call done from microphysics driver for Level=3 micro.
+!  Actual radiation call done from microphysics driver for Level=3 micro.
 !  For Chen-Cotton or Mahrer-Pielke radiation options, the radiation
 !  physics is done at this point. It updates the tendency but does not
 !  apply it until the following timestep. Updates fluxes needed for 

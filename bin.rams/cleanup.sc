@@ -1,3 +1,3 @@
 #!/bin/bash
-rm -f *.mod rams rams*.a
-rm -fr testrun.output
+rm -f *.mod rams rams-*
+rm -fr testsupercell.output

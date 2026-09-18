@@ -1137,9 +1137,13 @@ if (mod(time+0.001,frqstate(ngrid)) < dtlt .or. istp == 1) then
          micro_g(ngrid)%latheatfrzt = 0.
          micro_g(ngrid)%nucicert = 0.
          micro_g(ngrid)%nucicect = 0.
+         micro_g(ngrid)%inuchomrt = 0.
+         micro_g(ngrid)%inuchomct = 0.
+         micro_g(ngrid)%inucifnrt = 0.
+         micro_g(ngrid)%inucifnct = 0.
          micro_g(ngrid)%vapicet = 0.
          micro_g(ngrid)%melticet = 0.
-         micro_g(ngrid)%rain2icet = 0.
+         micro_g(ngrid)%rimeraint = 0.
          micro_g(ngrid)%aggregatet = 0.
          micro_g(ngrid)%rimecldt = 0.
       endif
@@ -1148,28 +1152,24 @@ if (mod(time+0.001,frqstate(ngrid)) < dtlt .or. istp == 1) then
       micro_g(ngrid)%vapcldt = 0.
       micro_g(ngrid)%vapraint = 0.
       if (iceprocs == 1) then
-         micro_g(ngrid)%inuchomrt = 0.
-         micro_g(ngrid)%inuchomct = 0.
-         micro_g(ngrid)%inucifnrt = 0.
-         micro_g(ngrid)%inucifnct = 0.
          if (ipris > 0) micro_g(ngrid)%vapprist = 0.
          if (ipris > 0) micro_g(ngrid)%vapsnowt = 0.
          micro_g(ngrid)%vapaggrt = 0.
          if (igraup > 0) micro_g(ngrid)%vapgraut = 0.
          if (ihail > 0) micro_g(ngrid)%vaphailt = 0.
-         if (ipris > 0) micro_g(ngrid)%meltprist = 0.
-         if (ipris > 0) micro_g(ngrid)%meltsnowt = 0.
-         micro_g(ngrid)%meltaggrt = 0.
-         if (igraup > 0) micro_g(ngrid)%meltgraut = 0.
-         if (ihail > 0) micro_g(ngrid)%melthailt = 0.
+         if (ipris > 0) micro_g(ngrid)%meltpristhmt = 0.
+         if (ipris > 0) micro_g(ngrid)%meltsnowthmt = 0.
+         micro_g(ngrid)%meltaggrthmt = 0.
+         if (igraup > 0) micro_g(ngrid)%meltgrauthmt = 0.
+         if (ihail > 0) micro_g(ngrid)%melthailthmt = 0.
          if (ipris > 0) micro_g(ngrid)%rimecldsnowt = 0.
          micro_g(ngrid)%rimecldaggrt = 0.
          if (igraup > 0) micro_g(ngrid)%rimecldgraut = 0.
          if (ihail > 0) micro_g(ngrid)%rimecldhailt = 0.
-         if (ipris > 0) micro_g(ngrid)%rain2snt = 0.
-         micro_g(ngrid)%rain2agt = 0.
-         if (igraup > 0) micro_g(ngrid)%rain2grt = 0.
-         if (ihail > 0) micro_g(ngrid)%rain2hat = 0.
+         if (ipris > 0) micro_g(ngrid)%rimerainsnowt = 0.
+         micro_g(ngrid)%rimerainaggrt = 0.
+         if (igraup > 0) micro_g(ngrid)%rimeraingraut = 0.
+         if (ihail > 0) micro_g(ngrid)%rimerainhailt = 0.
       endif
    endif 
 endif

@@ -162,7 +162,11 @@ else
    zmn(1,1) = 0.
    zmn(2,1) = deltaz
    do k = 3,nnzp(1)
-   dzr = dzrat
+   if (zmn(k-1,1)<zdelay) then
+      dzr = 1.
+   else
+      dzr = dzrat
+   endif
    if (nestz < -1 ) then
       if( k > kpm(2,nestza) .and.  &
           k <= kpm(nnzp(nestza)-1,nestza) .and.  &

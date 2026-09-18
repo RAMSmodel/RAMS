@@ -2,6 +2,7 @@
 Subroutine sfc_driver (mzp,mxp,myp,ia,iz,ja,jz)
 
 use mem_all
+use rconstants
 
 implicit none
 
@@ -13,9 +14,19 @@ if (nstbot == 0) return
 
 ng=ngrid
 
-CALL leaf3_sib (mzp,mxp,myp,nzg,nzs,npatch,ia,iz,ja,jz      &
-   ,leaf_g (ng), basic_g (ng), turb_g (ng), radiate_g(ng)   &
-   ,grid_g (ng), cuparm_g(ng), micro_g(ng), sib_g(ng))
+if (isfcl <=2 ) then
+   CALL leaf3_sib (mzp,mxp,myp,nzg,nzs,npatch,ia,iz,ja,jz      &
+      ,leaf_g (ng), basic_g (ng), turb_g (ng), radiate_g(ng)   &
+      ,grid_g (ng), cuparm_g(ng), micro_g(ng), sib_g(ng))
+else
+  radiate_g(ng)%albedt(:,:) = albedo
+  radiate_g(ng)%rlongup(:,:) = 0.98 * stefan * seatmp**4. + 0.02 * radiate_g(ng)%rlong(:,:)
+  turb_g(ng)%sflux_u(:,:) = 0.
+  turb_g(ng)%sflux_v(:,:) = 0.
+  turb_g(ng)%sflux_w(:,:) = 0.
+  turb_g(ng)%sflux_t(:,:) = dthcon/cp
+  turb_g(ng)%sflux_r(:,:) = drtcon/alvl
+endif
 
 return
 END SUBROUTINE sfc_driver
@@ -27,6 +38,7 @@ Subroutine leaf3_sib (m1,m2,m3,mzg,mzs,np,ia,iz,ja,jz   &
 use mem_all
 use leaf_coms
 use rconstants
+use ref_sounding, only:forc_time, forc_ts
 
 implicit none
 
@@ -45,6 +57,8 @@ real, allocatable, dimension(:,:) :: ths2,rvs2,pis2,dens2,ups2,vps2,zts2
 integer :: i,j,ip,iter_leaf,runstars
 integer :: jday,oyr,omn,ody,otm
 integer, external :: julday
+integer :: it1, it2 !only for iupdsst = 2
+real :: newsst !only for iupdsst = 2
 real,external :: rslif
 
 ! SIB2 - temporary diagnostic/output SIB2 variables
@@ -62,8 +76,19 @@ allocate(ths2(m2,m3),rvs2(m2,m3),pis2(m2,m3),dens2(m2,m3) &
 ! Time interpolation factor for updating SST
 if (iupdsst == 0) then
    timefac_sst = 0.
-else
+elseif (iupdsst == 1) then
    timefac_sst = (time-ssttime1(ngrid)) / (ssttime2(ngrid)-ssttime1(ngrid))
+else
+   it1 = findloc(time-forc_time >= 0, .TRUE., DIM=1, BACK=.TRUE.) 
+   if (time - forc_time(it1) == 0.) then
+      newsst = forc_ts(it1) - 273.15
+   else
+      it2 = it1 + 1
+      if (it2>size(forc_time)) stop "No future SST for IUPDSST = 2"
+      timefac_sst = (time - forc_time(it1))/(forc_time(it2)-forc_time(it1))
+      newsst = forc_ts(it1) + (forc_ts(it2) - forc_ts(it1)) * timefac_sst 
+      newsst = newsst - 273.15
+   endif
 endif
 
 ! Define LEAF3 and canopy time-split timesteps here.  This ensures that LEAF3
@@ -130,10 +155,14 @@ do j = ja,jz
 ! If KPP is running, then KPP will update the SST / water-internal-energy.
 ! Note however that KPP may not be run every timestep and thus may only
 ! update SST/water-internal-energy at its timesteps.
-  if(IKPP==0)then
-   leaf%soil_energy(mzg,i,j,1) = 334000.  &
-     + 4186. * (leaf%seatp(i,j) + (leaf%seatf(i,j) - leaf%seatp(i,j)) &
-     * timefac_sst - 273.15)
+  if (IKPP==0)then
+     if (iupdsst<=1) then
+        leaf%soil_energy(mzg,i,j,1) = 334000.  &
+          + 4186. * (leaf%seatp(i,j) + (leaf%seatf(i,j) - leaf%seatp(i,j)) &
+          * timefac_sst - 273.15)
+     else
+        leaf%soil_energy(mzg,i,j,1) = 334000. + 4186. * newsst
+     endif
   endif
 
 ! Fill surface precipitation arrays for input
@@ -232,16 +261,26 @@ do j = ja,jz
    if (ip == 1) then
 
       leaf%ground_rsat(i,j,ip) = rslif(prss,tempk(mzg))   
-      leaf%patch_rough(i,j,ip)  &
+      if (ip == 1 .and. icharnock == 1) then
+         leaf%patch_rought(i,j,ip)  &
                   = max(z0fac_water * leaf%ustar(i,j,ip) ** 2,.0001)
-
+         leaf%patch_roughm(i,j,ip)  &
+                  = max(z0fac_water * leaf%ustar(i,j,ip) ** 2,.0001)
+      else
+         leaf%patch_rought(i,j,ip) = ztrough
+         leaf%patch_roughm(i,j,ip) = zmrough
+      endif
    elseif (isfcl>=1) then
 
       if(isfcl==2) snowfac = &
        min(.99, leaf%sfcwater_depth(1,i,j,ip) / max(.001,leaf%veg_height(i,j,ip)))
 
       if (leaf%patch_area(i,j,ip) >= .009) then
-        leaf%patch_rough(i,j,ip)   &
+        leaf%patch_rought(i,j,ip)   &
+                     = max(grid%topzo(i,j),leaf%soil_rough(i,j,ip)  &
+                        ,leaf%veg_rough(i,j,ip)) * (1. - snowfac)   &
+                         + snowrough * snowfac
+        leaf%patch_roughm(i,j,ip)   &
                      = max(grid%topzo(i,j),leaf%soil_rough(i,j,ip)  &
                         ,leaf%veg_rough(i,j,ip)) * (1. - snowfac)   &
                          + snowrough * snowfac
@@ -288,7 +327,8 @@ do j = ja,jz
    if(runstars==1) &
     CALL stars (leaf%ustar(i,j,ip),leaf%tstar(i,j,ip)  &
         ,leaf%rstar(i,j,ip),ths,rvs,thetacan,leaf%can_rvap(i,j,ip)  &
-        ,zts,leaf%patch_rough(i,j,ip),vels_pat,dtllohcc,dens,dtlt)
+        ,zts,leaf%patch_rought(i,j,ip),leaf%patch_roughm(i,j,ip)    &
+        ,vels_pat,dtllohcc,dens,dtlt)
 
 ! For water patches, update temperature and moisture of "canopy" from
 ! divergence of fluxes with water surface and atmosphere.  rdi = ustar/5

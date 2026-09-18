@@ -257,9 +257,11 @@ if (ip == 1) then
    rlongup = rlongup + patch_area * stefan * tempk(mzg) ** 4
          
 elseif (isfcl == 0) then
-
+!Adele - soil/water emissivity is set to 0.98 in LEAF for all soil types
+!Let's continue to use 0.98 even if ISFCL = 0
    albedt = albedt + patch_area * albedo
-   rlongup = rlongup + patch_area * stefan * can_temp ** 4
+   rlongup = rlongup + 0.98 * patch_area * stefan * can_temp ** 4 &
+                     + 0.02 * patch_area * rlong
 
 else
 

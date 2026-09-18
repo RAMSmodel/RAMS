@@ -139,3 +139,33 @@ deallocate(zttopt)
 return
 END SUBROUTINE new_base_state
 
+!#######################################################################
+Subroutine update_base_winds()
+
+use ref_sounding
+use node_mod, only:mmzp
+use mem_grid, only:ztn,ngrid,time
+
+implicit none
+
+integer :: it1, it2,nlev
+real :: timefac
+real, dimension(size(ug,1)) :: newug, newvg
+
+nlev = size(ug,1)
+it1 = findloc(time-forc_time >= 0, .TRUE., DIM=1, BACK=.TRUE.) 
+if (time - forc_time(it1) == 0.) then
+   CALL htint(nlev,ug(:,it1),forc_lev,mmzp(ngrid),u01dn(:,ngrid),ztn(:,ngrid) )
+   CALL htint(nlev,vg(:,it1),forc_lev,mmzp(ngrid),v01dn(:,ngrid),ztn(:,ngrid) )
+else
+   it2 = it1 + 1
+   if (it2>size(forc_time)) stop "No future UG/VG for GEOSTROPHIC WIND FORCING"
+   timefac = (time - forc_time(it1))/(forc_time(it2)-forc_time(it1))
+   newug = ug(:,it1) + (ug(:,it2) - ug(:,it1)) * timefac 
+   newvg = vg(:,it1) + (vg(:,it2) - vg(:,it1)) * timefac 
+
+   CALL htint(nlev,newug,forc_lev,mmzp(ngrid),u01dn(:,ngrid),ztn(:,ngrid) )
+   CALL htint(nlev,newvg,forc_lev,mmzp(ngrid),v01dn(:,ngrid),ztn(:,ngrid) )
+endif
+
+END SUBROUTINE update_base_winds

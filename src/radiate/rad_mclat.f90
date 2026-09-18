@@ -30,6 +30,7 @@ real :: zwt
 data latind/1,1,2,3,4,5,5,6,7,8,9/
 data slat/-90.,-70.,-60.,-45.,-25.,-15.,15.,25.,45.,60.,70.,90./
 
+!   hgt,   press,     T(K),     water vap,   ozone,    density
 !  arctic winter
 data ((mcdat(ilev,1,ifld),ifld=1,6),ilev=1,11)/  &
        0., 101350.0,    249.1,  .1201E-02,  .4105E-07,  .1417E+01,  &

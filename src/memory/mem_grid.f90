@@ -57,7 +57,7 @@ implicit none
    integer,dimension(maxgrds) :: memgrd
 
    !-------------------------------------------------------------------------------
-   real                     :: time,ztop,dzrat,dzmax
+   real                     :: time,ztop,dzrat,dzmax,zdelay
    integer                  :: impl,iyear1,imonth1,idate1,ihour1  &
                               ,itime1,nacoust,initial,initorig,iflag,hrestart
    integer, dimension(maxgrds) :: nnacoust                              

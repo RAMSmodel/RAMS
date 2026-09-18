@@ -5,6 +5,7 @@ Subroutine rams_node ()
   use node_mod
   use micphys, only:idiffperts,iconv
   use kpp_parameters, only:IKPP
+  use ref_sounding, only:iugforce
 
   implicit none
 
@@ -36,6 +37,12 @@ Subroutine rams_node ()
     ! Examine Courant numbers in case model needs to be stopped or
     CALL dtset ()
 
+!----------------------------------------------------------------------------
+!   Update base state winds if doing geostrophic wind forcing
+!----------------------------------------------------------------------------
+    if(iugforce==2)then
+      CALL update_base_winds()
+    endif
 !----------------------------------------------------------------------------
 !   Compute new "temporary base state" for THP and RTP for diffusing
 !   perturbations from the mean state at current time.

@@ -12,6 +12,8 @@ integer :: iphdf5
 character(len=*) :: inout
 type (hdf5_select_type) :: mem_select,file_select
 integer, dimension(HDF5_MAX_DIMS) :: file_chunks
+! this will always be 0 for ISAN
+real(kind=4):: zfp_accuracy
 
 if(inout == 'IN') THEN
 
@@ -110,19 +112,19 @@ if(inout == 'OUT') then
    ! scalar values
    CALL shdf5_set_hs_select (1,'W',igrid,mem_select,file_select,file_chunks)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_year',mem_select,file_select  &
-                   ,file_chunks,ivars=iyear)
+                   ,file_chunks, zfp_accuracy,ivars=iyear)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_month',mem_select,file_select &
-                   ,file_chunks,ivars=imonth)
+                   ,file_chunks, zfp_accuracy,ivars=imonth)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_date',mem_select,file_select  &
-                   ,file_chunks,ivars=idate)
+                   ,file_chunks, zfp_accuracy,ivars=idate)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_hour',mem_select,file_select  &
-                   ,file_chunks,ivars=ihour)
+                   ,file_chunks, zfp_accuracy,ivars=ihour)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_nx',mem_select,file_select    &
-                   ,file_chunks,ivars=n1)
+                   ,file_chunks, zfp_accuracy,ivars=n1)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_ny',mem_select,file_select    &
-                   ,file_chunks,ivars=n2)
+                   ,file_chunks, zfp_accuracy,ivars=n2)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_nisn',mem_select,file_select  &
-                   ,file_chunks,ivars=nisn)
+                   ,file_chunks, zfp_accuracy,ivars=nisn)
 
    ! Vector, length is nisn 
    ! To indicate to shdf5_set_h5_select that the variable is a vector of
@@ -130,73 +132,73 @@ if(inout == 'OUT') then
    CALL shdf5_set_hs_select (-nisn,'W',igrid,mem_select,file_select &
                             ,file_chunks)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_levth',mem_select,file_select &
-                   ,file_chunks,ivara=levth)
+                   ,file_chunks, zfp_accuracy,ivara=levth)
 
    npts=n1*n2*nisn
    ! ISAN 3D isentropic variables
    CALL shdf5_set_hs_select (8,'W',igrid,mem_select,file_select,file_chunks)
    CALL vmissw (pi_u,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_u',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (pi_v,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_v',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (pi_p,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_p',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (pi_s,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_s',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (pi_r,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'isen_r',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
 
    npts=n1*n2
    ! ISAN 2D variables
    CALL shdf5_set_hs_select (2,'W',igrid,mem_select,file_select,file_chunks)
    CALL vmissw (rs_u,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_u',mem_select,file_select    &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_v,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_v',mem_select,file_select    &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_p,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_p',mem_select,file_select    &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_t,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_t',mem_select,file_select    &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_r,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_r',mem_select,file_select    &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_s,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_s',mem_select,file_select    &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_top,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_topo',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_qual,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_qual',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    
    CALL vmissw (rs_soilmoist1,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_soilmoist1',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_soilmoist2,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_soilmoist2',mem_select,file_select &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_soiltemp1,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_soiltemp1',mem_select,file_select  &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_soiltemp2,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_soiltemp2',mem_select,file_select  &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_snowmass,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_snowmass',mem_select,file_select   &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
    CALL vmissw (rs_snowdepth,npts,pi_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sfc_snowdepth',mem_select,file_select  &
-                   ,file_chunks,rvara=pi_scra)
+                   ,file_chunks, zfp_accuracy,rvara=pi_scra)
 
    print 201,' *****  Isentropic file written *************'  &
         ,iyear,imonth,idate,ihour,n1,n2,nisn  &
@@ -227,6 +229,7 @@ integer :: iphdf5
 character(len=*) :: inout
 type (hdf5_select_type) :: mem_select,file_select
 integer, dimension(HDF5_MAX_DIMS) :: file_chunks
+real(kind=4):: zfp_accuracy = 0
 
 if(inout == 'IN') then
 
@@ -286,7 +289,7 @@ if(inout == 'OUT') then
    CALL shdf5_set_hs_select (1,'W',igrid,mem_select,file_select &
                             ,file_chunks)
    CALL shdf5_orec (h5_fid,iphdf5,'sigz_nsigz',mem_select,file_select &
-                   ,file_chunks,ivars=nsigz)
+                   ,file_chunks, zfp_accuracy,ivars=nsigz)
 
    ! Vector, length is nsigz.
    ! To indicate to shdf5_set_h5_select that the variable is a vector of
@@ -294,7 +297,7 @@ if(inout == 'OUT') then
    CALL shdf5_set_hs_select (-nsigz,'R',igrid,mem_select,file_select &
                             ,file_chunks)
    CALL shdf5_orec (h5_fid,iphdf5,'sigz_sigz',mem_select,file_select &
-                   ,file_chunks,rvara=sigz)
+                   ,file_chunks, zfp_accuracy,rvara=sigz)
 
    npts=n1*n2*nsigz
    ! ISAN 3D sigma-z variables
@@ -302,19 +305,19 @@ if(inout == 'OUT') then
                             ,file_chunks)
    CALL vmissw (ps_u,npts,ps_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sigz_u',mem_select,file_select &
-                   ,file_chunks,rvara=ps_scra)
+                   ,file_chunks, zfp_accuracy,rvara=ps_scra)
    CALL vmissw (ps_v,npts,ps_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sigz_v',mem_select,file_select &
-                   ,file_chunks,rvara=ps_scra)
+                   ,file_chunks, zfp_accuracy,rvara=ps_scra)
    CALL vmissw (ps_p,npts,ps_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sigz_p',mem_select,file_select &
-                   ,file_chunks,rvara=ps_scra)
+                   ,file_chunks, zfp_accuracy,rvara=ps_scra)
    CALL vmissw (ps_t,npts,ps_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sigz_t',mem_select,file_select &
-                   ,file_chunks,rvara=ps_scra)
+                   ,file_chunks, zfp_accuracy,rvara=ps_scra)
    CALL vmissw (ps_r,npts,ps_scra,1E30,-9999.)
    CALL shdf5_orec (h5_fid,iphdf5,'sigz_r',mem_select,file_select &
-                   ,file_chunks,rvara=ps_scra)
+                   ,file_chunks, zfp_accuracy,rvara=ps_scra)
 
    print 201,' *****  Sigma-z file written *************'  &
         ,iyear,imonth,idate,ihour,n1,n2,nsigz   &

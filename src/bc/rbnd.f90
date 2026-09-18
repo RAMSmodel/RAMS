@@ -488,9 +488,12 @@ atau=max(bctau(ngrid),dtlt) !prevent from being less than dtlt
 if(iaerolbc(ngrid)==1)then
  if( ((sname == 'CIFNP') .and. &
        (jnmb(3)>=5 .and. (iifn==1.or.iifn==2))) .or. &
-     ((sname == 'CN1NP' .or. sname == 'CN1MP' .or. &
-       sname == 'CN2NP' .or. sname == 'CN2MP') .and. &
-       iaerosol==1) .or. &
+     ((sname == 'CN1NP' .or. sname == 'CN1MP') .and. &
+       iaerosol>=1) .or. &
+     ((sname == 'CN2NP' .or. sname == 'CN2MP') .and. &
+       iaerosol>=2) .or. &
+     ((sname == 'CN3NP' .or. sname == 'CN3MP') .and. &
+       iaerosol>=3) .or. &
      ((sname == 'MD1NP' .or. sname == 'MD1MP' .or. &
        sname == 'MD2NP' .or. sname == 'MD2MP') .and. &
        idust==1) .or. &
@@ -500,7 +503,10 @@ if(iaerolbc(ngrid)==1)then
      ((sname == 'SALT_FILM_NP' .or. sname == 'SALT_FILM_MP' .or. &
        sname == 'SALT_JET_NP'  .or. sname == 'SALT_JET_MP'  .or. &
        sname == 'SALT_SPUM_NP' .or. sname == 'SALT_SPUM_MP') .and. &
-       isalt==1) ) then
+       isalt==1) .or. & 
+     ((sname == 'REGEN_AERO1_NP' .or. sname == 'REGEN_AERO1_MP' .or. &
+       sname == 'REGEN_AERO2_NP' .or. sname == 'REGEN_AERO2_MP') .and. &
+       iccnlev==2) ) then
     setlbcinit=1
  endif
 endif
@@ -525,6 +531,7 @@ if (ibnd_thisgrid .ne. 2 .and. vnam .ne. 'U' .and. lsflg_thisgrid .ne. 3) then
             do k = 1,m1
                if(setlbcinit==1) then
                 ap(k,ia,j) = ap(k,ia,j)+(ap(k,lbw,j)-ap(k,ia,j))*(dtlt/atau)
+                ap(k,ia+1,j) = ap(k,ia+1,j)+(ap(k,lbw,j)-ap(k,ia+1,j))*(dtlt/(atau*2.))
                endif
                ap(k,lbw,j) = ap(k,ia,j)
             enddo
@@ -535,6 +542,7 @@ if (ibnd_thisgrid .ne. 2 .and. vnam .ne. 'U' .and. lsflg_thisgrid .ne. 3) then
             do k = 1,m1
                if(setlbcinit==1) then
                 ap(k,iz,j) = ap(k,iz,j)+(ap(k,lbe,j)-ap(k,iz,j))*(dtlt/atau)
+                ap(k,iz-1,j) = ap(k,iz-1,j)+(ap(k,lbe,j)-ap(k,iz-1,j))*(dtlt/(atau*2.))
                endif
                ap(k,lbe,j) = ap(k,iz,j)
             enddo
@@ -582,6 +590,7 @@ if (ibnd_thisgrid .ne. 2 .and. vnam .ne. 'U' .and. lsflg_thisgrid .ne. 3) then
                if (temp_v1(k) .ge. thresh) then
                   if(setlbcinit==1) then
                    ap(k,ia,j) = ap(k,ia,j)+(ap(k,lbw,j)-ap(k,ia,j))*(dtlt/atau)
+                   ap(k,ia+1,j) = ap(k,ia+1,j)+(ap(k,lbw,j)-ap(k,ia+1,j))*(dtlt/(atau*2.))
                    ap(k,lbw,j) = ap(k,ia,j)
                   else !radiative BC
                    ap(k,lbw,j) = temp_v2(k)
@@ -589,6 +598,7 @@ if (ibnd_thisgrid .ne. 2 .and. vnam .ne. 'U' .and. lsflg_thisgrid .ne. 3) then
                elseif (lsflg_thisgrid .eq. 1) then
                   if(setlbcinit==1) then
                    ap(k,ia,j) = ap(k,ia,j)+(ap(k,lbw,j)-ap(k,ia,j))*(dtlt/atau)
+                   ap(k,ia+1,j) = ap(k,ia+1,j)+(ap(k,lbw,j)-ap(k,ia+1,j))*(dtlt/(atau*2.))
                   endif
                   ap(k,lbw,j) = ap(k,ia,j)
                endif
@@ -636,6 +646,7 @@ if (ibnd_thisgrid .ne. 2 .and. vnam .ne. 'U' .and. lsflg_thisgrid .ne. 3) then
                if (temp_v1(k) .ge. thresh) then
                   if(setlbcinit==1) then
                    ap(k,iz,j) = ap(k,iz,j)+(ap(k,lbe,j)-ap(k,iz,j))*(dtlt/atau)
+                   ap(k,iz-1,j) = ap(k,iz-1,j)+(ap(k,lbe,j)-ap(k,iz-1,j))*(dtlt/(atau*2.))
                    ap(k,lbe,j) = ap(k,iz,j)
                   else !radiative BC
                    ap(k,lbe,j) = temp_v2(k)
@@ -643,6 +654,7 @@ if (ibnd_thisgrid .ne. 2 .and. vnam .ne. 'U' .and. lsflg_thisgrid .ne. 3) then
                elseif (lsflg_thisgrid .eq. 1) then
                   if(setlbcinit==1) then
                    ap(k,iz,j) = ap(k,iz,j)+(ap(k,lbe,j)-ap(k,iz,j))*(dtlt/atau)
+                   ap(k,iz-1,j) = ap(k,iz-1,j)+(ap(k,lbe,j)-ap(k,iz-1,j))*(dtlt/(atau*2.))
                   endif
                   ap(k,lbe,j) = ap(k,iz,j)
                endif
@@ -662,6 +674,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg_thisgrid.ne.3)then
            do k = 1,m1
               if(setlbcinit==1) then
                ap(k,i,ja) = ap(k,i,ja)+(ap(k,i,lbs)-ap(k,i,ja))*(dtlt/atau)
+               ap(k,i,ja+1) = ap(k,i,ja+1)+(ap(k,i,lbs)-ap(k,i,ja+1))*(dtlt/(atau*2.))
               endif
               ap(k,i,lbs) = ap(k,i,ja)
            enddo
@@ -672,6 +685,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg_thisgrid.ne.3)then
            do k = 1,m1
               if(setlbcinit==1) then
                ap(k,i,jz) = ap(k,i,jz)+(ap(k,i,lbn)-ap(k,i,jz))*(dtlt/atau)
+               ap(k,i,jz-1) = ap(k,i,jz-1)+(ap(k,i,lbn)-ap(k,i,jz-1))*(dtlt/(atau*2.))
               endif
               ap(k,i,lbn) = ap(k,i,jz)
            enddo
@@ -719,6 +733,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg_thisgrid.ne.3)then
               if (temp_v1(k) .ge. thresh) then
                  if(setlbcinit==1) then
                   ap(k,i,ja) = ap(k,i,ja)+(ap(k,i,lbs)-ap(k,i,ja))*(dtlt/atau)
+                  ap(k,i,ja+1) = ap(k,i,ja+1)+(ap(k,i,lbs)-ap(k,i,ja+1))*(dtlt/(atau*2.))
                   ap(k,i,lbs) = ap(k,i,ja)                
                  else !radiative BC
                   ap(k,i,lbs) = temp_v2(k)
@@ -726,6 +741,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg_thisgrid.ne.3)then
               elseif (lsflg_thisgrid .eq. 1) then
                  if(setlbcinit==1) then
                   ap(k,i,ja) = ap(k,i,ja)+(ap(k,i,lbs)-ap(k,i,ja))*(dtlt/atau)
+                  ap(k,i,ja+1) = ap(k,i,ja+1)+(ap(k,i,lbs)-ap(k,i,ja+1))*(dtlt/(atau*2.))
                  endif
                  ap(k,i,lbs) = ap(k,i,ja)
               endif
@@ -773,6 +789,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg_thisgrid.ne.3)then
               if (temp_v1(k) .ge. thresh) then
                  if(setlbcinit==1) then
                   ap(k,i,jz) = ap(k,i,jz)+(ap(k,i,lbn)-ap(k,i,jz))*(dtlt/atau)
+                  ap(k,i,jz-1) = ap(k,i,jz-1)+(ap(k,i,lbn)-ap(k,i,jz-1))*(dtlt/(atau*2.))
                   ap(k,i,lbn) = ap(k,i,jz)
                  else !radiative BC
                   ap(k,i,lbn) = temp_v2(k)
@@ -780,6 +797,7 @@ if(jdim.eq.1.and.jbnd.ne.2.and.vnam.ne.'V'.and.lsflg_thisgrid.ne.3)then
               elseif (lsflg_thisgrid .eq. 1) then
                  if(setlbcinit==1) then
                   ap(k,i,jz) = ap(k,i,jz)+(ap(k,i,lbn)-ap(k,i,jz))*(dtlt/atau)
+                  ap(k,i,jz-1) = ap(k,i,jz-1)+(ap(k,i,lbn)-ap(k,i,jz-1))*(dtlt/(atau*2.))
                  endif
                  ap(k,i,lbn) = ap(k,i,jz)
               endif
